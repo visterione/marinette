@@ -1,0 +1,1537 @@
+[PROJECT STRUCTURE]
+project/
+    - assets/
+        - i18n/
+            - en.json
+            - uk.json
+    - lib/
+        - app/
+            - core/
+                - theme/
+                - utils/
+                    - app_navigation.dart
+                    - custom_page_route.dart
+                    - page_transitions.dart
+                - values/
+            - data/
+                - models/
+                    - face_analysis_result.dart
+                    - facial_features.dart
+                    - history_screen.dart
+                - services/
+                    - color_type_analyzer.dart
+                    - face_analysis_service.dart
+                    - face_shape_analyzer.dart
+                    - facial_features_analyzer.dart
+                    - result_saver_service.dart
+            - modules/
+                - analysis/
+                    - analysis_result_screen.dart
+                    - loading_screen.dart
+                - camera/
+                    - camera_controller.dart
+                    - camera_screen.dart
+                - history/
+                    - history_screen.dart
+                - home/
+                - recommendations/
+                - shared/
+        - config/
+            - translations/
+                - app_translations.dart
+        - main.dart
+
+[FILE: marinette/pubspec.yaml]
+name: marinette
+description: A mobile app for beauty recommendations based on facial features analysis.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # State Management
+  get: ^4.6.5
+  
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Image Processing & ML
+  google_mlkit_face_detection: ^0.12.0
+  camera: ^0.11.0+2
+  image_picker: ^1.0.4
+  image: ^4.1.3
+  
+  # Utils
+  path_provider: ^2.0.15
+  permission_handler: ^11.3.1
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.6
+  hive_generator: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/i18n/
+
+[FILE: marinette/assets/i18n/en.json]
+{
+  "app_name": "Beauty Recommendations",
+  "take_photo": "Take Photo",
+  "choose_from_gallery": "Choose from Gallery",
+  "analyzing": "Analyzing your photo...",
+  "recommendations": "Recommendations",
+  "face_shape": "Face Shape",
+  "color_type": "Color Type",
+  "makeup_recommendations": "Makeup",
+  "hairstyle_recommendations": "Hairstyle",
+  "skincare_recommendations": "Skincare",
+  "error_no_face": "No face detected. Please try again.",
+  "error_multiple_faces": "Multiple faces detected. Please use a photo with one face.",
+  "error_camera": "Camera error. Please try again.",
+  "error": "Error",
+  "info": "Information",
+  "share_coming_soon": "Sharing feature coming soon!",
+  "analysis_failed": "Failed to analyze photo. Please try again.",
+  "welcome_message": "Take or choose a photo to get personalized beauty recommendations",
+  "history": "History",
+  "no_history": "You don't have any saved results yet",
+  "confirm_delete": "Confirm Deletion",
+  "delete_result_confirmation": "Are you sure you want to delete this result?",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "error_saving_result": "Error saving result",
+  "error_loading_result": "Error loading result",
+  "error_loading_results": "Error loading results",
+  "error_deleting_result": "Error deleting result",
+  "error_sharing": "Error sharing results"
+}
+
+[FILE: marinette/assets/i18n/uk.json]
+{
+  "app_name": "Б'юті-рекомендації",
+  "take_photo": "Зробити фото",
+  "choose_from_gallery": "Вибрати з галереї",
+  "analyzing": "Аналізуємо ваше фото...",
+  "recommendations": "Рекомендації",
+  "face_shape": "Форма обличчя",
+  "color_type": "Кольоротип",
+  "makeup_recommendations": "Макіяж",
+  "hairstyle_recommendations": "Зачіска",
+  "skincare_recommendations": "Догляд за шкірою",
+  "error_no_face": "Обличчя не знайдено. Спробуйте ще раз.",
+  "error_multiple_faces": "Знайдено декілька облич. Використовуйте фото з одним обличчям.",
+  "error_camera": "Помилка камери. Спробуйте ще раз.",
+  "error": "Помилка",
+  "info": "Інформація",
+  "share_coming_soon": "Функція поширення скоро з'явиться!",
+  "analysis_failed": "Не вдалося проаналізувати фото. Спробуйте ще раз.",
+  "welcome_message": "Зробіть або виберіть фото, щоб отримати персоналізовані б'юті-рекомендації",
+  "history": "Історія",
+  "no_history": "У вас ще немає збережених результатів",
+  "confirm_delete": "Підтвердження видалення",
+  "delete_result_confirmation": "Ви впевнені, що хочете видалити цей результат?",
+  "cancel": "Скасувати",
+  "delete": "Видалити",
+  "error_saving_result": "Помилка збереження результату",
+  "error_loading_result": "Помилка завантаження результату",
+  "error_loading_results": "Помилка завантаження результатів",
+  "error_deleting_result": "Помилка видалення результату",
+  "error_sharing": "Помилка під час поширення результатів"
+}
+
+[FILE: marinette/lib/app/core/utils/app_navigation.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class AppNavigation {
+  static Future<T?> navigateTo<T>({
+    required BuildContext context,
+    required Widget page,
+    String? routeName,
+  }) {
+    return Navigator.of(context).push<T>(
+      MaterialPageRoute(
+        builder: (context) => page,
+        settings: RouteSettings(name: routeName ?? page.runtimeType.toString()),
+      ),
+    );
+  }
+
+  static Future<T?> navigateWithSlide<T>({
+    required Widget page,
+    bool fullscreenDialog = false,
+  }) {
+    return Get.to<T>(
+          () => page,
+          transition: Transition.rightToLeft,
+          duration: const Duration(milliseconds: 300),
+          fullscreenDialog: fullscreenDialog,
+        ) ??
+        Future.value(null);
+  }
+
+  static void back<T>([T? result]) {
+    Get.back<T>(result: result);
+  }
+
+  static Future<bool?> showConfirmationDialog({
+    required String title,
+    required String content,
+    String? confirmText,
+    String? cancelText,
+  }) {
+    return Get.dialog<bool>(
+      AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(cancelText ?? 'cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              confirmText ?? 'confirm'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/core/utils/custom_page_route.dart]
+import 'package:flutter/material.dart';
+
+class CustomPageRoute<T> extends PageRoute<T> {
+  final Widget child;
+  @override
+  final RouteSettings settings;
+
+  CustomPageRoute({
+    required this.child,
+    required this.settings,
+  });
+
+  @override
+  Color? get barrierColor => null;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  Widget buildPage(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeInOut,
+      )),
+      child: child,
+    );
+  }
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  bool get opaque => true;
+}
+
+[FILE: marinette/lib/app/core/utils/page_transitions.dart]
+import 'package:flutter/material.dart';
+
+class FadePageRoute extends PageRouteBuilder {
+  final Widget page;
+
+  FadePageRoute({required this.page})
+      : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+}
+
+class SlidePageRoute extends PageRouteBuilder {
+  final Widget page;
+  final SlideDirection direction;
+
+  SlidePageRoute({
+    required this.page,
+    this.direction = SlideDirection.right,
+  }) : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            Offset begin;
+            switch (direction) {
+              case SlideDirection.right:
+                begin = const Offset(1.0, 0.0);
+                break;
+              case SlideDirection.left:
+                begin = const Offset(-1.0, 0.0);
+                break;
+              case SlideDirection.up:
+                begin = const Offset(0.0, 1.0);
+                break;
+              case SlideDirection.down:
+                begin = const Offset(0.0, -1.0);
+                break;
+            }
+
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: begin,
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOut,
+              )),
+              child: child,
+            );
+          },
+        );
+}
+
+enum SlideDirection {
+  right,
+  left,
+  up,
+  down,
+}
+
+[FILE: marinette/lib/app/data/models/face_analysis_result.dart]
+class FaceAnalysisResult {
+  final String faceShape;
+  final String colorType;
+  final List<String> makeupRecommendations;
+  final List<String> hairstyleRecommendations;
+  final List<String> skincareRecommendations;
+
+  FaceAnalysisResult({
+    required this.faceShape,
+    required this.colorType,
+    required this.makeupRecommendations,
+    required this.hairstyleRecommendations,
+    required this.skincareRecommendations,
+  });
+}
+
+[FILE: marinette/lib/app/data/models/facial_features.dart]
+import 'dart:math' show Point;
+
+class FacialFeatures {
+  final double symmetry;
+  final double faceWidth;
+  final double faceHeight;
+  final double jawlineStrength;
+  final double cheekboneProminence;
+  final double foreheadHeight;
+  final List<Point<int>> facialContours;
+
+  FacialFeatures({
+    required this.symmetry,
+    required this.faceWidth,
+    required this.faceHeight,
+    required this.jawlineStrength,
+    required this.cheekboneProminence,
+    required this.foreheadHeight,
+    required this.facialContours,
+  });
+}
+
+[FILE: marinette/lib/app/data/models/history_screen.dart]
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+
+class HistoryScreen extends StatelessWidget {
+  final ResultSaverService _saverService = Get.find<ResultSaverService>();
+
+  HistoryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('history'.tr),
+      ),
+      body: FutureBuilder<List<String>>(
+        future: _saverService.getAllSavedResults(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.history,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'no_history'.tr,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return GridView.builder(
+            padding: const EdgeInsets.all(8),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final imagePath = snapshot.data![index];
+              return _buildHistoryItem(imagePath);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHistoryItem(String imagePath) {
+    return GestureDetector(
+      onTap: () => _openResult(imagePath),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              right: 4,
+              top: 4,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
+                onPressed: () => _deleteResult(imagePath),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openResult(String imagePath) async {
+    final resultData = await _saverService.loadAnalysisResult(imagePath);
+    if (resultData != null) {
+      final result = FaceAnalysisResult(
+        faceShape: resultData['faceShape'],
+        colorType: resultData['colorType'],
+        makeupRecommendations:
+            List<String>.from(resultData['makeupRecommendations']),
+        hairstyleRecommendations:
+            List<String>.from(resultData['hairstyleRecommendations']),
+        skincareRecommendations:
+            List<String>.from(resultData['skincareRecommendations']),
+      );
+
+      Get.to(
+        () => AnalysisResultScreen(
+          imagePath: imagePath,
+          result: result,
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteResult(String imagePath) async {
+    final confirmed = await Get.dialog<bool>(
+      AlertDialog(
+        title: Text('confirm_delete'.tr),
+        content: Text('delete_result_confirmation'.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              'delete'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _saverService.deleteResult(imagePath);
+      // Оновлюємо екран
+      Get.forceAppUpdate();
+    }
+  }
+}
+
+[FILE: marinette/lib/app/data/services/color_type_analyzer.dart]
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:image/image.dart' as img;
+
+enum ColorType {
+  spring,
+  summer,
+  autumn,
+  winter,
+}
+
+class ColorTypeAnalyzer {
+  static Future<ColorType> analyzeColorType(String imagePath, Face face) async {
+    final File imageFile = File(imagePath);
+    final Uint8List bytes = await imageFile.readAsBytes();
+    final img.Image? image = img.decodeImage(bytes);
+
+    if (image == null) return ColorType.spring;
+
+    // Отримуємо область обличчя
+    final left = face.boundingBox.left.round();
+    final top = face.boundingBox.top.round();
+    final width = face.boundingBox.width.round();
+    final height = face.boundingBox.height.round();
+
+    // Вирізаємо область обличчя
+    final faceImage = img.copyCrop(
+      image,
+      x: left < 0 ? 0 : left,
+      y: top < 0 ? 0 : top,
+      width: width,
+      height: height,
+    );
+
+    // Аналізуємо кольори
+    final skinTone = _analyzeSkinTone(faceImage);
+    final undertone = _analyzeUndertone(faceImage);
+
+    return _determineColorType(skinTone, undertone);
+  }
+
+  static _SkinTone _analyzeSkinTone(img.Image faceImage) {
+    int totalPixels = 0;
+    double totalLightness = 0;
+
+    // Аналізуємо яскравість кольору шкіри
+    for (int y = 0; y < faceImage.height; y++) {
+      for (int x = 0; x < faceImage.width; x++) {
+        final pixel = faceImage.getPixel(x, y);
+
+        // Конвертуємо RGB в HSL для аналізу яскравості
+        final lightness = ((pixel.r + pixel.g + pixel.b) / 3) / 255;
+
+        totalLightness += lightness;
+        totalPixels++;
+      }
+    }
+
+    final averageLightness = totalLightness / totalPixels;
+
+    if (averageLightness > 0.7) return _SkinTone.light;
+    if (averageLightness > 0.5) return _SkinTone.medium;
+    return _SkinTone.dark;
+  }
+
+  static _Undertone _analyzeUndertone(img.Image faceImage) {
+    int totalPixels = 0;
+    double totalRed = 0;
+    double totalBlue = 0;
+
+    // Аналізуємо співвідношення червоного і синього
+    for (int y = 0; y < faceImage.height; y++) {
+      for (int x = 0; x < faceImage.width; x++) {
+        final pixel = faceImage.getPixel(x, y);
+        totalRed += pixel.r;
+        totalBlue += pixel.b;
+        totalPixels++;
+      }
+    }
+
+    final redRatio = totalRed / (totalPixels * 255);
+    final blueRatio = totalBlue / (totalPixels * 255);
+
+    if (redRatio > blueRatio * 1.1) return _Undertone.warm;
+    if (blueRatio > redRatio * 1.1) return _Undertone.cool;
+    return _Undertone.neutral;
+  }
+
+  static ColorType _determineColorType(
+      _SkinTone skinTone, _Undertone undertone) {
+    switch (undertone) {
+      case _Undertone.warm:
+        return skinTone == _SkinTone.light
+            ? ColorType.spring
+            : ColorType.autumn;
+      case _Undertone.cool:
+        return skinTone == _SkinTone.light
+            ? ColorType.summer
+            : ColorType.winter;
+      case _Undertone.neutral:
+        return skinTone == _SkinTone.light
+            ? ColorType.summer
+            : ColorType.winter;
+    }
+  }
+}
+
+enum _SkinTone {
+  light,
+  medium,
+  dark,
+}
+
+enum _Undertone {
+  warm,
+  cool,
+  neutral,
+}
+
+[FILE: marinette/lib/app/data/services/face_analysis_service.dart]
+import 'dart:io';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:marinette/app/data/services/face_shape_analyzer.dart';
+import 'package:marinette/app/data/services/color_type_analyzer.dart';
+import 'package:marinette/app/data/services/facial_features_analyzer.dart';
+import 'package:marinette/app/data/models/facial_features.dart';
+
+class FaceAnalysisService extends GetxService {
+  final FaceDetector _faceDetector = FaceDetector(
+    options: FaceDetectorOptions(
+      enableContours: true,
+      enableLandmarks: true,
+      performanceMode: FaceDetectorMode.accurate,
+      enableClassification: true,
+    ),
+  );
+
+  Future<FaceAnalysisResult?> analyzeFace(String imagePath) async {
+    try {
+      final inputImage = InputImage.fromFile(File(imagePath));
+      final faces = await _faceDetector.processImage(inputImage);
+
+      if (faces.isEmpty) {
+        Get.snackbar('error'.tr, 'error_no_face'.tr);
+        return null;
+      }
+
+      if (faces.length > 1) {
+        Get.snackbar('error'.tr, 'error_multiple_faces'.tr);
+        return null;
+      }
+
+      final face = faces.first;
+
+      // Детальний аналіз рис обличчя
+      final facialFeatures = await FacialFeaturesAnalyzer.analyzeFace(face);
+
+      // Визначення форми обличчя з урахуванням детального аналізу
+      final faceShape = _determineFaceShape(facialFeatures);
+
+      // Визначення кольоротипу
+      final colorType =
+          await ColorTypeAnalyzer.analyzeColorType(imagePath, face);
+
+      return FaceAnalysisResult(
+        faceShape: _getFaceShapeName(faceShape),
+        colorType: _getColorTypeName(colorType),
+        makeupRecommendations:
+            _getMakeupRecommendations(faceShape, colorType, facialFeatures),
+        hairstyleRecommendations:
+            _getHairstyleRecommendations(faceShape, facialFeatures),
+        skincareRecommendations: _getSkincareRecommendations(colorType),
+      );
+    } catch (e) {
+      Get.snackbar('error'.tr, 'error_analyzing'.tr);
+      return null;
+    }
+  }
+
+  FaceShape _determineFaceShape(FacialFeatures features) {
+    double ratio = features.faceHeight / features.faceWidth;
+
+    if (ratio > 1.5) {
+      return features.jawlineStrength > 0.7
+          ? FaceShape.rectangle
+          : FaceShape.oval;
+    } else if (ratio < 1.2) {
+      return features.cheekboneProminence > 0.7
+          ? FaceShape.heart
+          : FaceShape.round;
+    } else {
+      if (features.jawlineStrength > 0.8) return FaceShape.square;
+      if (features.cheekboneProminence > 0.8) return FaceShape.diamond;
+      return FaceShape.oval;
+    }
+  }
+
+  String _getFaceShapeName(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return 'Овальна';
+      case FaceShape.round:
+        return 'Кругла';
+      case FaceShape.square:
+        return 'Квадратна';
+      case FaceShape.heart:
+        return 'Серцеподібна';
+      case FaceShape.diamond:
+        return 'Діамантова';
+      case FaceShape.rectangle:
+        return 'Прямокутна';
+    }
+  }
+
+  String _getColorTypeName(ColorType type) {
+    switch (type) {
+      case ColorType.spring:
+        return 'Весна';
+      case ColorType.summer:
+        return 'Літо';
+      case ColorType.autumn:
+        return 'Осінь';
+      case ColorType.winter:
+        return 'Зима';
+    }
+  }
+
+  List<String> _getMakeupRecommendations(
+    FaceShape faceShape,
+    ColorType colorType,
+    FacialFeatures features,
+  ) {
+    List<String> recommendations = [];
+
+    // Базові рекомендації по формі обличчя
+    recommendations.addAll(_getBasicShapeRecommendations(faceShape));
+
+    // Додаткові рекомендації на основі детального аналізу
+    if (features.symmetry < 0.7) {
+      recommendations
+          .add('Використовуйте контуринг для балансування асиметрії');
+    }
+
+    if (features.cheekboneProminence > 0.8) {
+      recommendations.add('Підкресліть вилиці легким хайлайтером');
+    }
+
+    // Рекомендації по кольоротипу
+    recommendations.addAll(_getColorTypeRecommendations(colorType));
+
+    return recommendations;
+  }
+
+  List<String> _getBasicShapeRecommendations(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return [
+          'Підкресліть природні пропорції легким контурингом',
+          'Рум\'яна наносьте по діагоналі вгору для додаткового ліфтингу',
+          'Експериментуйте з різними техніками - ваша форма обличчя універсальна'
+        ];
+      case FaceShape.round:
+        return [
+          'Використовуйте контуринг по бокам обличчя для видовження',
+          'Наносьте рум\'яна під кутом догори для витягування форми',
+          'Акцентуйте увагу на очах для балансу пропорцій'
+        ];
+      case FaceShape.square:
+        return [
+          'Пом\'якшуйте кути обличчя за допомогою розтушованого контурингу',
+          'Наносьте рум\'яна круговими рухами для пом\'якшення рис',
+          'Використовуйте техніки, що додають округлості'
+        ];
+      case FaceShape.heart:
+        return [
+          'Підкресліть вилиці, щоб збалансувати ширше чоло',
+          'Використовуйте хайлайтер на підборідді для візуального подовження',
+          'Наносьте рум\'яна ближче до центру щік'
+        ];
+      case FaceShape.diamond:
+        return [
+          'Концентруйте контуринг на скронях та підборідді',
+          'Наносьте рум\'яна горизонтально для пом\'якшення гострих кутів',
+          'Додайте об\'єму в нижній частині обличчя'
+        ];
+      case FaceShape.rectangle:
+        return [
+          'Створюйте м\'які переходи при контурингу',
+          'Використовуйте рум\'яна для додання округлості',
+          'Підкресліть вилиці для балансу пропорцій'
+        ];
+    }
+  }
+
+  List<String> _getColorTypeRecommendations(ColorType type) {
+    switch (type) {
+      case ColorType.spring:
+        return [
+          'Обирайте теплі, яскраві відтінки помади',
+          'Використовуйте персикові та золотисті рум\'яна',
+          'Підходять коричневі та бронзові відтінки тіней'
+        ];
+      case ColorType.summer:
+        return [
+          'Обирайте холодні, приглушені відтінки',
+          'Використовуйте рожеві та лавандові рум\'яна',
+          'Підходять сірі та сріблясті відтінки тіней'
+        ];
+      case ColorType.autumn:
+        return [
+          'Обирайте теплі, землисті відтінки',
+          'Використовуйте теракотові та мідні рум\'яна',
+          'Підходять золотисто-коричневі тіні'
+        ];
+      case ColorType.winter:
+        return [
+          'Обирайте насичені, контрастні відтінки',
+          'Використовуйте холодні рожеві рум\'яна',
+          'Підходять димчасті та сині відтінки тіней'
+        ];
+    }
+  }
+
+  List<String> _getHairstyleRecommendations(
+    FaceShape shape,
+    FacialFeatures features,
+  ) {
+    List<String> baseRecommendations = _getBasicHairstyleRecommendations(shape);
+    List<String> additionalRecommendations = [];
+
+    // Додаткові рекомендації на основі аналізу рис
+    if (features.foreheadHeight > 0.7) {
+      additionalRecommendations.add(
+          'Розгляньте можливість створення чубчика для балансування високого чола');
+    }
+
+    if (features.jawlineStrength > 0.8) {
+      additionalRecommendations
+          .add('Оберіть м\'які хвилі для пом\'якшення сильної лінії щелепи');
+    }
+
+    return [...baseRecommendations, ...additionalRecommendations];
+  }
+
+  List<String> _getBasicHairstyleRecommendations(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return [
+          'Вам підходить більшість зачісок',
+          'Спробуйте довге волосся з легкими хвилями',
+          'Можна експериментувати з чубчиком будь-якої форми'
+        ];
+      case FaceShape.round:
+        return [
+          'Обирайте зачіски, що подовжують обличчя',
+          'Уникайте занадто об\'ємних укладок з боків',
+          'Асиметричні стрижки допоможуть видовжити обличчя'
+        ];
+      case FaceShape.square:
+        return [
+          'Обирайте м\'які, хвилясті укладки',
+          'Уникайте прямого волосся з чіткими лініями',
+          'Спробуйте багатошарові стрижки'
+        ];
+      case FaceShape.heart:
+        return [
+          'Обирайте зачіски з об\'ємом внизу',
+          'Уникайте занадто об\'ємних укладок у верхній частині',
+          'Підійдуть довгі бокові чубчики'
+        ];
+      case FaceShape.diamond:
+        return [
+          'Обирайте зачіски з об\'ємом у скроневій зоні',
+          'Експериментуйте з шаруватими стрижками',
+          'Підійдуть м\'які хвилі середньої довжини'
+        ];
+      case FaceShape.rectangle:
+        return [
+          'Обирайте багатошарові стрижки',
+          'Додайте об\'єму з боків',
+          'Уникайте занадто довгого прямого волосся'
+        ];
+    }
+  }
+
+  List<String> _getSkincareRecommendations(ColorType colorType) {
+    List<String> baseRecommendations = [
+      'Використовуйте сонцезахисний крем щодня',
+      'Очищайте шкіру вранці та ввечері',
+      'Не забувайте про зволоження'
+    ];
+
+    switch (colorType) {
+      case ColorType.spring:
+      case ColorType.autumn:
+        return [
+          ...baseRecommendations,
+          'Захищайте шкіру від пігментації',
+          'Використовуйте засоби з вітаміном C'
+        ];
+      case ColorType.summer:
+      case ColorType.winter:
+        return [
+          ...baseRecommendations,
+          'Зволожуйте шкіру інтенсивніше',
+          'Використовуйте заспокійливі засоби'
+        ];
+    }
+  }
+
+  @override
+  void onClose() {
+    _faceDetector.close();
+    super.onClose();
+  }
+}
+
+[FILE: marinette/lib/app/data/services/face_shape_analyzer.dart]
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'dart:math' show Point;
+
+enum FaceShape {
+  oval,
+  round,
+  square,
+  heart,
+  diamond,
+  rectangle,
+}
+
+class FaceShapeAnalyzer {
+  static FaceShape analyzeFaceShape(Face face) {
+    final double faceWidth = face.boundingBox.width;
+    final double faceHeight = face.boundingBox.height;
+    final double ratio = faceHeight / faceWidth;
+
+    // Отримуємо контури обличчя
+    final faceContour = face.contours[FaceContourType.face];
+    if (faceContour == null) return FaceShape.oval;
+
+    // Аналіз форми на основі співвідношень та контурів
+    if (ratio > 1.5) {
+      return _analyzeElongatedFace(faceContour);
+    } else if (ratio < 1.2) {
+      return _analyzeWideFace(faceContour);
+    } else {
+      return _analyzeMediumFace(faceContour);
+    }
+  }
+
+  static FaceShape _analyzeElongatedFace(FaceContour contour) {
+    // Аналіз верхньої частини обличчя
+    double topWidth = _getWidthAtPosition(contour.points, 0.2);
+    double bottomWidth = _getWidthAtPosition(contour.points, 0.8);
+
+    if (topWidth < bottomWidth * 0.85) {
+      return FaceShape.heart;
+    } else if (topWidth > bottomWidth * 1.15) {
+      return FaceShape.diamond;
+    }
+
+    return FaceShape.oval;
+  }
+
+  static FaceShape _analyzeWideFace(FaceContour contour) {
+    // Аналіз кутів щелепи
+    double jawAngle = _calculateJawAngle(contour.points);
+
+    if (jawAngle > 80) {
+      return FaceShape.square;
+    }
+
+    return FaceShape.round;
+  }
+
+  static FaceShape _analyzeMediumFace(FaceContour contour) {
+    // Аналіз пропорцій середньої частини обличчя
+    double middleWidth = _getWidthAtPosition(contour.points, 0.5);
+    double topWidth = _getWidthAtPosition(contour.points, 0.2);
+
+    if (middleWidth > topWidth * 1.1) {
+      return FaceShape.rectangle;
+    }
+
+    return FaceShape.oval;
+  }
+
+  static double _getWidthAtPosition(
+      List<Point<int>> points, double heightPercent) {
+    if (points.isEmpty) return 0;
+
+    final firstPoint = points.first;
+    final lastPoint = points.last;
+
+    int targetY =
+        (firstPoint.y + (lastPoint.y - firstPoint.y) * heightPercent).round();
+
+    var pointsAtHeight =
+        points.where((p) => (p.y - targetY).abs() < 5).toList();
+
+    if (pointsAtHeight.isEmpty) return 0;
+
+    var xValues = pointsAtHeight.map((p) => p.x).toList();
+
+    double minX = xValues.reduce((a, b) => a < b ? a : b).toDouble();
+    double maxX = xValues.reduce((a, b) => a > b ? a : b).toDouble();
+
+    return maxX - minX;
+  }
+
+  static double _calculateJawAngle(List<Point<int>> points) {
+    if (points.length < 3) return 90;
+
+    // Спрощений розрахунок кута щелепи
+    var bottomPoints = points.where((p) {
+      var maxY = points.map((p) => p.y).reduce((a, b) => a > b ? a : b);
+      return p.y > maxY - 20;
+    }).toList();
+
+    if (bottomPoints.length < 3) return 90;
+
+    var sorted = bottomPoints..sort((a, b) => a.x.compareTo(b.x));
+    var first = sorted.first;
+    var last = sorted.last;
+    var middle = sorted[sorted.length ~/ 2];
+
+    // Розрахунок кута між трьома точками
+    double dx1 = (first.x - middle.x).toDouble();
+    double dy1 = (first.y - middle.y).toDouble();
+    double dx2 = (last.x - middle.x).toDouble();
+    double dy2 = (last.y - middle.y).toDouble();
+
+    double dotProduct = dx1 * dx2 + dy1 * dy2;
+    double magnitude1 = sqrt(dx1 * dx1 + dy1 * dy1);
+    double magnitude2 = sqrt(dx2 * dx2 + dy2 * dy2);
+
+    if (magnitude1 == 0 || magnitude2 == 0) return 90;
+
+    return (180 / 3.14159) * (dotProduct / (magnitude1 * magnitude2));
+  }
+
+  static double sqrt(double x) => x <= 0 ? 0 : x.roundToDouble();
+}
+
+[FILE: marinette/lib/app/data/services/facial_features_analyzer.dart]
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'dart:math' show Point, min, max, sqrt, pow, atan2, pi;
+import 'package:marinette/app/data/models/facial_features.dart';
+
+class FacialFeaturesAnalyzer {
+  static Future<FacialFeatures> analyzeFace(Face face) async {
+    final faceContour = face.contours[FaceContourType.face];
+    if (faceContour == null) {
+      throw Exception('Face contour not detected');
+    }
+
+    final points = faceContour.points;
+
+    // Аналіз симетрії
+    final symmetry = _calculateSymmetry(points);
+
+    // Основні виміри
+    final faceWidth = face.boundingBox.width;
+    final faceHeight = face.boundingBox.height;
+
+    // Аналіз щелепи
+    final jawlineStrength = _analyzeJawline(face);
+
+    // Аналіз вилиць
+    final cheekboneProminence = _analyzeCheekbones(face);
+
+    // Аналіз чола
+    final foreheadHeight = _analyzeForeheadHeight(face);
+
+    return FacialFeatures(
+      symmetry: symmetry,
+      faceWidth: faceWidth,
+      faceHeight: faceHeight,
+      jawlineStrength: jawlineStrength,
+      cheekboneProminence: cheekboneProminence,
+      foreheadHeight: foreheadHeight,
+      facialContours: points,
+    );
+  }
+
+  static double _calculateSymmetry(List<Point<int>> points) {
+    if (points.isEmpty) return 0.0;
+
+    // Знаходимо центральну вертикальну лінію
+    double centerX =
+        points.map((p) => p.x).reduce((a, b) => a + b) / points.length;
+
+    // Рахуємо відхилення від симетрії
+    double totalDeviation = 0;
+    int pairs = 0;
+
+    for (int i = 0; i < points.length ~/ 2; i++) {
+      Point<int> leftPoint = points[i];
+      Point<int> rightPoint = points[points.length - 1 - i];
+
+      double leftDist = (centerX - leftPoint.x).abs();
+      double rightDist = (rightPoint.x - centerX).abs();
+
+      totalDeviation += (leftDist - rightDist).abs();
+      pairs++;
+    }
+
+    // Нормалізуємо результат до діапазону 0-1
+    double avgDeviation = totalDeviation / pairs;
+    double maxPossibleDeviation = points.map((p) => p.x).reduce(max).toDouble();
+
+    return 1 - (avgDeviation / maxPossibleDeviation);
+  }
+
+  static double _analyzeJawline(Face face) {
+    final jawContour = face.contours[FaceContourType.lowerLipBottom];
+    if (jawContour == null) return 0.5;
+
+    final points = jawContour.points;
+    if (points.isEmpty) return 0.5;
+
+    // Аналізуємо кут і чіткість лінії щелепи
+    double angleStrength = _calculateJawlineAngle(points);
+    double lineDefinition = _calculateLineDefinition(points);
+
+    return (angleStrength + lineDefinition) / 2;
+  }
+
+  static double _analyzeCheekbones(Face face) {
+    final leftCheek = face.contours[FaceContourType.leftCheek];
+    final rightCheek = face.contours[FaceContourType.rightCheek];
+
+    if (leftCheek == null || rightCheek == null) return 0.5;
+
+    // Аналізуємо випуклість і положення вилиць
+    double cheekboneWidth =
+        _calculateCheekboneWidth(leftCheek.points, rightCheek.points);
+    double cheekboneHeight =
+        _calculateCheekboneHeight(leftCheek.points, rightCheek.points);
+
+    return (cheekboneWidth + cheekboneHeight) / 2;
+  }
+
+  static double _analyzeForeheadHeight(Face face) {
+    final faceContour = face.contours[FaceContourType.face];
+    final noseContour = face.contours[FaceContourType.noseBridge];
+
+    if (faceContour == null || noseContour == null) return 0.5;
+
+    // Вимірюємо висоту чола відносно загальної висоти обличчя
+    double totalHeight = face.boundingBox.height;
+    double foreheadToNose =
+        (noseContour.points.first.y - faceContour.points.first.y).toDouble();
+
+    return foreheadToNose / totalHeight;
+  }
+
+  static double _calculateJawlineAngle(List<Point<int>> points) {
+    if (points.length < 3) return 0.5;
+
+    Point<int> start = points.first;
+    Point<int> end = points.last;
+
+    double angle =
+        atan2((end.y - start.y).toDouble(), (end.x - start.x).toDouble());
+    return (angle.abs() / pi) * 2; // Нормалізуємо до 0-1
+  }
+
+  static double _calculateLineDefinition(List<Point<int>> points) {
+    if (points.length < 2) return 0.5;
+
+    double totalDeviation = 0;
+    for (int i = 1; i < points.length; i++) {
+      Point<int> prev = points[i - 1];
+      Point<int> curr = points[i];
+
+      totalDeviation += sqrt(pow(curr.x - prev.x, 2) + pow(curr.y - prev.y, 2));
+    }
+
+    return 1 - (totalDeviation / (points.length * 10)); // Нормалізуємо до 0-1
+  }
+
+  static double _calculateCheekboneWidth(
+      List<Point<int>> leftPoints, List<Point<int>> rightPoints) {
+    if (leftPoints.isEmpty || rightPoints.isEmpty) return 0.5;
+
+    double leftMax = leftPoints.map((p) => p.x).reduce(min).toDouble();
+    double rightMax = rightPoints.map((p) => p.x).reduce(max).toDouble();
+
+    return (rightMax - leftMax) / 100; // Нормалізуємо до 0-1
+  }
+
+  static double _calculateCheekboneHeight(
+      List<Point<int>> leftPoints, List<Point<int>> rightPoints) {
+    if (leftPoints.isEmpty || rightPoints.isEmpty) return 0.5;
+
+    double leftY =
+        leftPoints.map((p) => p.y).reduce((a, b) => a + b) / leftPoints.length;
+    double rightY = rightPoints.map((p) => p.y).reduce((a, b) => a + b) /
+        rightPoints.length;
+
+    return 1 - (((leftY - rightY).abs()) / 50); // Нормалізуємо до 0-1
+  }
+}
+
+[FILE: marinette/lib/app/data/services/result_saver_service.dart]
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart' as path_provider;
+
+class ResultSaverService extends GetxService {
+  // Зберігаємо результати в пам'яті для веб-версії
+  final RxList<FaceAnalysisResult> _results = <FaceAnalysisResult>[].obs;
+  final RxMap<String, String> _images = <String, String>{}.obs;
+
+  Future<ResultSaverService> init() async {
+    // В веб-версії не потребує ініціалізації
+    if (!kIsWeb) {
+      try {
+        final appDir = await path_provider.getApplicationDocumentsDirectory();
+        final resultsDir = Directory('${appDir.path}/analysis_results');
+
+        if (!await resultsDir.exists()) {
+          await resultsDir.create(recursive: true);
+        }
+      } catch (e) {
+        debugPrint('Failed to initialize ResultSaverService: $e');
+      }
+    }
+    return this;
+  }
+
+  Future<String> saveAnalysisResult({
+    required String imagePath,
+    required FaceAnalysisResult result,
+  }) async {
+    try {
+      if (kIsWeb) {
+        // Для веб зберігаємо в пам'яті
+        final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+        _results.add(result);
+        _images[timestamp] = imagePath;
+        return timestamp;
+      } else {
+        // Для мобільних пристроїв зберігаємо у файловій системі
+        final appDir = await path_provider.getApplicationDocumentsDirectory();
+        final resultsDir = Directory('${appDir.path}/analysis_results');
+
+        if (!await resultsDir.exists()) {
+          await resultsDir.create(recursive: true);
+        }
+
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final resultPath = '${resultsDir.path}/result_$timestamp';
+
+        final File imageFile = File(imagePath);
+        final String newImagePath = '$resultPath.jpg';
+        await imageFile.copy(newImagePath);
+
+        final resultData = {
+          'imagePath': newImagePath,
+          'faceShape': result.faceShape,
+          'colorType': result.colorType,
+          'makeupRecommendations': result.makeupRecommendations,
+          'hairstyleRecommendations': result.hairstyleRecommendations,
+          'skincareRecommendations': result.skincareRecommendations,
+          'timestamp': timestamp,
+        };
+
+        final File resultFile = File('$resultPath.json');
+        await resultFile.writeAsString(json.encode(resultData));
+
+        return newImagePath;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'error'.tr,
+        'error_saving_result'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> loadAnalysisResult(String imagePath) async {
+    try {
+      if (kIsWeb) {
+        // Для веб повертаємо дані з пам'яті
+        final index = _images.values.toList().indexOf(imagePath);
+        if (index != -1) {
+          final result = _results[index];
+          return {
+            'faceShape': result.faceShape,
+            'colorType': result.colorType,
+            'makeupRecommendations': result.makeupRecommendations,
+            'hairstyleRecommendations': result.hairstyleRecommendations,
+            'skincareRecommendations': result.skincareRecommendations,
+          };
+        }
+        return null;
+      } else {
+        // Для мобільних пристроїв читаємо з файлу
+        final jsonPath = imagePath.replaceAll('.jpg', '.json');
+        final File resultFile = File(jsonPath);
+
+        if (await resultFile.exists()) {
+          final String jsonData = await resultFile.readAsString();
+          return json.decode(jsonData);
+        }
+        return null;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'error'.tr,
+        'error_loading_result'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return null;
+    }
+  }
+
+  Future<List<String>> getAllSavedResults() async {
+    try {
+      if (kIsWeb) {
+        // Для веб повертаємо шляхи з пам'яті
+        return _images.values.toList();
+      } else {
+        // Для мобільних пристроїв читаємо з директорії
+        final appDir = await path_provider.getApplicationDocumentsDirectory();
+        final resultsDir = Directory('${appDir.path}/analysis_results');
+
+        if (!await resultsDir.exists()) {
+          return [];
+        }
+
+        final List<FileSystemEntity> files = await resultsDir
+            .list()
+            .where((entity) => entity.path.endsWith('.jpg'))
+            .toList();
+
+        return files.map((file) => file.path).toList();
+      }
+    } catch (e) {
+      Get.snackbar(
+        'error'.tr,
+        'error_loading_results'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return [];
+    }
+  }
+
+  Future<void> deleteResult(String imagePath) async {
+    try {
+      if (kIsWeb) {
+        // Для веб видаляємо з пам'яті
+        final key = _images.entries.firstWhere((e) => e.value == imagePath).key;
+        final index = _images.values.toList().indexOf(imagePath);
+        _images.remove(key);
+        _results.removeAt(index);
+      } else {
+        // Для мобільних пристроїв видаляємо файли
+        final File imageFile = File(imagePath);
+        if (await imageFile.exists()) {
+          await imageFile.delete();
+        }
+
+        final jsonPath = imagePath.replaceAll('.jpg', '.json');
+        final File resultFile = File(jsonPath);
+        if (await resultFile.exists()) {
+          await resultFile.delete();
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        'error'.tr,
+        'error_deleting_result'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+}
+
+[FILE: marinette/config/translations/app_translations.dart]
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+class AppTranslations extends Translations {
+  @override
+  Map<String, Map<String, String>> get keys => {};
+}
+
+class LocalizationService extends GetxService {
+  final RxString currentLocale = 'en'.obs;
+  final Map<String, Map<String, String>> translations = {};
+
+  Future<LocalizationService> init() async {
+    await loadTranslations();
+    return this;
+  }
+
+  Future<void> loadTranslations() async {
+    final en = await rootBundle.loadString('assets/i18n/en.json');
+    final uk = await rootBundle.loadString('assets/i18n/uk.json');
+
+    translations['en'] = Map<String, String>.from(json.decode(en));
+    translations['uk'] = Map<String, String>.from(json.decode(uk));
+
+    Get.addTranslations(translations);
+  }
+
+  void changeLocale(String locale) {
+    currentLocale.value = locale;
+    Get.updateLocale(Locale(locale));
+  }
+
+  String getCurrentLocale() => currentLocale.value;
+}
+
+[FILE: marinette/main.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:marinette/app/modules/home/home_screen.dart';
+import 'package:marinette/config/translations/app_translations.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:flutter/foundation.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize services
+  if (!kIsWeb) {
+    await Hive.initFlutter();
+  }
+
+  await Get.putAsync(() => LocalizationService().init());
+  await Get.putAsync(() => ResultSaverService().init());
+
+  runApp(const BeautyRecommendationsApp());
+}
+
+class BeautyRecommendationsApp extends StatelessWidget {
+  const BeautyRecommendationsApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final localizationService = Get.find<LocalizationService>();
+
+    return GetMaterialApp(
+      title: 'Beauty Recommendations',
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+        useMaterial3: true,
+        cardTheme: const CardTheme(
+          color: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.pink,
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.pink,
+          ),
+        ),
+      ),
+      translations: AppTranslations(),
+      locale: Locale(localizationService.getCurrentLocale()),
+      fallbackLocale: const Locale('en'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('uk'),
+      ],
+      home: const HomeScreen(),
+    );
+  }
+}
