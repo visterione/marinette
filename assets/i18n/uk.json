@@ -28,14 +28,14 @@
   "error_loading_results": "Помилка завантаження результатів",
   "error_deleting_result": "Помилка видалення результату",
   "error_sharing": "Помилка під час поширення результатів",
-  
+
   "face_shape_oval": "Овальна",
   "face_shape_round": "Кругла",
   "face_shape_square": "Квадратна",
   "face_shape_heart": "Серцеподібна",
   "face_shape_diamond": "Діамантова",
   "face_shape_rectangle": "Прямокутна",
-  
+
   "color_type_spring": "Весна",
   "color_type_summer": "Літо",
   "color_type_autumn": "Осінь",

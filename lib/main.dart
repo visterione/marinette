@@ -26,11 +26,11 @@ class BeautyRecommendationsApp extends StatelessWidget {
     final localizationService = Get.find<LocalizationService>();
 
     return GetMaterialApp(
-      title: 'Beauty Recommendations',
+      title: 'Marinette',
       theme: AppTheme.theme,
       translations: AppTranslations(),
       locale: Locale(localizationService.getCurrentLocale()),
-      fallbackLocale: const Locale('en'),
+      fallbackLocale: const Locale('uk'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

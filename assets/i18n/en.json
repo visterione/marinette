@@ -28,14 +28,14 @@
   "error_loading_results": "Error loading results",
   "error_deleting_result": "Error deleting result",
   "error_sharing": "Error sharing results",
-  
+
   "face_shape_oval": "Oval",
   "face_shape_round": "Round",
   "face_shape_square": "Square",
   "face_shape_heart": "Heart-shaped",
   "face_shape_diamond": "Diamond",
   "face_shape_rectangle": "Rectangle",
-  
+
   "color_type_spring": "Spring",
   "color_type_summer": "Summer",
   "color_type_autumn": "Autumn",

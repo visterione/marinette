@@ -49,7 +49,7 @@ class CustomCameraController extends GetxController {
       }
 
       final controller = CameraController(
-        cameras[0],
+        cameras[1],
         ResolutionPreset.high,
         enableAudio: false,
       );
@@ -71,8 +71,8 @@ class CustomCameraController extends GetxController {
       }
 
       final XFile image = await cameraController.value!.takePicture();
-      print('Photo taken: ${image?.path}');
-      return image?.path;
+      print('Photo taken: ${image.path}');
+      return image.path;
     } catch (e) {
       print('Error taking photo: $e');
       Get.snackbar('error'.tr, 'error_camera'.tr);
