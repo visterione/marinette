@@ -6,13 +6,8 @@ class RecommendationsService {
   static List<String> getMakeupRecommendations(
       FaceShape shape, ColorType colorType) {
     List<String> recommendations = [];
-
-    // Базові рекомендації по формі обличчя
     recommendations.addAll(_getMakeupShapeRecommendations(shape));
-
-    // Додаємо рекомендації по кольоротипу
     recommendations.addAll(_getMakeupColorRecommendations(colorType));
-
     return recommendations;
   }
 
@@ -20,96 +15,96 @@ class RecommendationsService {
     switch (shape) {
       case FaceShape.oval:
         return [
-          'Підкресліть природні пропорції легким контурингом',
-          'Рум\'яна наносіть по діагоналі вгору для додаткового ліфтингу',
-          'Експериментуйте з різними техніками - ваша форма обличчя універсальна',
-          'Акцентуйте увагу на очах або губах за вашим вибором',
-          'Використовуйте хайлайтер на вилицях для підкреслення природного рельєфу'
+          'makeup_shape_oval'.tr,
+          'makeup_shape_oval_2'.tr,
+          'makeup_shape_oval_3'.tr,
+          'makeup_shape_oval_4'.tr,
+          'makeup_shape_oval_5'.tr
         ];
 
       case FaceShape.round:
         return [
-          'Використовуйте контуринг по бокам обличчя для видовження',
-          'Наносьте рум\'яна під кутом догори для витягування форми',
-          'Створюйте чіткі кути при нанесенні тонального засобу в зоні щелепи',
-          'Робіть акцент на вилицях за допомогою хайлайтера',
-          'Використовуйте техніку овального контурингу носа'
+          'makeup_shape_round'.tr,
+          'makeup_shape_round_2'.tr,
+          'makeup_shape_round_3'.tr,
+          'makeup_shape_round_4'.tr,
+          'makeup_shape_round_5'.tr
         ];
 
       case FaceShape.square:
         return [
-          'Пом\'якшуйте кути обличчя за допомогою розтушованого контурингу',
-          'Наносьте рум\'яна круговими рухами для пом\'якшення рис',
-          'Уникайте різких ліній при нанесенні макіяжу',
-          'Додавайте світловідбиваючі частинки в зоні скул',
-          'Використовуйте м\'які пастельні тони для очей'
+          'makeup_shape_square'.tr,
+          'makeup_shape_square_2'.tr,
+          'makeup_shape_square_3'.tr,
+          'makeup_shape_square_4'.tr,
+          'makeup_shape_square_5'.tr
         ];
 
       case FaceShape.heart:
         return [
-          'Підкресліть вилиці, щоб збалансувати ширше чоло',
-          'Використовуйте хайлайтер на підборідді для візуального подовження',
-          'Затемнюйте зовнішні кути чола для балансу',
-          'Наносіть рум\'яна ближче до центру щік',
-          'Акцентуйте нижню частину обличчя за допомогою світлих відтінків'
+          'makeup_shape_heart'.tr,
+          'makeup_shape_heart_2'.tr,
+          'makeup_shape_heart_3'.tr,
+          'makeup_shape_heart_4'.tr,
+          'makeup_shape_heart_5'.tr
         ];
 
       case FaceShape.diamond:
         return [
-          'Концентруйте контуринг на скронях та підборідді',
-          'Наносьте рум\'яна горизонтально для пом\'якшення гострих кутів',
-          'Підкреслюйте центр обличчя світлими відтінками',
-          'Використовуйте м\'які переходи при розтушовці',
-          'Додавайте об\'єм в нижній частині обличчя світлими текстурами'
+          'makeup_shape_diamond'.tr,
+          'makeup_shape_diamond_2'.tr,
+          'makeup_shape_diamond_3'.tr,
+          'makeup_shape_diamond_4'.tr,
+          'makeup_shape_diamond_5'.tr
         ];
 
       case FaceShape.rectangle:
         return [
-          'Створюйте м\'які переходи при контурингу',
-          'Використовуйте рум\'яна для додання округлості',
-          'Підкресліть вилиці для балансу пропорцій',
-          'Додавайте світлі акценти в центральній частині обличчя',
-          'Уникайте вертикальних ліній при нанесенні макіяжу'
+          'makeup_shape_rectangle'.tr,
+          'makeup_shape_rectangle_2'.tr,
+          'makeup_shape_rectangle_3'.tr,
+          'makeup_shape_rectangle_4'.tr,
+          'makeup_shape_rectangle_5'.tr
         ];
     }
   }
 
-  static List<String> _getMakeupColorRecommendations(ColorType type) {
-    switch (type) {
+  static List<String> _getMakeupColorRecommendations(ColorType colorType) {
+    switch (colorType) {
       case ColorType.spring:
         return [
-          'Обирайте теплі, яскраві відтінки помади: корал, персик, теплий рожевий',
-          'Використовуйте золотисті та персикові рум\'яна',
-          'Для очей підійдуть бронзові, золотисті та теплі коричневі тіні',
-          'Експериментуйте з теракотовими відтінками для губ',
-          'Використовуйте теплі відтінки бронзера'
+          'makeup_color_spring'.tr,
+          'makeup_color_spring_2'.tr,
+          'makeup_color_spring_3'.tr,
+          'makeup_color_spring_4'.tr,
+          'makeup_color_spring_5'.tr
         ];
 
       case ColorType.summer:
         return [
-          'Обирайте холодні, приглушені відтінки помади: рожевий, малиновий',
-          'Використовуйте холодні рожеві та лавандові рум\'яна',
-          'Для очей ідеальні сріблясті, сірі та прохолодні коричневі тони',
-          'Уникайте занадто яскравих та теплих відтінків',
-          'Віддавайте перевагу пастельним тонам'
+          'makeup_color_summer'.tr,
+          'makeup_color_summer_2'.tr,
+          'makeup_color_summer_3'.tr,
+          'makeup_color_summer_4'.tr,
+          'makeup_color_summer_5'.tr
         ];
 
       case ColorType.autumn:
         return [
-          'Обирайте теплі, землисті відтінки помади: теракот, мідь',
-          'Використовуйте теплі коричневі та теракотові рум\'яна',
-          'Для очей підійдуть зелені, золотисто-коричневі тони',
-          'Експериментуйте з насиченими осінніми кольорами',
-          'Додавайте золотистий шиммер для сяяння'
+          'makeup_color_autumn'.tr,
+          'makeup_color_autumn_2'.tr,
+          'makeup_color_autumn_3'.tr,
+          'makeup_color_autumn_4'.tr,
+          'makeup_color_autumn_5'.tr
         ];
 
       case ColorType.winter:
         return [
-          'Обирайте яскраві, контрастні відтінки помади: червоний, фуксія',
-          'Використовуйте холодні рожеві та ягідні рум\'яна',
-          'Для очей підійдуть димчасті, сині та сріблясті відтінки',
-          'Експериментуйте з насиченими кольорами',
-          'Використовуйте контрастні комбінації'
+          'makeup_color_winter'.tr,
+          'makeup_color_winter_2'.tr,
+          'makeup_color_winter_3'.tr,
+          'makeup_color_winter_4'.tr,
+          'makeup_color_winter_5'.tr
         ];
     }
   }
@@ -117,13 +112,8 @@ class RecommendationsService {
   static List<String> getHairstyleRecommendations(
       FaceShape shape, ColorType colorType) {
     List<String> recommendations = [];
-
-    // Базові рекомендації по формі обличчя
     recommendations.addAll(_getHairstyleShapeRecommendations(shape));
-
-    // Додаємо рекомендації по кольору волосся
     recommendations.addAll(_getHairColorRecommendations(colorType));
-
     return recommendations;
   }
 
@@ -131,107 +121,99 @@ class RecommendationsService {
     switch (shape) {
       case FaceShape.oval:
         return [
-          'Вам підходить більшість зачісок завдяки пропорційній формі обличчя',
-          'Спробуйте довге волосся з легкими хвилями для романтичного образу',
-          'Середня довжина з градуюванням підкреслить риси обличчя',
-          'Можна експериментувати з чубчиком будь-якої форми',
-          'Підійдуть як прямі, так і кучеряві зачіски'
+          'hairstyle_oval'.tr,
+          'hairstyle_oval_2'.tr,
+          'hairstyle_oval_3'.tr,
+          'hairstyle_oval_4'.tr,
+          'hairstyle_oval_5'.tr
         ];
 
       case FaceShape.round:
         return [
-          'Обирайте зачіски, що додають висоти та видовжують обличчя',
-          'Уникайте занадто об\'ємних укладок з боків',
-          'Асиметричні стрижки допоможуть видовжити обличчя',
-          'Довге волосся з рваними кінцями створить потрібний ефект',
-          'Косий чубчик допоможе зробити обличчя більш витонченим'
+          'hairstyle_round'.tr,
+          'hairstyle_round_2'.tr,
+          'hairstyle_round_3'.tr,
+          'hairstyle_round_4'.tr,
+          'hairstyle_round_5'.tr
         ];
 
       case FaceShape.square:
         return [
-          'Обирайте м\'які, хвилясті укладки для пом\'якшення рис',
-          'Уникайте прямого волосся з чіткими лініями',
-          'Багатошарові стрижки додадуть м\'якості',
-          'Довжина нижче підборіддя пом\'якшить лінію щелепи',
-          'Легкі локони біля обличчя створять романтичний образ'
+          'hairstyle_square'.tr,
+          'hairstyle_square_2'.tr,
+          'hairstyle_square_3'.tr,
+          'hairstyle_square_4'.tr,
+          'hairstyle_square_5'.tr
         ];
 
       case FaceShape.heart:
         return [
-          'Обирайте зачіски з об\'ємом внизу для балансу',
-          'Уникайте занадто об\'ємних укладок у верхній частині',
-          'Середня довжина з м\'якими шарами ідеально підійде',
-          'Бокові проділи допоможуть збалансувати риси',
-          'Довгий боковий чубчик пом\'якшить лінію чола'
+          'hairstyle_heart'.tr,
+          'hairstyle_heart_2'.tr,
+          'hairstyle_heart_3'.tr,
+          'hairstyle_heart_4'.tr,
+          'hairstyle_heart_5'.tr
         ];
 
       case FaceShape.diamond:
         return [
-          'Обирайте зачіски з об\'ємом у скроневій зоні',
-          'Експериментуйте з шаруватими стрижками',
-          'Довжина до плечей або нижче найбільш вдала',
-          'Уникайте занадто прилеглих до голови зачісок',
-          'М\'які хвилі середньої довжини підкреслять вашу форму обличчя'
+          'hairstyle_diamond'.tr,
+          'hairstyle_diamond_2'.tr,
+          'hairstyle_diamond_3'.tr,
+          'hairstyle_diamond_4'.tr,
+          'hairstyle_diamond_5'.tr
         ];
 
       case FaceShape.rectangle:
         return [
-          'Обирайте багатошарові стрижки для додання об\'єму',
-          'Додайте об\'єму з боків для балансу пропорцій',
-          'Уникайте занадто довгого прямого волосся',
-          'Чубчик допоможе візуально скоротити довжину обличчя',
-          'Каскадні стрижки створять потрібний об\'єм'
+          'hairstyle_rectangle'.tr,
+          'hairstyle_rectangle_2'.tr,
+          'hairstyle_rectangle_3'.tr,
+          'hairstyle_rectangle_4'.tr,
+          'hairstyle_rectangle_5'.tr
         ];
     }
   }
 
-  static List<String> _getHairColorRecommendations(ColorType type) {
-    switch (type) {
+  static List<String> _getHairColorRecommendations(ColorType colorType) {
+    switch (colorType) {
       case ColorType.spring:
         return [
-          'Золотисті відтінки блонду підкреслять природну яскравість',
-          'Медові та карамельні тони чудово підійдуть',
-          'Експериментуйте з теплими рудими відтінками',
-          'Уникайте холодних попелястих тонів',
-          'Спробуйте техніку медового балаяжу'
+          'haircolor_spring'.tr,
+          'haircolor_spring_2'.tr,
+          'haircolor_spring_3'.tr
         ];
 
       case ColorType.summer:
         return [
-          'Обирайте холодні платинові та попелясті відтінки',
-          'Перлинний блонд підкреслить вашу зовнішність',
-          'Експериментуйте з пастельними тонами',
-          'Уникайте занадто теплих та рудих відтінків',
-          'Підійдуть світло-русі тони з холодним підтоном'
+          'haircolor_summer'.tr,
+          'haircolor_summer_2'.tr,
+          'haircolor_summer_3'.tr
         ];
 
       case ColorType.autumn:
         return [
-          'Обирайте насичені каштанові та мідні відтінки',
-          'Золотисто-коричневі тони підкреслять природну красу',
-          'Експериментуйте з теплими рудими тонами',
-          'Підійдуть відтінки кориці та карамелі',
-          'Спробуйте техніку червоного балаяжу'
+          'haircolor_autumn'.tr,
+          'haircolor_autumn_2'.tr,
+          'haircolor_autumn_3'.tr
         ];
 
       case ColorType.winter:
         return [
-          'Обирайте контрастні кольори - чорний або платиновий блонд',
-          'Холодні темні відтінки підкреслять вашу зовнішність',
-          'Експериментуйте з попелястими тонами',
-          'Уникайте теплих медових відтінків',
-          'Підійдуть синювато-чорні тони'
+          'haircolor_winter'.tr,
+          'haircolor_winter_2'.tr,
+          'haircolor_winter_3'.tr
         ];
     }
   }
 
   static List<String> getSkincareRecommendations(ColorType colorType) {
     List<String> baseRecommendations = [
-      'Обов\'язково використовуйте сонцезахисний крем щодня',
-      'Очищайте шкіру двічі на день м\'яким засобом',
-      'Не забувайте про зволоження шкіри',
-      'Регулярно робіть пілінг та відлущування',
-      'Використовуйте сироватки з активними компонентами'
+      'skincare_recommendation_1'.tr,
+      'skincare_recommendation_2'.tr,
+      'skincare_recommendation_3'.tr,
+      'skincare_recommendation_4'.tr,
+      'skincare_recommendation_5'.tr
     ];
 
     List<String> colorTypeRecommendations =
@@ -244,38 +226,38 @@ class RecommendationsService {
     switch (type) {
       case ColorType.spring:
         return [
-          'Використовуйте легкі текстури засобів',
-          'Зверніть увагу на засоби з вітаміном С',
-          'Додайте до догляду антиоксиданти',
-          'Захищайтесь від пігментації SPF 30-50',
-          'Обирайте заспокійливі маски для чутливої шкіри'
+          'skincare_spring'.tr,
+          'skincare_spring_2'.tr,
+          'skincare_spring_3'.tr,
+          'skincare_spring_4'.tr,
+          'skincare_spring_5'.tr
         ];
 
       case ColorType.summer:
         return [
-          'Використовуйте некомедогенні засоби',
-          'Зволожуйте шкіру легкими гелевими текстурами',
-          'Захищайтесь від сонця SPF 50+',
-          'Додайте до догляду ніацинамід',
-          'Регулярно робіть заспокійливі маски'
+          'skincare_summer'.tr,
+          'skincare_summer_2'.tr,
+          'skincare_summer_3'.tr,
+          'skincare_summer_4'.tr,
+          'skincare_summer_5'.tr
         ];
 
       case ColorType.autumn:
         return [
-          'Обирайте поживні креми з багатою текстурою',
-          'Використовуйте олії для додаткового живлення',
-          'Захищайтесь від сонця SPF 30+',
-          'Звертайте увагу на засоби з ретинолом',
-          'Регулярно використовуйте зволожуючі маски'
+          'skincare_autumn'.tr,
+          'skincare_autumn_2'.tr,
+          'skincare_autumn_3'.tr,
+          'skincare_autumn_4'.tr,
+          'skincare_autumn_5'.tr
         ];
 
       case ColorType.winter:
         return [
-          'Використовуйте креми з насиченою текстурою',
-          'Додайте до догляду пептиди та церамиди',
-          'Захищайтесь від сонця SPF 50+',
-          'Зверніть увагу на засоби з гіалуроновою кислотою',
-          'Робіть регулярно поживні маски'
+          'skincare_winter'.tr,
+          'skincare_winter_2'.tr,
+          'skincare_winter_3'.tr,
+          'skincare_winter_4'.tr,
+          'skincare_winter_5'.tr
         ];
     }
   }
@@ -305,7 +287,6 @@ class RecommendationsService {
   static List<String> getPersonalizedTips({
     required FaceShape faceShape,
     required ColorType colorType,
-    bool includeProductSuggestions = true,
   }) {
     List<String> tips = [];
 
@@ -318,117 +299,72 @@ class RecommendationsService {
     // Додаємо сезонну пораду
     tips.add(getSeasonalRecommendation());
 
-    // Додаємо пропозиції щодо продуктів, якщо потрібно
-    if (includeProductSuggestions) {
-      tips.addAll(_getProductSuggestions(colorType));
-    }
-
     return tips;
   }
 
   static String _getPersonalizedMakeupTip(
       FaceShape faceShape, ColorType colorType) {
-    String base = 'Для вашого типу зовнішності особливо важливо: ';
+    // Базова порада щодо форми обличчя
+    String tip = 'personalized_makeup_base'.tr;
 
+    // Додаємо специфіку для форми обличчя
     switch (faceShape) {
       case FaceShape.oval:
-        base += 'підкреслювати природну гармонію рис обличчя. ';
+        tip += 'personalized_makeup_oval'.tr;
         break;
       case FaceShape.round:
-        base += 'створювати візуальні вертикальні лінії. ';
+        tip += 'personalized_makeup_round'.tr;
         break;
       case FaceShape.square:
-        base += 'пом\'якшувати кути обличчя. ';
+        tip += 'personalized_makeup_square'.tr;
         break;
       case FaceShape.heart:
-        base += 'балансувати верхню та нижню частини обличчя. ';
+        tip += 'personalized_makeup_heart'.tr;
         break;
       case FaceShape.diamond:
-        base += 'акцентувати увагу на центрі обличчя. ';
+        tip += 'personalized_makeup_diamond'.tr;
         break;
       case FaceShape.rectangle:
-        base += 'створювати гармонійні пропорції. ';
+        tip += 'personalized_makeup_rectangle'.tr;
         break;
     }
 
+    // Додаємо пораду щодо кольоротипу
+    tip += '. ';
     switch (colorType) {
       case ColorType.spring:
-        base +=
-            'Використовуйте теплі, яскраві відтінки для створення свіжого образу.';
+        tip += 'personalized_makeup_spring'.tr;
         break;
       case ColorType.summer:
-        base += 'Обирайте ніжні, пастельні тони для природного макіяжу.';
+        tip += 'personalized_makeup_summer'.tr;
         break;
       case ColorType.autumn:
-        base +=
-            'Віддавайте перевагу теплим, землистим відтінкам для гармонійного образу.';
+        tip += 'personalized_makeup_autumn'.tr;
         break;
       case ColorType.winter:
-        base +=
-            'Експериментуйте з яскравими, контрастними кольорами для виразного макіяжу.';
+        tip += 'personalized_makeup_winter'.tr;
         break;
     }
 
-    return base;
+    return tip;
   }
 
   static String _getPersonalizedHairTip(FaceShape faceShape) {
+    String tip = 'personalized_hair'.tr;
+
     switch (faceShape) {
       case FaceShape.oval:
-        return 'Ваша форма обличчя дозволяє експериментувати з різними зачісками. Спробуйте нові стилі укладки для різноманітності образів.';
+        return tip + 'personalized_hair_oval'.tr;
       case FaceShape.round:
-        return 'Оберіть зачіску з об\'ємом у верхній частині голови та видовженими пасмами для витонченого силуету.';
+        return tip + 'personalized_hair_round'.tr;
       case FaceShape.square:
-        return 'М\'які хвилі та багатошарові стрижки допоможуть пом\'якшити риси обличчя.';
+        return tip + 'personalized_hair_square'.tr;
       case FaceShape.heart:
-        return 'Зачіски з об\'ємом у нижній частині обличчя допоможуть збалансувати пропорції.';
+        return tip + 'personalized_hair_heart'.tr;
       case FaceShape.diamond:
-        return 'Додайте об\'єм у зоні скронь за допомогою бокових пасом або легких хвиль.';
+        return tip + 'personalized_hair_diamond'.tr;
       case FaceShape.rectangle:
-        return 'Багатошарові стрижки середньої довжини допоможуть створити гармонійний образ.';
+        return tip + 'personalized_hair_rectangle'.tr;
     }
-  }
-
-  static List<String> _getProductSuggestions(ColorType colorType) {
-    List<String> suggestions = [
-      'Рекомендовані продукти для вашого типу зовнішності:'
-    ];
-
-    switch (colorType) {
-      case ColorType.spring:
-        suggestions.addAll([
-          '• BB-крем з легкою текстурою та сяючим фінішем',
-          '• Персиковий або кораловий рум\'янець',
-          '• Золотистий хайлайтер',
-          '• Зволожуюча помада теплих відтінків'
-        ]);
-        break;
-      case ColorType.summer:
-        suggestions.addAll([
-          '• Тональний крем з натуральним покриттям',
-          '• Холодний рожевий рум\'янець',
-          '• Перламутровий хайлайтер',
-          '• Помада холодних рожевих відтінків'
-        ]);
-        break;
-      case ColorType.autumn:
-        suggestions.addAll([
-          '• Тональна основа з матовим фінішем',
-          '• Теракотовий або бронзовий рум\'янець',
-          '• Бронзер теплих відтінків',
-          '• Помада коричнево-червоних тонів'
-        ]);
-        break;
-      case ColorType.winter:
-        suggestions.addAll([
-          '• Тональний крем з середнім покриттям',
-          '• Яскраво-рожевий рум\'янець',
-          '• Сріблястий хайлайтер',
-          '• Помада насичених відтінків'
-        ]);
-        break;
-    }
-
-    return suggestions;
   }
 }

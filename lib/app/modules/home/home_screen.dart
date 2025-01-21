@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/services/face_analysis_service.dart';
-import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
-import 'package:marinette/app/modules/camera/camera_controller.dart';
-import 'package:marinette/app/modules/camera/camera_screen.dart';
-import 'package:marinette/app/modules/history/history_screen.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/data/services/content_service.dart';
 import 'package:marinette/config/translations/app_translations.dart';
+import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
+import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
+import 'package:marinette/app/modules/camera/camera_controller.dart';
+import 'package:marinette/app/modules/history/history_screen.dart';
+import 'package:marinette/app/core/widgets/wave_background_painter.dart';
+import 'package:marinette/app/data/models/story.dart';
+import 'package:marinette/app/data/services/stories_service.dart';
+import 'package:marinette/app/core/widgets/story_viewer.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final RxList<Story> _stories = <Story>[].obs;
 
   void _changeLanguage() {
     final service = Get.find<LocalizationService>();
@@ -21,38 +34,44 @@ class HomeScreen extends StatelessWidget {
       try {
         debugPrint('Starting image processing for path: $imagePath');
 
-        // Показуємо індикатор завантаження
         Get.dialog(
-          WillPopScope(
-            onWillPop: () async => false,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+          PopScope(
+            canPop: false,
+            child: const Center(child: CircularProgressIndicator()),
           ),
           barrierDismissible: false,
         );
 
-        debugPrint('Creating FaceAnalysisService');
         final analysisService = Get.put(FaceAnalysisService());
-
-        debugPrint('Starting face analysis');
         final result = await analysisService.analyzeFace(imagePath);
-        debugPrint('Face analysis completed: $result');
 
-        // Закриваємо індикатор завантаження
         if (Get.isDialogOpen ?? false) {
           Get.back();
         }
 
-        // Показуємо результати
         if (result != null) {
-          debugPrint('Navigating to results screen');
+          debugPrint('Saving result to history');
+          try {
+            final resultSaverService = Get.find<ResultSaverService>();
+            await resultSaverService.saveResult(
+              imagePath: imagePath,
+              result: result,
+            );
+            debugPrint('Result saved successfully');
+          } catch (e) {
+            debugPrint('Error saving result: $e');
+            Get.snackbar(
+              'error'.tr,
+              'error_saving_result'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+
           await Get.to(() => AnalysisResultScreen(
                 imagePath: imagePath,
                 result: result,
               ));
         } else {
-          debugPrint('Analysis returned null result');
           Get.snackbar(
             'error'.tr,
             'analysis_failed'.tr,
@@ -61,7 +80,6 @@ class HomeScreen extends StatelessWidget {
         }
       } catch (e) {
         debugPrint('Error during image processing: $e');
-        // Закриваємо індикатор завантаження у випадку помилки
         if (Get.isDialogOpen ?? false) {
           Get.back();
         }
@@ -71,13 +89,324 @@ class HomeScreen extends StatelessWidget {
           snackPosition: SnackPosition.BOTTOM,
         );
       }
-    } else {
-      debugPrint('No image path provided');
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadStories();
+  }
+
+  Future<void> _loadStories() async {
+    try {
+      final stories = await StoriesService.getStories();
+      _stories.value = stories;
+    } catch (e) {
+      debugPrint('Error loading stories: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_loading_stories'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void _handleStoryTap(Story story) {
+    Get.to(
+      () => StoryViewer(
+        story: story,
+        onClose: () => Get.back(),
+      ),
+      fullscreenDialog: true,
+      transition: Transition.fadeIn,
+    );
+  }
+
+  Widget _buildStoriesSection() {
+    return Obx(() {
+      if (_stories.isEmpty) return const SizedBox.shrink();
+
+      return Container(
+        height: 85, // Зменшена загальна висота
+        margin: const EdgeInsets.only(bottom: 24),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          itemCount: _stories.length,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemBuilder: (context, index) {
+            final story = _stories[index];
+            return GestureDetector(
+              onTap: () => _handleStoryTap(story),
+              child: Container(
+                width: 60, // Зменшена ширина
+                margin: const EdgeInsets.only(right: 8), // Зменшений відступ
+                child: Column(
+                  children: [
+                    Container(
+                      height: 60, // Зменшена висота кружечка
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: story.isViewed
+                            ? null
+                            : const LinearGradient(
+                                colors: [Colors.pink, Colors.purple],
+                              ),
+                      ),
+                      padding: const EdgeInsets.all(2),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: NetworkImage(story.previewImageUrl),
+                            fit: BoxFit.cover,
+                          ),
+                          border: story.isViewed
+                              ? Border.all(color: Colors.grey.shade300)
+                              : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      story.title,
+                      style: const TextStyle(
+                        fontSize: 11, // Зменшений розмір шрифту
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  Widget _buildFeatureCard({
+    required String titleKey,
+    required String subtitleKey,
+    required IconData icon,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.pink.withAlpha(76),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                Colors.grey.shade50,
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      titleKey.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      subtitleKey.tr,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.pink.withAlpha(25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: Colors.pink,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTipOfTheDay(ContentService contentService) {
+    return Obx(() {
+      final tip = contentService.currentTip.value;
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.pink, Colors.purple],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.pink.withAlpha(76),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  tip.icon,
+                  style: const TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'tip_of_the_day'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              tip.tip.tr,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildTrendsCarousel(ContentService contentService) {
+    return Obx(() {
+      final trends = contentService.currentTrends;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.trending_up,
+                color: Colors.pink,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'season_trends'.tr,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: trends
+                  .map((trend) => Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: _buildTrendCard(
+                          title: trend.title.tr,
+                          description:
+                              '${trend.title.toLowerCase()}_description'.tr,
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildTrendCard({required String title, required String description}) {
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.pink.withAlpha(25),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Ініціалізуємо CustomCameraController
+    final cameraController = Get.put(CustomCameraController());
+
+    final contentService = Get.find<ContentService>();
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('app_name'.tr),
@@ -93,86 +422,74 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Container(
+        height: screenHeight,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.pink, Colors.purple],
+            colors: [Color(0xFFFDF2F8), Color(0xFFF5F3FF)],
+            stops: [0.0, 1.0],
           ),
         ),
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: WaveBackgroundPainter(),
+              ),
+            ),
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Icon(
-                        Icons.face,
-                        size: 80,
-                        color: Colors.pink,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'welcome_message'.tr,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.camera_alt),
-                        label: Text('take_photo'.tr),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
-                          ),
-                        ),
-                        onPressed: () async {
-                          debugPrint('Camera button pressed');
-                          Get.lazyPut(() => CustomCameraController());
-                          final imagePath =
-                              await Get.to<String>(() => const CameraScreen());
-                          debugPrint(
-                              'Returned from camera with path: $imagePath');
+                      _buildStoriesSection(),
+                      _buildFeatureCard(
+                        titleKey: 'take_photo',
+                        subtitleKey: 'take_photo_subtitle',
+                        icon: Icons.camera_alt,
+                        onTap: () async {
+                          final imagePath = await cameraController.takePhoto();
                           await _processImage(imagePath);
                         },
                       ),
                       const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.photo_library),
-                        label: Text('choose_from_gallery'.tr),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
-                          ),
-                        ),
-                        onPressed: () async {
-                          debugPrint('Gallery button pressed');
-                          final controller = Get.put(CustomCameraController());
-                          final imagePath = await controller.pickFromGallery();
-                          debugPrint(
-                              'Returned from gallery with path: $imagePath');
+                      _buildFeatureCard(
+                        titleKey: 'choose_from_gallery',
+                        subtitleKey: 'choose_from_gallery_subtitle',
+                        icon: Icons.photo_library,
+                        onTap: () async {
+                          final imagePath =
+                              await cameraController.pickFromGallery();
                           await _processImage(imagePath);
                         },
                       ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(() => const BeautyHubScreen());
+                        },
+                        child: _buildFeatureCard(
+                          titleKey: 'beauty_hub',
+                          subtitleKey: 'beauty_hub_subtitle',
+                          icon: Icons.menu_book,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _buildTipOfTheDay(contentService),
+                      const SizedBox(height: 24),
+                      _buildTrendsCarousel(contentService),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

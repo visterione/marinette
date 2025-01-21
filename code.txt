@@ -1,0 +1,3831 @@
+[PROJECT STRUCTURE]
+[FILE: marinette/assets/i18n/en.json]
+{
+  "app_name": "Beauty Recommendations",
+  "take_photo": "Take Photo",
+  "choose_from_gallery": "Choose from Gallery",
+  "analyzing": "Analyzing your photo...",
+  "recommendations": "Recommendations",
+  "face_shape": "Face Shape",
+  "color_type": "Color Type",
+  "makeup_recommendations": "Makeup",
+  "hairstyle_recommendations": "Hairstyle",
+  "skincare_recommendations": "Skincare",
+  "error_no_face": "No face detected. Please try again.",
+  "error_multiple_faces": "Multiple faces detected. Please use a photo with one face.",
+  "error_camera": "Camera error. Please try again.",
+  "error": "Error",
+  "info": "Information",
+  "share_coming_soon": "Sharing feature coming soon!",
+  "analysis_failed": "Failed to analyze photo. Please try again.",
+  "welcome_message": "Take or choose a photo to get personalized beauty recommendations",
+  "history": "History",
+  "no_history": "You don't have any saved results yet",
+  "confirm_delete": "Confirm Deletion",
+  "delete_result_confirmation": "Are you sure you want to delete this result?",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "error_saving_result": "Error saving result",
+  "error_loading_result": "Error loading result",
+  "error_loading_results": "Error loading results",
+  "error_deleting_result": "Error deleting result",
+  "error_sharing": "Error sharing results",
+
+  "face_shape_oval": "Oval",
+  "face_shape_round": "Round",
+  "face_shape_square": "Square",
+  "face_shape_heart": "Heart-shaped",
+  "face_shape_diamond": "Diamond",
+  "face_shape_rectangle": "Rectangle",
+
+  "color_type_spring": "Spring",
+  "color_type_summer": "Summer",
+  "color_type_autumn": "Autumn",
+  "color_type_winter": "Winter",
+
+  "season_winter": "In winter, pay special attention to moisturizing and protecting your skin from the cold. Use more nourishing creams and protective lip balms.",
+  "season_spring": "In spring, focus on skin renewal after winter. Add exfoliating products and antioxidants to your care routine.",
+  "season_summer": "In summer, sun protection is the most important element of care. Use light textures and don't forget about hydration.",
+  "season_autumn": "In autumn, skin needs special protection and restoration. Pay attention to products with vitamins and antioxidants.",
+
+  "makeup_shape_oval": "Enhance natural proportions with light contouring",
+  "makeup_shape_oval_2": "Apply blush diagonally upward for additional lifting",
+  "makeup_shape_oval_3": "Experiment with different techniques - your face shape is universal",
+  "makeup_shape_oval_4": "Emphasize eyes or lips according to your preference",
+  "makeup_shape_oval_5": "Use highlighter on cheekbones to enhance natural relief",
+
+  "makeup_shape_round": "Use contouring on the sides of the face for elongation",
+  "makeup_shape_round_2": "Apply blush at an upward angle to elongate the shape",
+  "makeup_shape_round_3": "Create clear angles when applying foundation in the jaw area",
+  "makeup_shape_round_4": "Emphasize cheekbones with highlighter",
+  "makeup_shape_round_5": "Use oval contouring technique for nose",
+  
+  "makeup_shape_square": "Soften face angles with blended contouring",
+  "makeup_shape_square_2": "Apply blush in circular motions to soften features",
+  "makeup_shape_square_3": "Avoid sharp lines when applying makeup",
+  "makeup_shape_square_4": "Add light-reflecting particles in the cheekbone area",
+  "makeup_shape_square_5": "Use soft pastel shades for eyes",
+  
+  "makeup_shape_heart": "Emphasize cheekbones to balance wider forehead",
+  "makeup_shape_heart_2": "Use highlighter on chin for visual elongation",
+  "makeup_shape_heart_3": "Darken outer corners of forehead for balance",
+  "makeup_shape_heart_4": "Apply blush closer to the center of cheeks",
+  "makeup_shape_heart_5": "Accent lower part of face with light shades",
+  
+  "makeup_shape_diamond": "Focus contouring on temples and chin",
+  "makeup_shape_diamond_2": "Apply blush horizontally to soften sharp angles",
+  "makeup_shape_diamond_3": "Emphasize face center with light shades",
+  "makeup_shape_diamond_4": "Use soft transitions when blending",
+  "makeup_shape_diamond_5": "Add volume to lower face with light textures",
+  
+  "makeup_shape_rectangle": "Create soft transitions with contouring",
+  "makeup_shape_rectangle_2": "Use blush to add roundness",
+  "makeup_shape_rectangle_3": "Emphasize cheekbones for proportion balance",
+  "makeup_shape_rectangle_4": "Add light accents in the central face area",
+  "makeup_shape_rectangle_5": "Avoid vertical lines when applying makeup",
+  
+  "makeup_color_spring": "Choose warm, bright lipstick shades: coral, peach, warm pink",
+  "makeup_color_spring_2": "Use golden and peach blush",
+  "makeup_color_spring_3": "Bronze, gold, and warm brown eyeshadows will suit you",
+  "makeup_color_spring_4": "Experiment with terracotta lip shades",
+  "makeup_color_spring_5": "Use warm bronzer shades",
+
+  "makeup_color_summer": "Choose cool, muted lipstick shades: pink, raspberry",
+  "makeup_color_summer_2": "Use cool pink and lavender blush",
+  "makeup_color_summer_3": "Silver, grey, and cool brown tones for eyes are ideal",
+  "makeup_color_summer_4": "Avoid too bright and warm shades",
+  "makeup_color_summer_5": "Prefer pastel tones",
+
+  "makeup_color_autumn": "Choose warm, earthy lipstick shades: terracotta, copper",
+  "makeup_color_autumn_2": "Use warm brown and terracotta blush",
+  "makeup_color_autumn_3": "Green and golden-brown eyeshadows will suit you",
+  "makeup_color_autumn_4": "Experiment with rich autumn colors",
+  "makeup_color_autumn_5": "Add golden shimmer for glow",
+
+  "makeup_color_winter": "Choose bright, contrasting lipstick shades: red, fuchsia",
+  "makeup_color_winter_2": "Use cool pink and berry blush",
+  "makeup_color_winter_3": "Smokey, blue, and silver eyeshadows will suit you",
+  "makeup_color_winter_4": "Experiment with saturated colors",
+  "makeup_color_winter_5": "Use contrasting combinations",
+
+  "haircolor_spring": "Golden blonde shades will emphasize natural brightness",
+  "haircolor_spring_2": "Honey and caramel tones will suit perfectly",
+  "haircolor_spring_3": "Experiment with warm red shades",
+
+  "haircolor_summer": "Choose cool platinum and ashy shades",
+  "haircolor_summer_2": "Pearl blonde will emphasize your appearance",
+  "haircolor_summer_3": "Try pastel tones",
+
+  "haircolor_autumn": "Choose rich chestnut and copper shades",
+  "haircolor_autumn_2": "Golden-brown tones will enhance natural beauty",
+  "haircolor_autumn_3": "Experiment with warm red tones",
+
+  "haircolor_winter": "Choose contrasting colors - black or platinum blonde",
+  "haircolor_winter_2": "Cool dark shades will emphasize your appearance",
+  "haircolor_winter_3": "Try bluish-black tones",
+
+  "hairstyle_oval": "Most hairstyles suit you thanks to your proportional face shape",
+  "hairstyle_oval_2": "Try long hair with light waves for a romantic look",
+  "hairstyle_oval_3": "Medium length with graduation will emphasize facial features",
+  "hairstyle_oval_4": "You can experiment with any type of bangs",
+  "hairstyle_oval_5": "Both straight and curly hairstyles will work well",
+  
+  "hairstyle_round": "Choose hairstyles that add height and elongate the face",
+  "hairstyle_round_2": "Avoid too voluminous styles on the sides",
+  "hairstyle_round_3": "Asymmetrical cuts will help elongate the face",
+  "hairstyle_round_4": "Long hair with textured ends will create the desired effect",
+  "hairstyle_round_5": "Side-swept bangs will help make face appear more refined",
+  
+  "hairstyle_square": "Choose soft, wavy styles to soften features",
+  "hairstyle_square_2": "Avoid straight hair with sharp lines",
+  "hairstyle_square_3": "Layered cuts will add softness",
+  "hairstyle_square_4": "Length below chin will soften jawline",
+  "hairstyle_square_5": "Light curls around face will create romantic look",
+  
+  "hairstyle_heart": "Choose styles with volume at bottom for balance",
+  "hairstyle_heart_2": "Avoid too much volume at top",
+  "hairstyle_heart_3": "Medium length with soft layers is ideal",
+  "hairstyle_heart_4": "Side parts help balance features",
+  "hairstyle_heart_5": "Long side bangs will soften forehead line",
+  
+  "hairstyle_diamond": "Choose styles with volume in temple area",
+  "hairstyle_diamond_2": "Experiment with layered cuts",
+  "hairstyle_diamond_3": "Shoulder length or longer is most flattering",
+  "hairstyle_diamond_4": "Avoid styles too close to head",
+  "hairstyle_diamond_5": "Soft medium-length waves emphasize your face shape",
+  
+  "hairstyle_rectangle": "Choose layered cuts to add volume",
+  "hairstyle_rectangle_2": "Add side volume for proportion balance",
+  "hairstyle_rectangle_3": "Avoid too long straight hair",
+  "hairstyle_rectangle_4": "Bangs help visually shorten face length",
+  "hairstyle_rectangle_5": "Cascade cuts create needed volume",
+  
+  "skincare_recommendation_1": "Always use sunscreen daily",
+  "skincare_recommendation_2": "Cleanse your skin twice a day with a gentle cleanser",
+  "skincare_recommendation_3": "Don't forget about skin hydration",
+  "skincare_recommendation_4": "Regular exfoliation and peeling",
+  "skincare_recommendation_5": "Use serums with active ingredients",
+  
+  "skincare_spring": "Use light texture products",
+  "skincare_spring_2": "Pay attention to vitamin C products",
+  "skincare_spring_3": "Add antioxidants to your routine",
+  "skincare_spring_4": "Protect from pigmentation with SPF 30-50",
+  "skincare_spring_5": "Choose calming masks for sensitive skin",
+  
+  "skincare_summer": "Use non-comedogenic products",
+  "skincare_summer_2": "Moisturize with light gel textures",
+  "skincare_summer_3": "Protect from sun with SPF 50+",
+  "skincare_summer_4": "Add niacinamide to your routine",
+  "skincare_summer_5": "Regular use of calming masks",
+  
+  "skincare_autumn": "Choose rich-textured nourishing creams",
+  "skincare_autumn_2": "Use oils for additional nourishment",
+  "skincare_autumn_3": "Protect from sun with SPF 30+",
+  "skincare_autumn_4": "Pay attention to retinol products",
+  "skincare_autumn_5": "Regular use of moisturizing masks",
+  
+  "skincare_winter": "Use creams with rich texture",
+  "skincare_winter_2": "Add peptides and ceramides to your routine",
+  "skincare_winter_3": "Protect from sun with SPF 50+",
+  "skincare_winter_4": "Pay attention to hyaluronic acid products",
+  "skincare_winter_5": "Regular nourishing masks",
+
+  "personalized_makeup_base": "For your appearance type, it's especially important to: ",
+  "personalized_makeup_oval": "emphasize the natural harmony of facial features",
+  "personalized_makeup_round": "create visual vertical lines",
+  "personalized_makeup_square": "soften facial angles",
+  "personalized_makeup_heart": "balance upper and lower parts of the face",
+  "personalized_makeup_diamond": "accent the center of the face",
+  "personalized_makeup_rectangle": "create harmonious proportions",
+
+  "personalized_makeup_spring": "Use warm, bright shades for a fresh look",
+  "personalized_makeup_summer": "Choose soft, pastel tones for natural makeup",
+  "personalized_makeup_autumn": "Prefer warm, earthy shades for a harmonious look",
+  "personalized_makeup_winter": "Experiment with bright, contrasting colors for expressive makeup",
+
+  "personalized_hair": "Your face shape allows: ",
+  "personalized_hair_oval": "You can experiment with different hairstyles as your face shape has balanced proportions",
+  "personalized_hair_round": "Choose hairstyles that add height and elongate the face",
+  "personalized_hair_square": "Soft waves and layered cuts will help soften your features",
+  "personalized_hair_heart": "Hairstyles with volume at the bottom will help balance proportions",
+  "personalized_hair_diamond": "Add volume in the temple area with side strands",
+  "personalized_hair_rectangle": "Multi-layered cuts will help add necessary volume"
+}
+
+[FILE: marinette/i18n/uk.json]
+{
+  "app_name": "Б'юті-рекомендації",
+  "take_photo": "Зробити фото",
+  "choose_from_gallery": "Вибрати з галереї",
+  "analyzing": "Аналізуємо ваше фото...",
+  "recommendations": "Рекомендації",
+  "face_shape": "Форма обличчя",
+  "color_type": "Кольоротип",
+  "makeup_recommendations": "Макіяж",
+  "hairstyle_recommendations": "Зачіска",
+  "skincare_recommendations": "Догляд за шкірою",
+  "error_no_face": "Обличчя не знайдено. Спробуйте ще раз.",
+  "error_multiple_faces": "Знайдено декілька облич. Використовуйте фото з одним обличчям.",
+  "error_camera": "Помилка камери. Спробуйте ще раз.",
+  "error": "Помилка",
+  "info": "Інформація",
+  "share_coming_soon": "Функція поширення скоро з'явиться!",
+  "analysis_failed": "Не вдалося проаналізувати фото. Спробуйте ще раз.",
+  "welcome_message": "Зробіть або виберіть фото, щоб отримати персоналізовані б'юті-рекомендації",
+  "history": "Історія",
+  "no_history": "У вас ще немає збережених результатів",
+  "confirm_delete": "Підтвердження видалення",
+  "delete_result_confirmation": "Ви впевнені, що хочете видалити цей результат?",
+  "cancel": "Скасувати",
+  "delete": "Видалити",
+  "error_saving_result": "Помилка збереження результату",
+  "error_loading_result": "Помилка завантаження результату",
+  "error_loading_results": "Помилка завантаження результатів",
+  "error_deleting_result": "Помилка видалення результату",
+  "error_sharing": "Помилка під час поширення результатів",
+
+  "face_shape_oval": "Овальна",
+  "face_shape_round": "Кругла",
+  "face_shape_square": "Квадратна",
+  "face_shape_heart": "Серцеподібна",
+  "face_shape_diamond": "Діамантова",
+  "face_shape_rectangle": "Прямокутна",
+
+  "color_type_spring": "Весна",
+  "color_type_summer": "Літо",
+  "color_type_autumn": "Осінь",
+  "color_type_winter": "Зима",
+
+  "season_winter": "В зимовий період особливу увагу приділіть зволоженню та захисту шкіри від холоду. Використовуйте більш поживні креми та захисні бальзами для губ.",
+  "season_spring": "Весною зосередьтесь на відновленні шкіри після зими. Додайте до догляду відлущуючі засоби та антиоксиданти.",
+  "season_summer": "Влітку найважливіший елемент догляду - сонцезахист. Використовуйте легкі текстури та не забувайте про зволоження.",
+  "season_autumn": "Восени шкіра потребує особливого захисту та відновлення. Зверніть увагу на засоби з вітамінами та антиоксидантами.",
+
+  "makeup_shape_oval": "Підкресліть природні пропорції легким контурингом",
+  "makeup_shape_oval_2": "Рум'яна наносіть по діагоналі вгору для додаткового ліфтингу",
+  "makeup_shape_oval_3": "Експериментуйте з різними техніками - ваша форма обличчя універсальна",
+  "makeup_shape_oval_4": "Акцентуйте увагу на очах або губах за вашим вибором",
+  "makeup_shape_oval_5": "Використовуйте хайлайтер на вилицях для підкреслення природного рельєфу",
+
+  "makeup_shape_round": "Використовуйте контуринг по бокам обличчя для видовження",
+  "makeup_shape_round_2": "Наносьте рум'яна під кутом догори для витягування форми",
+  "makeup_shape_round_3": "Створюйте чіткі кути при нанесенні тонального засобу в зоні щелепи",
+  "makeup_shape_round_4": "Робіть акцент на вилицях за допомогою хайлайтера",
+  "makeup_shape_round_5": "Використовуйте техніку овального контурингу носа",
+  
+  "makeup_shape_square": "Пом'якшуйте кути обличчя за допомогою розтушованого контурингу",
+  "makeup_shape_square_2": "Наносьте рум'яна круговими рухами для пом'якшення рис",
+  "makeup_shape_square_3": "Уникайте різких ліній при нанесенні макіяжу",
+  "makeup_shape_square_4": "Додавайте світловідбиваючі частинки в зоні скул",
+  "makeup_shape_square_5": "Використовуйте м'які пастельні тони для очей",
+  
+  "makeup_shape_heart": "Підкресліть вилиці, щоб збалансувати ширше чоло",
+  "makeup_shape_heart_2": "Використовуйте хайлайтер на підборідді для візуального подовження",
+  "makeup_shape_heart_3": "Затемнюйте зовнішні кути чола для балансу",
+  "makeup_shape_heart_4": "Наносіть рум'яна ближче до центру щік",
+  "makeup_shape_heart_5": "Акцентуйте нижню частину обличчя за допомогою світлих відтінків",
+  
+  "makeup_shape_diamond": "Концентруйте контуринг на скронях та підборідді",
+  "makeup_shape_diamond_2": "Наносьте рум'яна горизонтально для пом'якшення гострих кутів",
+  "makeup_shape_diamond_3": "Підкреслюйте центр обличчя світлими відтінками",
+  "makeup_shape_diamond_4": "Використовуйте м'які переходи при розтушовці",
+  "makeup_shape_diamond_5": "Додавайте об'єм в нижній частині обличчя світлими текстурами",
+  
+  "makeup_shape_rectangle": "Створюйте м'які переходи при контурингу",
+  "makeup_shape_rectangle_2": "Використовуйте рум'яна для додання округлості",
+  "makeup_shape_rectangle_3": "Підкресліть вилиці для балансу пропорцій",
+  "makeup_shape_rectangle_4": "Додавайте світлі акценти в центральній частині обличчя",
+  "makeup_shape_rectangle_5": "Уникайте вертикальних ліній при нанесенні макіяжу",
+  
+  "makeup_color_spring": "Обирайте теплі, яскраві відтінки помади: корал, персик, теплий рожевий",
+  "makeup_color_spring_2": "Використовуйте золотисті та персикові рум'яна",
+  "makeup_color_spring_3": "Для очей підійдуть бронзові, золотисті та теплі коричневі тіні",
+  "makeup_color_spring_4": "Експериментуйте з теракотовими відтінками для губ",
+  "makeup_color_spring_5": "Використовуйте теплі відтінки бронзера",
+
+  "makeup_color_summer": "Обирайте холодні, приглушені відтінки помади: рожевий, малиновий",
+  "makeup_color_summer_2": "Використовуйте холодні рожеві та лавандові рум'яна",
+  "makeup_color_summer_3": "Для очей ідеальні сріблясті, сірі та прохолодні коричневі тони",
+  "makeup_color_summer_4": "Уникайте занадто яскравих та теплих відтінків",
+  "makeup_color_summer_5": "Віддавайте перевагу пастельним тонам",
+
+  "makeup_color_autumn": "Обирайте теплі, землисті відтінки помади: теракот, мідь",
+  "makeup_color_autumn_2": "Використовуйте теплі коричневі та теракотові рум'яна",
+  "makeup_color_autumn_3": "Для очей підійдуть зелені, золотисто-коричневі тони",
+  "makeup_color_autumn_4": "Експериментуйте з насиченими осінніми кольорами",
+  "makeup_color_autumn_5": "Додавайте золотистий шиммер для сяяння",
+
+  "makeup_color_winter": "Обирайте яскраві, контрастні відтінки помади: червоний, фуксія",
+  "makeup_color_winter_2": "Використовуйте холодні рожеві та ягідні рум'яна",
+  "makeup_color_winter_3": "Для очей підійдуть димчасті, сині та сріблясті відтінки",
+  "makeup_color_winter_4": "Експериментуйте з насиченими кольорами",
+  "makeup_color_winter_5": "Використовуйте контрастні комбінації",
+
+  "haircolor_spring": "Золотисті відтінки блонду підкреслять природну яскравість",
+  "haircolor_spring_2": "Медові та карамельні тони чудово підійдуть",
+  "haircolor_spring_3": "Експериментуйте з теплими рудими відтінками",
+
+  "haircolor_summer": "Обирайте холодні платинові та попелясті відтінки",
+  "haircolor_summer_2": "Перлинний блонд підкреслить вашу зовнішність",
+  "haircolor_summer_3": "Експериментуйте з пастельними тонами",
+
+  "haircolor_autumn": "Обирайте насичені каштанові та мідні відтінки",
+  "haircolor_autumn_2": "Золотисто-коричневі тони підкреслять природну красу",
+  "haircolor_autumn_3": "Експериментуйте з теплими рудими тонами",
+
+  "haircolor_winter": "Обирайте контрастні кольори - чорний або платиновий блонд",
+  "haircolor_winter_2": "Холодні темні відтінки підкреслять вашу зовнішність",
+  "haircolor_winter_3": "Спробуйте синювато-чорні тони",
+
+  "hairstyle_oval": "Вам підходить більшість зачісок завдяки пропорційній формі обличчя",
+  "hairstyle_oval_2": "Спробуйте довге волосся з легкими хвилями для романтичного образу",
+  "hairstyle_oval_3": "Середня довжина з градуюванням підкреслить риси обличчя",
+  "hairstyle_oval_4": "Можна експериментувати з чубчиком будь-якої форми",
+  "hairstyle_oval_5": "Підійдуть як прямі, так і кучеряві зачіски",
+  
+  "hairstyle_round": "Обирайте зачіски, що додають висоти та видовжують обличчя",
+  "hairstyle_round_2": "Уникайте занадто об'ємних укладок з боків",
+  "hairstyle_round_3": "Асиметричні стрижки допоможуть видовжити обличчя",
+  "hairstyle_round_4": "Довге волосся з рваними кінцями створить потрібний ефект",
+  "hairstyle_round_5": "Косий чубчик допоможе зробити обличчя більш витонченим",
+  
+  "hairstyle_square": "Обирайте м'які, хвилясті укладки для пом'якшення рис",
+  "hairstyle_square_2": "Уникайте прямого волосся з чіткими лініями",
+  "hairstyle_square_3": "Багатошарові стрижки додадуть м'якості",
+  "hairstyle_square_4": "Довжина нижче підборіддя пом'якшить лінію щелепи",
+  "hairstyle_square_5": "Легкі локони біля обличчя створять романтичний образ",
+  
+  "hairstyle_heart": "Обирайте зачіски з об'ємом внизу для балансу",
+  "hairstyle_heart_2": "Уникайте занадто об'ємних укладок у верхній частині",
+  "hairstyle_heart_3": "Середня довжина з м'якими шарами ідеально підійде",
+  "hairstyle_heart_4": "Бокові проділи допоможуть збалансувати риси",
+  "hairstyle_heart_5": "Довгий боковий чубчик пом'якшить лінію чола",
+  
+  "hairstyle_diamond": "Обирайте зачіски з об'ємом у скроневій зоні",
+  "hairstyle_diamond_2": "Експериментуйте з шаруватими стрижками",
+  "hairstyle_diamond_3": "Довжина до плечей або нижче найбільш вдала",
+  "hairstyle_diamond_4": "Уникайте занадто прилеглих до голови зачісок",
+  "hairstyle_diamond_5": "М'які хвилі середньої довжини підкреслять вашу форму обличчя",
+  
+  "hairstyle_rectangle": "Обирайте багатошарові стрижки для додання об'єму",
+  "hairstyle_rectangle_2": "Додайте об'єму з боків для балансу пропорцій",
+  "hairstyle_rectangle_3": "Уникайте занадто довгого прямого волосся",
+  "hairstyle_rectangle_4": "Чубчик допоможе візуально скоротити довжину обличчя",
+  "hairstyle_rectangle_5": "Каскадні стрижки створять потрібний об'єм",
+  
+  "skincare_recommendation_1": "Обов'язково використовуйте сонцезахисний крем щодня",
+  "skincare_recommendation_2": "Очищайте шкіру двічі на день м'яким засобом",
+  "skincare_recommendation_3": "Не забувайте про зволоження шкіри",
+  "skincare_recommendation_4": "Регулярно робіть пілінг та відлущування",
+  "skincare_recommendation_5": "Використовуйте сироватки з активними компонентами",
+  
+  "skincare_spring": "Використовуйте легкі текстури засобів",
+  "skincare_spring_2": "Зверніть увагу на засоби з вітаміном С",
+  "skincare_spring_3": "Додайте до догляду антиоксиданти",
+  "skincare_spring_4": "Захищайтесь від пігментації SPF 30-50",
+  "skincare_spring_5": "Обирайте заспокійливі маски для чутливої шкіри",
+  
+  "skincare_summer": "Використовуйте некомедогенні засоби",
+  "skincare_summer_2": "Зволожуйте шкіру легкими гелевими текстурами",
+  "skincare_summer_3": "Захищайтесь від сонця SPF 50+",
+  "skincare_summer_4": "Додайте до догляду ніацинамід",
+  "skincare_summer_5": "Регулярно робіть заспокійливі маски",
+  
+  "skincare_autumn": "Обирайте поживні креми з багатою текстурою",
+  "skincare_autumn_2": "Використовуйте олії для додаткового живлення",
+  "skincare_autumn_3": "Захищайтесь від сонця SPF 30+",
+  "skincare_autumn_4": "Звертайте увагу на засоби з ретинолом",
+  "skincare_autumn_5": "Регулярно використовуйте зволожуючі маски",
+  
+  "skincare_winter": "Використовуйте креми з насиченою текстурою",
+  "skincare_winter_2": "Додайте до догляду пептиди та церамиди",
+  "skincare_winter_3": "Захищайтесь від сонця SPF 50+",
+  "skincare_winter_4": "Зверніть увагу на засоби з гіалуроновою кислотою",
+  "skincare_winter_5": "Робіть регулярно поживні маски",
+
+  "personalized_makeup_base": "Для вашого типу зовнішності особливо важливо: ",
+  "personalized_makeup_oval": "підкреслювати природну гармонію рис обличчя",
+  "personalized_makeup_round": "створювати візуальні вертикальні лінії",
+  "personalized_makeup_square": "пом'якшувати кути обличчя",
+  "personalized_makeup_heart": "балансувати верхню та нижню частини обличчя",
+  "personalized_makeup_diamond": "акцентувати центр обличчя",
+  "personalized_makeup_rectangle": "створювати гармонійні пропорції",
+
+  "personalized_makeup_spring": "Використовуйте теплі, яскраві відтінки для свіжого образу",
+  "personalized_makeup_summer": "Обирайте м'які, пастельні тони для природного макіяжу",
+  "personalized_makeup_autumn": "Віддавайте перевагу теплим, землистим відтінкам для гармонійного образу",
+  "personalized_makeup_winter": "Експериментуйте з яскравими, контрастними кольорами для виразного макіяжу",
+
+  "personalized_hair": "Ваша форма обличчя дозволяє: ",
+  "personalized_hair_oval": "Ви можете експериментувати з різними зачісками, оскільки ваша форма обличчя має збалансовані пропорції",
+  "personalized_hair_round": "Обирайте зачіски, що додають висоти та видовжують обличчя",
+  "personalized_hair_square": "М'які хвилі та багатошарові стрижки допоможуть пом'якшити риси",
+  "personalized_hair_heart": "Зачіски з об'ємом внизу допоможуть збалансувати пропорції",
+  "personalized_hair_diamond": "Додайте об'єм у скроневій зоні за допомогою бокових пасом",
+  "personalized_hair_rectangle": "Багатошарові стрижки допоможуть додати необхідний об'єм"
+}
+
+[FILE: marinette/lib/app/core/theme/app_theme.dart]
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static ThemeData get theme => ThemeData(
+        primarySwatch: Colors.pink,
+        fontFamily: 'PlayfairDisplay',
+        useMaterial3: true,
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(fontFamily: 'PlayfairDisplay'),
+          displayMedium: TextStyle(fontFamily: 'PlayfairDisplay'),
+          displaySmall: TextStyle(fontFamily: 'PlayfairDisplay'),
+          headlineLarge: TextStyle(fontFamily: 'PlayfairDisplay'),
+          headlineMedium: TextStyle(fontFamily: 'PlayfairDisplay'),
+          headlineSmall: TextStyle(fontFamily: 'PlayfairDisplay'),
+          titleLarge: TextStyle(fontFamily: 'PlayfairDisplay'),
+          titleMedium: TextStyle(fontFamily: 'PlayfairDisplay'),
+          titleSmall: TextStyle(fontFamily: 'PlayfairDisplay'),
+          bodyLarge: TextStyle(fontFamily: 'PlayfairDisplay'),
+          bodyMedium: TextStyle(fontFamily: 'PlayfairDisplay'),
+          bodySmall: TextStyle(fontFamily: 'PlayfairDisplay'),
+        ),
+        cardTheme: const CardTheme(
+          color: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.pink,
+            textStyle: const TextStyle(
+              fontFamily: 'PlayfairDisplay',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.pink,
+            textStyle: const TextStyle(
+              fontFamily: 'PlayfairDisplay',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.pink,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontFamily: 'PlayfairDisplay',
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.pink,
+          ),
+        ),
+      );
+}
+
+[FILE: marinette/lib/app/core/utils/app_navigation.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class AppNavigation {
+  static Future<T?> navigateTo<T>({
+    required BuildContext context,
+    required Widget page,
+    String? routeName,
+  }) {
+    return Navigator.of(context).push<T>(
+      MaterialPageRoute(
+        builder: (context) => page,
+        settings: RouteSettings(name: routeName ?? page.runtimeType.toString()),
+      ),
+    );
+  }
+
+  static Future<T?> navigateWithSlide<T>({
+    required Widget page,
+    bool fullscreenDialog = false,
+  }) {
+    return Get.to<T>(
+          () => page,
+          transition: Transition.rightToLeft,
+          duration: const Duration(milliseconds: 300),
+          fullscreenDialog: fullscreenDialog,
+        ) ??
+        Future.value(null);
+  }
+
+  static void back<T>([T? result]) {
+    Get.back<T>(result: result);
+  }
+
+  static Future<bool?> showConfirmationDialog({
+    required String title,
+    required String content,
+    String? confirmText,
+    String? cancelText,
+  }) {
+    return Get.dialog<bool>(
+      AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(cancelText ?? 'cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              confirmText ?? 'confirm'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/core/utils/custom_page_route.dart]
+import 'package:flutter/material.dart';
+
+class CustomPageRoute<T> extends PageRoute<T> {
+  final Widget child;
+  @override
+  final RouteSettings settings;
+
+  CustomPageRoute({
+    required this.child,
+    required this.settings,
+  });
+
+  @override
+  Color? get barrierColor => null;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  Widget buildPage(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeInOut,
+      )),
+      child: child,
+    );
+  }
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  bool get opaque => true;
+}
+
+[FILE: marinette/lib/app/core/utils/page_transitions.dart]
+import 'package:flutter/material.dart';
+
+class FadePageRoute extends PageRouteBuilder {
+  final Widget page;
+
+  FadePageRoute({required this.page})
+      : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+}
+
+class SlidePageRoute extends PageRouteBuilder {
+  final Widget page;
+  final SlideDirection direction;
+
+  SlidePageRoute({
+    required this.page,
+    this.direction = SlideDirection.right,
+  }) : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            Offset begin;
+            switch (direction) {
+              case SlideDirection.right:
+                begin = const Offset(1.0, 0.0);
+                break;
+              case SlideDirection.left:
+                begin = const Offset(-1.0, 0.0);
+                break;
+              case SlideDirection.up:
+                begin = const Offset(0.0, 1.0);
+                break;
+              case SlideDirection.down:
+                begin = const Offset(0.0, -1.0);
+                break;
+            }
+
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: begin,
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOut,
+              )),
+              child: child,
+            );
+          },
+        );
+}
+
+enum SlideDirection {
+  right,
+  left,
+  up,
+  down,
+}
+
+[FILE: marinette/lib/app/core/widgets/wave_background_painter.dart]
+import 'package:flutter/material.dart';
+
+class WaveBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.pink.withOpacity(0.1)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+
+    // Початкова точка
+    path.moveTo(0, size.height * 0.3);
+
+    // Перша хвиля
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.35,
+      size.width * 0.5,
+      size.height * 0.3,
+    );
+
+    // Друга хвиля
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.25,
+      size.width,
+      size.height * 0.3,
+    );
+
+    // Завершення шляху
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+[FILE: marinette/lib/app/data/content/beauty_trends.dart]
+class BeautyTrend {
+  final String title;
+  final String description;
+  final String season; // 'winter', 'spring', 'summer', 'autumn'
+
+  const BeautyTrend({
+    required this.title,
+    required this.description,
+    required this.season,
+  });
+}
+
+const List<BeautyTrend> beautyTrends = [
+  // Spring Trends
+  BeautyTrend(
+    title: 'Glass Skin',
+    description: 'Achieve that dewy, transparent complexion',
+    season: 'spring',
+  ),
+  BeautyTrend(
+    title: 'Pastel Eyeshadows',
+    description: 'Light, airy colors for a fresh spring look',
+    season: 'spring',
+  ),
+  BeautyTrend(
+    title: 'Natural Blush',
+    description: 'Soft, rosy cheeks for springtime glow',
+    season: 'spring',
+  ),
+
+  // Summer Trends
+  BeautyTrend(
+    title: 'Sunburnt Blush',
+    description: 'The perfect summer flush across the nose and cheeks',
+    season: 'summer',
+  ),
+  BeautyTrend(
+    title: 'Glazed Skin',
+    description: 'Dewy, hydrated skin with a glossy finish',
+    season: 'summer',
+  ),
+  BeautyTrend(
+    title: 'Waterproof Makeup',
+    description: 'Long-lasting looks for hot summer days',
+    season: 'summer',
+  ),
+
+  // Autumn Trends
+  BeautyTrend(
+    title: 'Soft Matte Skin',
+    description: 'Velvet-like finish for autumn sophistication',
+    season: 'autumn',
+  ),
+  BeautyTrend(
+    title: 'Berry Lips',
+    description: 'Deep, rich colors for fall season',
+    season: 'autumn',
+  ),
+  BeautyTrend(
+    title: 'Copper Eyes',
+    description: 'Warm metallic shades for autumn glow',
+    season: 'autumn',
+  ),
+
+  // Winter Trends
+  BeautyTrend(
+    title: 'Glossy Lips',
+    description: 'Hydrated, plump lips for winter days',
+    season: 'winter',
+  ),
+  BeautyTrend(
+    title: 'Frosted Looks',
+    description: 'Shimmering finishes for winter magic',
+    season: 'winter',
+  ),
+  BeautyTrend(
+    title: 'Rich Hydration',
+    description: 'Deep moisturizing for winter protection',
+    season: 'winter',
+  ),
+];
+
+[FILE: marinette/lib/app/data/content/daily_tips.dart]
+class DailyTip {
+  final String tip;
+  final String icon;
+
+  const DailyTip({
+    required this.tip,
+    this.icon = '💡',
+  });
+}
+
+const List<DailyTip> dailyTips = [
+  DailyTip(
+    tip:
+        'Use ice cube therapy in the morning to reduce puffiness and give your skin a natural glow',
+    icon: '❄️',
+  ),
+  DailyTip(
+    tip:
+        'Apply your skincare products from thinnest to thickest consistency for better absorption',
+    icon: '🧴',
+  ),
+  DailyTip(
+    tip:
+        'Protect your skin with SPF even on cloudy days to prevent premature aging',
+    icon: '☀️',
+  ),
+  DailyTip(
+    tip: 'Stay hydrated! Drink plenty of water for a natural, healthy glow',
+    icon: '💧',
+  ),
+  DailyTip(
+    tip: 'Clean your makeup brushes regularly to prevent breakouts',
+    icon: '🖌️',
+  ),
+  DailyTip(
+    tip: 'Get your beauty sleep! 7-8 hours of sleep helps skin regeneration',
+    icon: '😴',
+  ),
+  DailyTip(
+    tip: 'Pat, don\'t rub! Be gentle when applying products around your eyes',
+    icon: '👁️',
+  ),
+  DailyTip(
+    tip: 'Use a silk pillowcase to prevent hair breakage and skin creasing',
+    icon: '🛏️',
+  ),
+  DailyTip(
+    tip: 'Apply face masks on clean, exfoliated skin for better results',
+    icon: '🎭',
+  ),
+  DailyTip(
+    tip: 'Don\'t forget your neck when applying skincare products',
+    icon: '✨',
+  ),
+];
+
+[FILE: marinette/lib/app/data/models/face_analysis_result.dart]
+class FaceAnalysisResult {
+  final String faceShape;
+  final String colorType;
+  final List<String> makeupRecommendations;
+  final List<String> hairstyleRecommendations;
+  final List<String> skincareRecommendations;
+
+  FaceAnalysisResult({
+    required this.faceShape,
+    required this.colorType,
+    required this.makeupRecommendations,
+    required this.hairstyleRecommendations,
+    required this.skincareRecommendations,
+  });
+}
+
+[FILE: marinette/lib/app/data/models/facial_features.dart]
+import 'dart:math' show Point;
+
+class FacialFeatures {
+  final double symmetry;
+  final double faceWidth;
+  final double faceHeight;
+  final double jawlineStrength;
+  final double cheekboneProminence;
+  final double foreheadHeight;
+  final List<Point<int>> facialContours;
+
+  FacialFeatures({
+    required this.symmetry,
+    required this.faceWidth,
+    required this.faceHeight,
+    required this.jawlineStrength,
+    required this.cheekboneProminence,
+    required this.foreheadHeight,
+    required this.facialContours,
+  });
+}
+
+[FILE: marinette/lib/app/data/services/audio_service.dart]
+import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:marinette/app/data/services/user_preferences_service.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+
+class AudioService extends GetxService {
+  AudioPlayer? _player;
+  final _isPlaying = false.obs;
+  final _isMuted = false.obs;
+  final _isInitialized = false.obs;
+  final UserPreferencesService _prefs = Get.find<UserPreferencesService>();
+
+  static const String _bgMusicPath = 'assets/audio/nana.mp3';
+  static const String _isMusicEnabledKey = 'is_music_enabled';
+  static const double _defaultVolume =
+      0.3; // Зменшили гучність за замовчуванням
+
+  Future<AudioService> init() async {
+    try {
+      _player = AudioPlayer();
+
+      // Налаштовуємо аудіо з обробкою помилок
+      try {
+        await _player?.setAsset(_bgMusicPath);
+        await _player?.setLoopMode(LoopMode.all);
+        await _player?.setVolume(_defaultVolume);
+        _isInitialized.value = true;
+
+        // Відновлюємо останній стан музики
+        final isMusicEnabled = await _prefs.getBool(_isMusicEnabledKey) ?? true;
+        if (isMusicEnabled) {
+          await play();
+        }
+      } catch (e) {
+        debugPrint('Error configuring audio player: $e');
+        _isInitialized.value = false;
+      }
+    } catch (e) {
+      debugPrint('Error creating audio player: $e');
+      _isInitialized.value = false;
+    }
+    return this;
+  }
+
+  bool get isPlaying => _isPlaying.value;
+  bool get isMuted => _isMuted.value;
+  bool get isInitialized => _isInitialized.value;
+
+  Future<void> play() async {
+    if (!_isInitialized.value || _player == null) return;
+
+    try {
+      await _player?.play();
+      _isPlaying.value = true;
+      await _prefs.setBool(_isMusicEnabledKey, true);
+    } catch (e) {
+      debugPrint('Error playing music: $e');
+    }
+  }
+
+  Future<void> pause() async {
+    if (!_isInitialized.value || _player == null) return;
+
+    try {
+      await _player?.pause();
+      _isPlaying.value = false;
+      await _prefs.setBool(_isMusicEnabledKey, false);
+    } catch (e) {
+      debugPrint('Error pausing music: $e');
+    }
+  }
+
+  Future<void> toggle() async {
+    if (!_isInitialized.value) return;
+
+    if (_isPlaying.value) {
+      await pause();
+    } else {
+      await play();
+    }
+  }
+
+  Future<void> mute() async {
+    if (!_isInitialized.value || _player == null) return;
+
+    try {
+      await _player?.setVolume(0);
+      _isMuted.value = true;
+    } catch (e) {
+      debugPrint('Error muting music: $e');
+    }
+  }
+
+  Future<void> unmute() async {
+    if (!_isInitialized.value || _player == null) return;
+
+    try {
+      await _player?.setVolume(_defaultVolume);
+      _isMuted.value = false;
+    } catch (e) {
+      debugPrint('Error unmuting music: $e');
+    }
+  }
+
+  Future<void> toggleMute() async {
+    if (!_isInitialized.value) return;
+
+    if (_isMuted.value) {
+      await unmute();
+    } else {
+      await mute();
+    }
+  }
+
+  Future<void> setVolume(double volume) async {
+    if (!_isInitialized.value || _player == null) return;
+
+    try {
+      await _player?.setVolume(volume);
+      _isMuted.value = volume == 0;
+    } catch (e) {
+      debugPrint('Error setting volume: $e');
+    }
+  }
+
+  @override
+  void onClose() {
+    _player?.dispose();
+    super.onClose();
+  }
+}
+
+[FILE: marinette/lib/app/data/services/color_type_analyzer.dart]
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:marinette/app/data/services/skin_color_analyzer.dart';
+
+enum ColorType {
+  spring, // Тепле-яскраве
+  summer, // Холодне-м'яке
+  autumn, // Тепле-м'яке
+  winter, // Холодне-яскраве
+}
+
+class ColorTypeAnalyzer {
+  static Future<ColorType> analyzeColorType(String imagePath, Face face) async {
+    try {
+      final skinTone = await SkinColorAnalyzer.analyzeSkinTone(imagePath, face);
+
+      // Визначаємо кольоротип на основі характеристик кольору шкіри
+      bool isWarm = skinTone.warmth > 0.5;
+      bool isBright = skinTone.saturation > 0.4;
+      bool isLight = skinTone.lightness > 0.5;
+
+      // Основна логіка визначення кольоротипу:
+      if (isWarm) {
+        // Теплі кольоротипи
+        if (isBright && isLight) {
+          return ColorType.spring; // Тепле-яскраве
+        } else {
+          return ColorType.autumn; // Тепле-м'яке
+        }
+      } else {
+        // Холодні кольоротипи
+        if (isBright) {
+          return ColorType.winter; // Холодне-яскраве
+        } else {
+          return ColorType.summer; // Холодне-м'яке
+        }
+      }
+    } catch (e) {
+      // У випадку помилки повертаємо spring як найбільш універсальний тип
+      return ColorType.spring;
+    }
+  }
+
+  static Map<String, List<String>> getColorPalette(ColorType colorType) {
+    switch (colorType) {
+      case ColorType.spring:
+        return {
+          'основні': ['Теплий жовтий', 'Кораловий', 'Персиковий', 'Золотистий'],
+          'акцентні': ['Яскраво-зелений', 'Бірюзовий', 'Світло-рожевий'],
+          'уникати': ['Чорний', 'Сірий', 'Приглушені холодні відтінки'],
+        };
+      case ColorType.summer:
+        return {
+          'основні': ['Холодний рожевий', 'Лавандовий', 'Блакитний', 'Сірий'],
+          'акцентні': ['М\'ята', 'Бузковий', 'Сріблястий'],
+          'уникати': ['Помаранчевий', 'Коричневий', 'Яскраві теплі відтінки'],
+        };
+      case ColorType.autumn:
+        return {
+          'основні': ['Теракотовий', 'Хакі', 'Гірчичний', 'Коричневий'],
+          'акцентні': ['Бронзовий', 'Оливковий', 'Мідний'],
+          'уникати': ['Яскраво-рожевий', 'Сріблястий', 'Холодні пастельні'],
+        };
+      case ColorType.winter:
+        return {
+          'основні': ['Чистий білий', 'Чорний', 'Темно-синій', 'Сапфіровий'],
+          'акцентні': ['Смарагдовий', 'Фуксія', 'Яскраво-червоний'],
+          'уникати': ['Бежевий', 'Помаранчевий', 'Приглушені теплі відтінки'],
+        };
+    }
+  }
+
+  static Map<String, List<String>> getMakeupColors(ColorType colorType) {
+    switch (colorType) {
+      case ColorType.spring:
+        return {
+          'помада': ['Кораловий', 'Персиковий', 'Теплий рожевий'],
+          'рум\'яна': ['Персиковий', 'Абрикосовий', 'Золотистий'],
+          'тіні': ['Золотисто-коричневий', 'Бронзовий', 'Теплий зелений'],
+        };
+      case ColorType.summer:
+        return {
+          'помада': ['Холодний рожевий', 'Малиновий', 'Сливовий'],
+          'рум\'яна': ['Рожевий', 'Лавандовий', 'Світло-малиновий'],
+          'тіні': ['Сірий', 'Блакитний', 'Рожево-коричневий'],
+        };
+      case ColorType.autumn:
+        return {
+          'помада': ['Теракотовий', 'Мідний', 'Коричневий'],
+          'рум\'яна': ['Теракотовий', 'Бронзовий', 'Теплий коричневий'],
+          'тіні': ['Золотисто-коричневий', 'Хакі', 'Мідний'],
+        };
+      case ColorType.winter:
+        return {
+          'помада': ['Яскраво-червоний', 'Фуксія', 'Бордовий'],
+          'рум\'яна': ['Холодний рожевий', 'Вишневий', 'Малиновий'],
+          'тіні': ['Димчастий', 'Синій', 'Сріблястий'],
+        };
+    }
+  }
+}
+
+[FILE: marinette/lib/app/data/services/content_service.dart]
+import 'package:get/get.dart';
+import 'package:marinette/app/data/content/daily_tips.dart';
+import 'package:marinette/app/data/content/beauty_trends.dart';
+
+class ContentService extends GetxService {
+  final Rx<DailyTip> currentTip = dailyTips[0].obs;
+  final RxList<BeautyTrend> currentTrends = <BeautyTrend>[].obs;
+
+  Future<ContentService> init() async {
+    updateDailyTip();
+    updateSeasonalTrends();
+    return this;
+  }
+
+  void updateDailyTip() {
+    final dayOfYear =
+        DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
+    final tipIndex = dayOfYear % dailyTips.length;
+    currentTip.value = dailyTips[tipIndex];
+  }
+
+  void updateSeasonalTrends() {
+    final currentMonth = DateTime.now().month;
+    String season;
+
+    if (currentMonth >= 3 && currentMonth <= 5) {
+      season = 'spring';
+    } else if (currentMonth >= 6 && currentMonth <= 8) {
+      season = 'summer';
+    } else if (currentMonth >= 9 && currentMonth <= 11) {
+      season = 'autumn';
+    } else {
+      season = 'winter';
+    }
+
+    final seasonalTrends =
+        beautyTrends.where((trend) => trend.season == season).toList();
+    currentTrends.value = seasonalTrends;
+  }
+}
+
+[FILE: marinette/lib/app/data/services/face_analysis_service.dart]
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:marinette/app/data/services/face_shape_analyzer.dart';
+import 'package:marinette/app/data/services/color_type_analyzer.dart';
+import 'package:marinette/app/data/services/recommendations_service.dart';
+
+class FaceAnalysisService extends GetxService {
+  final FaceDetector _faceDetector = FaceDetector(
+    options: FaceDetectorOptions(
+      enableContours: true,
+      enableLandmarks: true,
+      performanceMode: FaceDetectorMode.accurate,
+    ),
+  );
+
+  Future<FaceAnalysisResult?> analyzeFace(String imagePath) async {
+    debugPrint('Starting face analysis for: $imagePath');
+    try {
+      late InputImage inputImage;
+
+      if (kIsWeb) {
+        // Отримуємо XFile для веб
+        final XFile pickedFile = XFile(imagePath);
+        final Uint8List bytes = await pickedFile.readAsBytes();
+        inputImage = InputImage.fromBytes(
+          bytes: bytes,
+          metadata: InputImageMetadata(
+            size: const Size(800, 600), // Приблизний розмір
+            rotation: InputImageRotation.rotation0deg,
+            format: InputImageFormat.bgra8888,
+            bytesPerRow: 800 * 4, // width * 4 bytes per pixel
+          ),
+        );
+      } else {
+        // Для мобільної версії
+        final File imageFile = File(imagePath);
+        inputImage = InputImage.fromFile(imageFile);
+      }
+
+      debugPrint('Processing image with ML Kit');
+      final faces = await _faceDetector.processImage(inputImage);
+      debugPrint('Found ${faces.length} faces');
+
+      if (faces.isEmpty) {
+        debugPrint('No faces detected');
+        Get.snackbar('error'.tr, 'error_no_face'.tr);
+        return null;
+      }
+
+      if (faces.length > 1) {
+        debugPrint('Multiple faces detected');
+        Get.snackbar('error'.tr, 'error_multiple_faces'.tr);
+        return null;
+      }
+
+      final face = faces.first;
+      debugPrint('Analyzing single face');
+
+      // Визначення форми обличчя
+      final faceShape = FaceShapeAnalyzer.analyzeFaceShape(face);
+      debugPrint('Face shape determined: $faceShape');
+
+      // Визначення кольоротипу
+      final colorType =
+          await ColorTypeAnalyzer.analyzeColorType(imagePath, face);
+      debugPrint('Color type determined: $colorType');
+
+      // Отримання рекомендацій
+      debugPrint('Generating recommendations');
+      final makeupRecommendations =
+          RecommendationsService.getMakeupRecommendations(faceShape, colorType);
+      final hairstyleRecommendations =
+          RecommendationsService.getHairstyleRecommendations(
+              faceShape, colorType);
+      final skincareRecommendations =
+          RecommendationsService.getSkincareRecommendations(colorType);
+
+      // Отримання персоналізованих порад
+      final personalTips = RecommendationsService.getPersonalizedTips(
+        faceShape: faceShape,
+        colorType: colorType,
+      );
+
+      // Додаємо сезонну рекомендацію
+      final seasonalTip = RecommendationsService.getSeasonalRecommendation();
+
+      // Об'єднуємо всі рекомендації
+      return FaceAnalysisResult(
+        faceShape: _getFaceShapeName(faceShape),
+        colorType: _getColorTypeName(colorType),
+        makeupRecommendations: [
+          ...makeupRecommendations,
+          personalTips[0]
+        ], // Додаємо персоналізовану пораду по макіяжу
+        hairstyleRecommendations: [
+          ...hairstyleRecommendations,
+          personalTips[1]
+        ], // Додаємо пораду по волоссю
+        skincareRecommendations: [
+          ...skincareRecommendations,
+          seasonalTip
+        ], // Додаємо сезонну пораду
+      );
+    } catch (e, stackTrace) {
+      debugPrint('Error during analysis: $e');
+      debugPrint('Stack trace: $stackTrace');
+      Get.snackbar('error'.tr, 'error_analyzing'.tr);
+      return null;
+    }
+  }
+
+  String _getFaceShapeName(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return 'face_shape_oval'.tr;
+      case FaceShape.round:
+        return 'face_shape_round'.tr;
+      case FaceShape.square:
+        return 'face_shape_square'.tr;
+      case FaceShape.heart:
+        return 'face_shape_heart'.tr;
+      case FaceShape.diamond:
+        return 'face_shape_diamond'.tr;
+      case FaceShape.rectangle:
+        return 'face_shape_rectangle'.tr;
+    }
+  }
+
+  String _getColorTypeName(ColorType type) {
+    switch (type) {
+      case ColorType.spring:
+        return 'color_type_spring'.tr;
+      case ColorType.summer:
+        return 'color_type_summer'.tr;
+      case ColorType.autumn:
+        return 'color_type_autumn'.tr;
+      case ColorType.winter:
+        return 'color_type_winter'.tr;
+    }
+  }
+
+  @override
+  void onClose() {
+    _faceDetector.close();
+    super.onClose();
+  }
+}
+
+[FILE: marinette/lib/app/data/services/face_shape_analyzer.dart]
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'dart:math' show Point;
+
+enum FaceShape {
+  oval,
+  round,
+  square,
+  heart,
+  diamond,
+  rectangle,
+}
+
+class FaceShapeAnalyzer {
+  static FaceShape analyzeFaceShape(Face face) {
+    final double faceWidth = face.boundingBox.width;
+    final double faceHeight = face.boundingBox.height;
+    final double ratio = faceHeight / faceWidth;
+
+    // Отримуємо контури обличчя
+    final faceContour = face.contours[FaceContourType.face];
+    if (faceContour == null) return FaceShape.oval;
+
+    // Аналіз форми на основі співвідношень та контурів
+    if (ratio > 1.5) {
+      return _analyzeElongatedFace(faceContour);
+    } else if (ratio < 1.2) {
+      return _analyzeWideFace(faceContour);
+    } else {
+      return _analyzeMediumFace(faceContour);
+    }
+  }
+
+  static FaceShape _analyzeElongatedFace(FaceContour contour) {
+    // Аналіз верхньої частини обличчя
+    double topWidth = _getWidthAtPosition(contour.points, 0.2);
+    double bottomWidth = _getWidthAtPosition(contour.points, 0.8);
+
+    if (topWidth < bottomWidth * 0.85) {
+      return FaceShape.heart;
+    } else if (topWidth > bottomWidth * 1.15) {
+      return FaceShape.diamond;
+    }
+
+    return FaceShape.oval;
+  }
+
+  static FaceShape _analyzeWideFace(FaceContour contour) {
+    // Аналіз кутів щелепи
+    double jawAngle = _calculateJawAngle(contour.points);
+
+    if (jawAngle > 80) {
+      return FaceShape.square;
+    }
+
+    return FaceShape.round;
+  }
+
+  static FaceShape _analyzeMediumFace(FaceContour contour) {
+    // Аналіз пропорцій середньої частини обличчя
+    double middleWidth = _getWidthAtPosition(contour.points, 0.5);
+    double topWidth = _getWidthAtPosition(contour.points, 0.2);
+
+    if (middleWidth > topWidth * 1.1) {
+      return FaceShape.rectangle;
+    }
+
+    return FaceShape.oval;
+  }
+
+  static double _getWidthAtPosition(
+      List<Point<int>> points, double heightPercent) {
+    if (points.isEmpty) return 0;
+
+    final firstPoint = points.first;
+    final lastPoint = points.last;
+
+    int targetY =
+        (firstPoint.y + (lastPoint.y - firstPoint.y) * heightPercent).round();
+
+    var pointsAtHeight =
+        points.where((p) => (p.y - targetY).abs() < 5).toList();
+
+    if (pointsAtHeight.isEmpty) return 0;
+
+    var xValues = pointsAtHeight.map((p) => p.x).toList();
+
+    double minX = xValues.reduce((a, b) => a < b ? a : b).toDouble();
+    double maxX = xValues.reduce((a, b) => a > b ? a : b).toDouble();
+
+    return maxX - minX;
+  }
+
+  static double _calculateJawAngle(List<Point<int>> points) {
+    if (points.length < 3) return 90;
+
+    // Спрощений розрахунок кута щелепи
+    var bottomPoints = points.where((p) {
+      var maxY = points.map((p) => p.y).reduce((a, b) => a > b ? a : b);
+      return p.y > maxY - 20;
+    }).toList();
+
+    if (bottomPoints.length < 3) return 90;
+
+    var sorted = bottomPoints..sort((a, b) => a.x.compareTo(b.x));
+    var first = sorted.first;
+    var last = sorted.last;
+    var middle = sorted[sorted.length ~/ 2];
+
+    // Розрахунок кута між трьома точками
+    double dx1 = (first.x - middle.x).toDouble();
+    double dy1 = (first.y - middle.y).toDouble();
+    double dx2 = (last.x - middle.x).toDouble();
+    double dy2 = (last.y - middle.y).toDouble();
+
+    double dotProduct = dx1 * dx2 + dy1 * dy2;
+    double magnitude1 = sqrt(dx1 * dx1 + dy1 * dy1);
+    double magnitude2 = sqrt(dx2 * dx2 + dy2 * dy2);
+
+    if (magnitude1 == 0 || magnitude2 == 0) return 90;
+
+    return (180 / 3.14159) * (dotProduct / (magnitude1 * magnitude2));
+  }
+
+  static double sqrt(double x) => x <= 0 ? 0 : x.roundToDouble();
+}
+
+[FILE: marinette/lib/app/data/services/facial_features_analyzer.dart]
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'dart:math' show Point, min, max, sqrt, pow, atan2, pi;
+import 'package:marinette/app/data/models/facial_features.dart';
+
+class FacialFeaturesAnalyzer {
+  static Future<FacialFeatures> analyzeFace(Face face) async {
+    final faceContour = face.contours[FaceContourType.face];
+    if (faceContour == null) {
+      throw Exception('Face contour not detected');
+    }
+
+    final points = faceContour.points;
+
+    // Аналіз симетрії
+    final symmetry = _calculateSymmetry(points);
+
+    // Основні виміри
+    final faceWidth = face.boundingBox.width;
+    final faceHeight = face.boundingBox.height;
+
+    // Аналіз щелепи
+    final jawlineStrength = _analyzeJawline(face);
+
+    // Аналіз вилиць
+    final cheekboneProminence = _analyzeCheekbones(face);
+
+    // Аналіз чола
+    final foreheadHeight = _analyzeForeheadHeight(face);
+
+    return FacialFeatures(
+      symmetry: symmetry,
+      faceWidth: faceWidth,
+      faceHeight: faceHeight,
+      jawlineStrength: jawlineStrength,
+      cheekboneProminence: cheekboneProminence,
+      foreheadHeight: foreheadHeight,
+      facialContours: points,
+    );
+  }
+
+  static double _calculateSymmetry(List<Point<int>> points) {
+    if (points.isEmpty) return 0.0;
+
+    // Знаходимо центральну вертикальну лінію
+    double centerX =
+        points.map((p) => p.x).reduce((a, b) => a + b) / points.length;
+
+    // Рахуємо відхилення від симетрії
+    double totalDeviation = 0;
+    int pairs = 0;
+
+    for (int i = 0; i < points.length ~/ 2; i++) {
+      Point<int> leftPoint = points[i];
+      Point<int> rightPoint = points[points.length - 1 - i];
+
+      double leftDist = (centerX - leftPoint.x).abs();
+      double rightDist = (rightPoint.x - centerX).abs();
+
+      totalDeviation += (leftDist - rightDist).abs();
+      pairs++;
+    }
+
+    // Нормалізуємо результат до діапазону 0-1
+    double avgDeviation = totalDeviation / pairs;
+    double maxPossibleDeviation = points.map((p) => p.x).reduce(max).toDouble();
+
+    return 1 - (avgDeviation / maxPossibleDeviation);
+  }
+
+  static double _analyzeJawline(Face face) {
+    final jawContour = face.contours[FaceContourType.lowerLipBottom];
+    if (jawContour == null) return 0.5;
+
+    final points = jawContour.points;
+    if (points.isEmpty) return 0.5;
+
+    // Аналізуємо кут і чіткість лінії щелепи
+    double angleStrength = _calculateJawlineAngle(points);
+    double lineDefinition = _calculateLineDefinition(points);
+
+    return (angleStrength + lineDefinition) / 2;
+  }
+
+  static double _analyzeCheekbones(Face face) {
+    final leftCheek = face.contours[FaceContourType.leftCheek];
+    final rightCheek = face.contours[FaceContourType.rightCheek];
+
+    if (leftCheek == null || rightCheek == null) return 0.5;
+
+    // Аналізуємо випуклість і положення вилиць
+    double cheekboneWidth =
+        _calculateCheekboneWidth(leftCheek.points, rightCheek.points);
+    double cheekboneHeight =
+        _calculateCheekboneHeight(leftCheek.points, rightCheek.points);
+
+    return (cheekboneWidth + cheekboneHeight) / 2;
+  }
+
+  static double _analyzeForeheadHeight(Face face) {
+    final faceContour = face.contours[FaceContourType.face];
+    final noseContour = face.contours[FaceContourType.noseBridge];
+
+    if (faceContour == null || noseContour == null) return 0.5;
+
+    // Вимірюємо висоту чола відносно загальної висоти обличчя
+    double totalHeight = face.boundingBox.height;
+    double foreheadToNose =
+        (noseContour.points.first.y - faceContour.points.first.y).toDouble();
+
+    return foreheadToNose / totalHeight;
+  }
+
+  static double _calculateJawlineAngle(List<Point<int>> points) {
+    if (points.length < 3) return 0.5;
+
+    Point<int> start = points.first;
+    Point<int> end = points.last;
+
+    double angle =
+        atan2((end.y - start.y).toDouble(), (end.x - start.x).toDouble());
+    return (angle.abs() / pi) * 2; // Нормалізуємо до 0-1
+  }
+
+  static double _calculateLineDefinition(List<Point<int>> points) {
+    if (points.length < 2) return 0.5;
+
+    double totalDeviation = 0;
+    for (int i = 1; i < points.length; i++) {
+      Point<int> prev = points[i - 1];
+      Point<int> curr = points[i];
+
+      totalDeviation += sqrt(pow(curr.x - prev.x, 2) + pow(curr.y - prev.y, 2));
+    }
+
+    return 1 - (totalDeviation / (points.length * 10)); // Нормалізуємо до 0-1
+  }
+
+  static double _calculateCheekboneWidth(
+      List<Point<int>> leftPoints, List<Point<int>> rightPoints) {
+    if (leftPoints.isEmpty || rightPoints.isEmpty) return 0.5;
+
+    double leftMax = leftPoints.map((p) => p.x).reduce(min).toDouble();
+    double rightMax = rightPoints.map((p) => p.x).reduce(max).toDouble();
+
+    return (rightMax - leftMax) / 100; // Нормалізуємо до 0-1
+  }
+
+  static double _calculateCheekboneHeight(
+      List<Point<int>> leftPoints, List<Point<int>> rightPoints) {
+    if (leftPoints.isEmpty || rightPoints.isEmpty) return 0.5;
+
+    double leftY =
+        leftPoints.map((p) => p.y).reduce((a, b) => a + b) / leftPoints.length;
+    double rightY = rightPoints.map((p) => p.y).reduce((a, b) => a + b) /
+        rightPoints.length;
+
+    return 1 - (((leftY - rightY).abs()) / 50); // Нормалізуємо до 0-1
+  }
+}
+
+[FILE: marinette/lib/app/data/services/recoommendations_service.dart]
+import 'package:get/get.dart';
+import 'package:marinette/app/data/services/face_shape_analyzer.dart';
+import 'package:marinette/app/data/services/color_type_analyzer.dart';
+
+class RecommendationsService {
+  static List<String> getMakeupRecommendations(
+      FaceShape shape, ColorType colorType) {
+    List<String> recommendations = [];
+    recommendations.addAll(_getMakeupShapeRecommendations(shape));
+    recommendations.addAll(_getMakeupColorRecommendations(colorType));
+    return recommendations;
+  }
+
+  static List<String> _getMakeupShapeRecommendations(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return [
+          'makeup_shape_oval'.tr,
+          'makeup_shape_oval_2'.tr,
+          'makeup_shape_oval_3'.tr,
+          'makeup_shape_oval_4'.tr,
+          'makeup_shape_oval_5'.tr
+        ];
+
+      case FaceShape.round:
+        return [
+          'makeup_shape_round'.tr,
+          'makeup_shape_round_2'.tr,
+          'makeup_shape_round_3'.tr,
+          'makeup_shape_round_4'.tr,
+          'makeup_shape_round_5'.tr
+        ];
+
+      case FaceShape.square:
+        return [
+          'makeup_shape_square'.tr,
+          'makeup_shape_square_2'.tr,
+          'makeup_shape_square_3'.tr,
+          'makeup_shape_square_4'.tr,
+          'makeup_shape_square_5'.tr
+        ];
+
+      case FaceShape.heart:
+        return [
+          'makeup_shape_heart'.tr,
+          'makeup_shape_heart_2'.tr,
+          'makeup_shape_heart_3'.tr,
+          'makeup_shape_heart_4'.tr,
+          'makeup_shape_heart_5'.tr
+        ];
+
+      case FaceShape.diamond:
+        return [
+          'makeup_shape_diamond'.tr,
+          'makeup_shape_diamond_2'.tr,
+          'makeup_shape_diamond_3'.tr,
+          'makeup_shape_diamond_4'.tr,
+          'makeup_shape_diamond_5'.tr
+        ];
+
+      case FaceShape.rectangle:
+        return [
+          'makeup_shape_rectangle'.tr,
+          'makeup_shape_rectangle_2'.tr,
+          'makeup_shape_rectangle_3'.tr,
+          'makeup_shape_rectangle_4'.tr,
+          'makeup_shape_rectangle_5'.tr
+        ];
+    }
+  }
+
+  static List<String> _getMakeupColorRecommendations(ColorType colorType) {
+    switch (colorType) {
+      case ColorType.spring:
+        return [
+          'makeup_color_spring'.tr,
+          'makeup_color_spring_2'.tr,
+          'makeup_color_spring_3'.tr,
+          'makeup_color_spring_4'.tr,
+          'makeup_color_spring_5'.tr
+        ];
+
+      case ColorType.summer:
+        return [
+          'makeup_color_summer'.tr,
+          'makeup_color_summer_2'.tr,
+          'makeup_color_summer_3'.tr,
+          'makeup_color_summer_4'.tr,
+          'makeup_color_summer_5'.tr
+        ];
+
+      case ColorType.autumn:
+        return [
+          'makeup_color_autumn'.tr,
+          'makeup_color_autumn_2'.tr,
+          'makeup_color_autumn_3'.tr,
+          'makeup_color_autumn_4'.tr,
+          'makeup_color_autumn_5'.tr
+        ];
+
+      case ColorType.winter:
+        return [
+          'makeup_color_winter'.tr,
+          'makeup_color_winter_2'.tr,
+          'makeup_color_winter_3'.tr,
+          'makeup_color_winter_4'.tr,
+          'makeup_color_winter_5'.tr
+        ];
+    }
+  }
+
+  static List<String> getHairstyleRecommendations(
+      FaceShape shape, ColorType colorType) {
+    List<String> recommendations = [];
+    recommendations.addAll(_getHairstyleShapeRecommendations(shape));
+    recommendations.addAll(_getHairColorRecommendations(colorType));
+    return recommendations;
+  }
+
+  static List<String> _getHairstyleShapeRecommendations(FaceShape shape) {
+    switch (shape) {
+      case FaceShape.oval:
+        return [
+          'hairstyle_oval'.tr,
+          'hairstyle_oval_2'.tr,
+          'hairstyle_oval_3'.tr,
+          'hairstyle_oval_4'.tr,
+          'hairstyle_oval_5'.tr
+        ];
+
+      case FaceShape.round:
+        return [
+          'hairstyle_round'.tr,
+          'hairstyle_round_2'.tr,
+          'hairstyle_round_3'.tr,
+          'hairstyle_round_4'.tr,
+          'hairstyle_round_5'.tr
+        ];
+
+      case FaceShape.square:
+        return [
+          'hairstyle_square'.tr,
+          'hairstyle_square_2'.tr,
+          'hairstyle_square_3'.tr,
+          'hairstyle_square_4'.tr,
+          'hairstyle_square_5'.tr
+        ];
+
+      case FaceShape.heart:
+        return [
+          'hairstyle_heart'.tr,
+          'hairstyle_heart_2'.tr,
+          'hairstyle_heart_3'.tr,
+          'hairstyle_heart_4'.tr,
+          'hairstyle_heart_5'.tr
+        ];
+
+      case FaceShape.diamond:
+        return [
+          'hairstyle_diamond'.tr,
+          'hairstyle_diamond_2'.tr,
+          'hairstyle_diamond_3'.tr,
+          'hairstyle_diamond_4'.tr,
+          'hairstyle_diamond_5'.tr
+        ];
+
+      case FaceShape.rectangle:
+        return [
+          'hairstyle_rectangle'.tr,
+          'hairstyle_rectangle_2'.tr,
+          'hairstyle_rectangle_3'.tr,
+          'hairstyle_rectangle_4'.tr,
+          'hairstyle_rectangle_5'.tr
+        ];
+    }
+  }
+
+  static List<String> _getHairColorRecommendations(ColorType colorType) {
+    switch (colorType) {
+      case ColorType.spring:
+        return [
+          'haircolor_spring'.tr,
+          'haircolor_spring_2'.tr,
+          'haircolor_spring_3'.tr
+        ];
+
+      case ColorType.summer:
+        return [
+          'haircolor_summer'.tr,
+          'haircolor_summer_2'.tr,
+          'haircolor_summer_3'.tr
+        ];
+
+      case ColorType.autumn:
+        return [
+          'haircolor_autumn'.tr,
+          'haircolor_autumn_2'.tr,
+          'haircolor_autumn_3'.tr
+        ];
+
+      case ColorType.winter:
+        return [
+          'haircolor_winter'.tr,
+          'haircolor_winter_2'.tr,
+          'haircolor_winter_3'.tr
+        ];
+    }
+  }
+
+  static List<String> getSkincareRecommendations(ColorType colorType) {
+    List<String> baseRecommendations = [
+      'skincare_recommendation_1'.tr,
+      'skincare_recommendation_2'.tr,
+      'skincare_recommendation_3'.tr,
+      'skincare_recommendation_4'.tr,
+      'skincare_recommendation_5'.tr
+    ];
+
+    List<String> colorTypeRecommendations =
+        _getSkincareColorRecommendations(colorType);
+
+    return [...baseRecommendations, ...colorTypeRecommendations];
+  }
+
+  static List<String> _getSkincareColorRecommendations(ColorType type) {
+    switch (type) {
+      case ColorType.spring:
+        return [
+          'skincare_spring'.tr,
+          'skincare_spring_2'.tr,
+          'skincare_spring_3'.tr,
+          'skincare_spring_4'.tr,
+          'skincare_spring_5'.tr
+        ];
+
+      case ColorType.summer:
+        return [
+          'skincare_summer'.tr,
+          'skincare_summer_2'.tr,
+          'skincare_summer_3'.tr,
+          'skincare_summer_4'.tr,
+          'skincare_summer_5'.tr
+        ];
+
+      case ColorType.autumn:
+        return [
+          'skincare_autumn'.tr,
+          'skincare_autumn_2'.tr,
+          'skincare_autumn_3'.tr,
+          'skincare_autumn_4'.tr,
+          'skincare_autumn_5'.tr
+        ];
+
+      case ColorType.winter:
+        return [
+          'skincare_winter'.tr,
+          'skincare_winter_2'.tr,
+          'skincare_winter_3'.tr,
+          'skincare_winter_4'.tr,
+          'skincare_winter_5'.tr
+        ];
+    }
+  }
+
+  static String getSeasonalRecommendation() {
+    final now = DateTime.now();
+    final month = now.month;
+
+    // Зима (грудень, січень, лютий)
+    if (month == 12 || month == 1 || month == 2) {
+      return 'season_winter'.tr;
+    }
+    // Весна (березень, квітень, травень)
+    else if (month >= 3 && month <= 5) {
+      return 'season_spring'.tr;
+    }
+    // Літо (червень, липень, серпень)
+    else if (month >= 6 && month <= 8) {
+      return 'season_summer'.tr;
+    }
+    // Осінь (вересень, жовтень, листопад)
+    else {
+      return 'season_autumn'.tr;
+    }
+  }
+
+  static List<String> getPersonalizedTips({
+    required FaceShape faceShape,
+    required ColorType colorType,
+  }) {
+    List<String> tips = [];
+
+    // Додаємо специфічні поради щодо макіяжу
+    tips.add(_getPersonalizedMakeupTip(faceShape, colorType));
+
+    // Додаємо пораду щодо догляду за волоссям
+    tips.add(_getPersonalizedHairTip(faceShape));
+
+    // Додаємо сезонну пораду
+    tips.add(getSeasonalRecommendation());
+
+    return tips;
+  }
+
+  static String _getPersonalizedMakeupTip(
+      FaceShape faceShape, ColorType colorType) {
+    // Базова порада щодо форми обличчя
+    String tip = 'personalized_makeup_base'.tr;
+
+    // Додаємо специфіку для форми обличчя
+    switch (faceShape) {
+      case FaceShape.oval:
+        tip += 'personalized_makeup_oval'.tr;
+        break;
+      case FaceShape.round:
+        tip += 'personalized_makeup_round'.tr;
+        break;
+      case FaceShape.square:
+        tip += 'personalized_makeup_square'.tr;
+        break;
+      case FaceShape.heart:
+        tip += 'personalized_makeup_heart'.tr;
+        break;
+      case FaceShape.diamond:
+        tip += 'personalized_makeup_diamond'.tr;
+        break;
+      case FaceShape.rectangle:
+        tip += 'personalized_makeup_rectangle'.tr;
+        break;
+    }
+
+    // Додаємо пораду щодо кольоротипу
+    tip += '. ';
+    switch (colorType) {
+      case ColorType.spring:
+        tip += 'personalized_makeup_spring'.tr;
+        break;
+      case ColorType.summer:
+        tip += 'personalized_makeup_summer'.tr;
+        break;
+      case ColorType.autumn:
+        tip += 'personalized_makeup_autumn'.tr;
+        break;
+      case ColorType.winter:
+        tip += 'personalized_makeup_winter'.tr;
+        break;
+    }
+
+    return tip;
+  }
+
+  static String _getPersonalizedHairTip(FaceShape faceShape) {
+    String tip = 'personalized_hair'.tr;
+
+    switch (faceShape) {
+      case FaceShape.oval:
+        return tip + 'personalized_hair_oval'.tr;
+      case FaceShape.round:
+        return tip + 'personalized_hair_round'.tr;
+      case FaceShape.square:
+        return tip + 'personalized_hair_square'.tr;
+      case FaceShape.heart:
+        return tip + 'personalized_hair_heart'.tr;
+      case FaceShape.diamond:
+        return tip + 'personalized_hair_diamond'.tr;
+      case FaceShape.rectangle:
+        return tip + 'personalized_hair_rectangle'.tr;
+    }
+  }
+}
+
+[FILE: marinette/lib/app/data/services/result_saver_service.dart]
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:marinette/app/data/services/user_preferences_service.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+
+class ResultSaverService extends GetxService {
+  static const String resultsFolderName = 'analysis_results';
+  final RxList<Map<String, dynamic>> _results = <Map<String, dynamic>>[].obs;
+  bool _isInitialized = false;
+  late final UserPreferencesService _userPrefs;
+
+  Future<ResultSaverService> init() async {
+    try {
+      if (_isInitialized) return this;
+
+      _userPrefs = Get.find<UserPreferencesService>();
+      final userId = _userPrefs.getCurrentUserId();
+
+      final appDir = await getApplicationDocumentsDirectory();
+      final resultsDir = Directory('${appDir.path}/$resultsFolderName/$userId');
+
+      if (!await resultsDir.exists()) {
+        await resultsDir.create(recursive: true);
+      }
+
+      await _loadExistingResults();
+
+      _isInitialized = true;
+      debugPrint('ResultSaverService initialized successfully');
+    } catch (e) {
+      debugPrint('Failed to initialize ResultSaverService: $e');
+    }
+    return this;
+  }
+
+  // Замінюємо getter на звичайний асинхронний метод
+  Future<String> _getUserResultsPath() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final userId = _userPrefs.getCurrentUserId();
+    return '${appDir.path}/$resultsFolderName/$userId';
+  }
+
+  Future<void> _loadExistingResults() async {
+    try {
+      final resultsDir = Directory(await _getUserResultsPath());
+
+      if (!await resultsDir.exists()) return;
+
+      final List<FileSystemEntity> files = await resultsDir
+          .list()
+          .where((entity) => entity.path.endsWith('.json'))
+          .toList();
+
+      final List<Map<String, dynamic>> loadedResults = [];
+
+      for (var file in files) {
+        try {
+          final content = await File(file.path).readAsString();
+          final data = json.decode(content) as Map<String, dynamic>;
+
+          final imageFile = File(data['imagePath'] as String);
+          if (await imageFile.exists()) {
+            loadedResults.add(data);
+          } else {
+            await file.delete();
+          }
+        } catch (e) {
+          debugPrint('Error reading result file: $e');
+          continue;
+        }
+      }
+
+      loadedResults.sort(
+          (a, b) => (b['timestamp'] as int).compareTo(a['timestamp'] as int));
+
+      _results.value = loadedResults;
+    } catch (e) {
+      debugPrint('Error loading existing results: $e');
+    }
+  }
+
+  Future<String> saveResult({
+    required String imagePath,
+    required FaceAnalysisResult result,
+  }) async {
+    try {
+      final resultsDir = Directory(await _getUserResultsPath());
+
+      if (!await resultsDir.exists()) {
+        await resultsDir.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final resultPath = '${resultsDir.path}/result_$timestamp';
+
+      final File imageFile = File(imagePath);
+      final String newImagePath = '$resultPath.jpg';
+      await imageFile.copy(newImagePath);
+
+      final resultData = {
+        'imagePath': newImagePath,
+        'faceShape': result.faceShape,
+        'colorType': result.colorType,
+        'makeupRecommendations': result.makeupRecommendations,
+        'hairstyleRecommendations': result.hairstyleRecommendations,
+        'skincareRecommendations': result.skincareRecommendations,
+        'timestamp': timestamp,
+      };
+
+      final File resultFile = File('$resultPath.json');
+      await resultFile.writeAsString(json.encode(resultData));
+
+      _results.insert(0, resultData);
+
+      debugPrint('Result saved successfully: $newImagePath');
+      return newImagePath;
+    } catch (e) {
+      debugPrint('Error saving result: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllResults() async {
+    if (!_isInitialized) {
+      await init();
+    }
+
+    await _loadExistingResults();
+    return _results;
+  }
+
+  Future<void> deleteResult(String imagePath) async {
+    try {
+      final imageFile = File(imagePath);
+      if (await imageFile.exists()) {
+        await imageFile.delete();
+      }
+
+      final jsonPath = imagePath.replaceAll('.jpg', '.json');
+      final resultFile = File(jsonPath);
+      if (await resultFile.exists()) {
+        await resultFile.delete();
+      }
+
+      _results.removeWhere((result) => result['imagePath'] == imagePath);
+
+      debugPrint('Result deleted successfully: $imagePath');
+    } catch (e) {
+      debugPrint('Error deleting result: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> clearAllResults() async {
+    try {
+      final resultsDir = Directory(await _getUserResultsPath());
+      if (await resultsDir.exists()) {
+        await resultsDir.delete(recursive: true);
+      }
+      _results.clear();
+      debugPrint('All results cleared successfully');
+    } catch (e) {
+      debugPrint('Error clearing results: $e');
+      rethrow;
+    }
+  }
+}
+
+[FILE: marinette/lib/app/data/services/skin_color_analyzer.dart]
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:math' show Point;
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:image/image.dart' as img;
+
+class SkinToneResult {
+  final double lightness; // 0-1: від темного до світлого
+  final double warmth; // 0-1: від холодного до теплого
+  final double saturation; // 0-1: від приглушеного до яскравого
+  final List<int> rgbValues; // [R, G, B]
+
+  SkinToneResult({
+    required this.lightness,
+    required this.warmth,
+    required this.saturation,
+    required this.rgbValues,
+  });
+
+  @override
+  String toString() {
+    return 'SkinTone(lightness: $lightness, warmth: $warmth, saturation: $saturation, RGB: $rgbValues)';
+  }
+}
+
+class SkinColorAnalyzer {
+  static Future<SkinToneResult> analyzeSkinTone(
+      String imagePath, Face face) async {
+    try {
+      // Завантажуємо зображення
+      final File imageFile = File(imagePath);
+      final Uint8List bytes = await imageFile.readAsBytes();
+      final img.Image? image = img.decodeImage(bytes);
+
+      if (image == null) throw Exception('Failed to decode image');
+
+      // Отримуємо область обличчя
+      final cheekPoints = _getCheekPoints(face);
+      final foreheadPoints = _getForeheadPoints(face);
+      final analyzedPoints = [...cheekPoints, ...foreheadPoints];
+
+      // Аналізуємо колір у вибраних точках
+      List<List<int>> colorSamples = [];
+      for (final point in analyzedPoints) {
+        if (point.x.round() >= 0 &&
+            point.x.round() < image.width &&
+            point.y.round() >= 0 &&
+            point.y.round() < image.height) {
+          final pixel = image.getPixel(point.x.round(), point.y.round());
+          colorSamples.add([pixel.r.toInt(), pixel.g.toInt(), pixel.b.toInt()]);
+        }
+      }
+
+      // Вираховуємо середні значення
+      final averageRGB = _calculateAverageRGB(colorSamples);
+      final hsv = _rgbToHSV(averageRGB[0], averageRGB[1], averageRGB[2]);
+
+      return SkinToneResult(
+        lightness: hsv[2], // V з HSV
+        warmth: _calculateWarmth(averageRGB),
+        saturation: hsv[1], // S з HSV
+        rgbValues: averageRGB,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static List<Point<int>> _getCheekPoints(Face face) {
+    final leftCheek = face.contours[FaceContourType.leftCheek]?.points ?? [];
+    final rightCheek = face.contours[FaceContourType.rightCheek]?.points ?? [];
+    return [...leftCheek, ...rightCheek];
+  }
+
+  static List<Point<int>> _getForeheadPoints(Face face) {
+    final faceContour = face.contours[FaceContourType.face]?.points ?? [];
+    if (faceContour.isEmpty) return [];
+
+    // Беремо точки з верхньої третини обличчя
+    final topY = faceContour.map((p) => p.y).reduce((a, b) => a < b ? a : b);
+    final bottomY = faceContour.map((p) => p.y).reduce((a, b) => a > b ? a : b);
+    final foreheadThreshold = topY + (bottomY - topY) ~/ 3;
+
+    return faceContour.where((p) => p.y <= foreheadThreshold).toList();
+  }
+
+  static List<int> _calculateAverageRGB(List<List<int>> samples) {
+    if (samples.isEmpty) return [0, 0, 0];
+
+    int totalR = 0, totalG = 0, totalB = 0;
+    for (final sample in samples) {
+      totalR += sample[0];
+      totalG += sample[1];
+      totalB += sample[2];
+    }
+
+    return [
+      totalR ~/ samples.length,
+      totalG ~/ samples.length,
+      totalB ~/ samples.length,
+    ];
+  }
+
+  static List<double> _rgbToHSV(int r, int g, int b) {
+    final rf = r / 255;
+    final gf = g / 255;
+    final bf = b / 255;
+
+    final cmax = [rf, gf, bf].reduce((a, b) => a > b ? a : b);
+    final cmin = [rf, gf, bf].reduce((a, b) => a < b ? a : b);
+    final delta = cmax - cmin;
+
+    // Вираховуємо H
+    double h = 0;
+    if (delta != 0) {
+      if (cmax == rf) {
+        h = 60 * (((gf - bf) / delta) % 6);
+      } else if (cmax == gf) {
+        h = 60 * (((bf - rf) / delta) + 2);
+      } else {
+        h = 60 * (((rf - gf) / delta) + 4);
+      }
+    }
+    if (h < 0) h += 360;
+
+    // Вираховуємо S
+    final s = cmax == 0 ? 0.0 : delta / cmax;
+
+    // V вже маємо (cmax)
+    return [h, s, cmax];
+  }
+
+  static double _calculateWarmth(List<int> rgb) {
+    // Порівнюємо кількість теплих (червоний) і холодних (синій) тонів
+    final redAmount = rgb[0] / 255;
+    final blueAmount = rgb[2] / 255;
+
+    // Нормалізуємо до діапазону 0-1, де:
+    // 0 - дуже холодний
+    // 0.5 - нейтральний
+    // 1 - дуже теплий
+    return (redAmount - blueAmount + 1) / 2;
+  }
+}
+
+[FILE: marinette/lib/app/data/services/user_preferences_service.dart]
+import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+
+class UserPreferencesService extends GetxService {
+  static const String _userBoxName = 'user_preferences';
+  static const String _userIdKey = 'user_id';
+
+  late Box _box;
+  final RxString userId = ''.obs;
+
+  Future<UserPreferencesService> init() async {
+    try {
+      _box = await Hive.openBox(_userBoxName);
+      String? savedUserId = _box.get(_userIdKey);
+
+      if (savedUserId == null) {
+        savedUserId = _generateUserId();
+        await _box.put(_userIdKey, savedUserId);
+      }
+
+      userId.value = savedUserId;
+      return this;
+    } catch (e) {
+      debugPrint('Error initializing UserPreferencesService: $e');
+      rethrow;
+    }
+  }
+
+  String _generateUserId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+
+  String getCurrentUserId() {
+    return userId.value;
+  }
+
+  Future<void> setBool(String key, bool value) async {
+    try {
+      await _box.put(key, value);
+    } catch (e) {
+      debugPrint('Error setting bool preference: $e');
+    }
+  }
+
+  Future<bool?> getBool(String key) async {
+    try {
+      return _box.get(key) as bool?;
+    } catch (e) {
+      debugPrint('Error getting bool preference: $e');
+      return null;
+    }
+  }
+
+  @override
+  void onClose() {
+    _box.close();
+    super.onClose();
+  }
+}
+
+[FILE: marinette/lib/app/modules/analysis/analysis_result_screen.dart]
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:path_provider/path_provider.dart';
+
+class AnalysisResultScreen extends StatelessWidget {
+  final String imagePath;
+  final FaceAnalysisResult result;
+  final String? heroTag;
+
+  const AnalysisResultScreen({
+    super.key,
+    required this.imagePath,
+    required this.result,
+    this.heroTag,
+  });
+
+  Future<void> _shareResults() async {
+    try {
+      final String shareText = '''
+🎭 ${result.faceShape} / ${result.colorType}
+
+💄 ${result.makeupRecommendations.map((r) => '• $r').join('\n')}
+
+💇‍♀️ ${result.hairstyleRecommendations.map((r) => '• $r').join('\n')}
+
+✨ ${result.skincareRecommendations.map((r) => '• $r').join('\n')}
+
+Проаналізовано за допомогою Beauty Recommendations App
+''';
+
+      final tempDir = await getTemporaryDirectory();
+      final tempImagePath = '${tempDir.path}/shared_image.jpg';
+      await File(imagePath).copy(tempImagePath);
+
+      await Share.shareXFiles(
+        [XFile(tempImagePath)],
+        text: shareText,
+        subject: 'Мої б\'юті-рекомендації',
+      );
+    } catch (e) {
+      Get.snackbar(
+        'error'.tr,
+        'error_sharing'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tag = heroTag ?? imagePath;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFDF2F8), Color(0xFFF5F3FF)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // AppBar
+            SliverAppBar(
+              expandedHeight: screenWidth,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  'recommendations'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Hero(
+                      tag: tag,
+                      child: Image.file(
+                        File(imagePath),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    // Gradient overlay
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Colors.black54],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: _shareResults,
+                ),
+              ],
+            ),
+
+            // Content
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  // Type Info Card
+                  Card(
+                    elevation: 8,
+                    shadowColor: Colors.pink.withAlpha(76),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildTypeInfo('face_shape'.tr, result.faceShape),
+                          Container(
+                            height: 40,
+                            width: 1,
+                            color: Colors.grey.withAlpha(50),
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          _buildTypeInfo('color_type'.tr, result.colorType),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Makeup Recommendations
+                  _buildRecommendationSection(
+                    title: 'makeup_recommendations'.tr,
+                    recommendations: result.makeupRecommendations,
+                    icon: Icons.face,
+                    color: Colors.pink,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Hairstyle Recommendations
+                  _buildRecommendationSection(
+                    title: 'hairstyle_recommendations'.tr,
+                    recommendations: result.hairstyleRecommendations,
+                    icon: Icons.content_cut,
+                    color: Colors.purple,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Skincare Recommendations
+                  _buildRecommendationSection(
+                    title: 'skincare_recommendations'.tr,
+                    recommendations: result.skincareRecommendations,
+                    icon: Icons.spa,
+                    color: Colors.pinkAccent,
+                  ),
+                  const SizedBox(height: 16),
+                ]),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeInfo(String label, String value) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendationSection({
+    required String title,
+    required List<String> recommendations,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 8,
+      shadowColor: color.withAlpha(76),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: color),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...recommendations.map((recommendation) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.only(top: 8, right: 12),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          recommendation,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/modules/analysis/loading_screen.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black54,
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 20),
+              Text(
+                'analyzing'.tr,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/modules/camera/camera_controller.dart]
+import 'package:camera/camera.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/services.dart'; // Додано для DeviceOrientation
+
+class CustomCameraController extends GetxController {
+  final ImagePicker _picker = ImagePicker();
+  Rx<CameraController?> cameraController = Rx<CameraController?>(null);
+  RxBool isCameraInitialized = false.obs;
+  RxBool hasPermission = false.obs;
+  RxInt selectedCameraIndex =
+      1.obs; // Починаємо з фронтальної камери (індекс 1)
+  List<CameraDescription> cameras = [];
+
+  @override
+  void onInit() async {
+    super.onInit();
+    await _checkPermissions();
+  }
+
+  @override
+  void onClose() {
+    cameraController.value?.dispose();
+    super.onClose();
+  }
+
+  Future<void> _checkPermissions() async {
+    try {
+      final camera = await Permission.camera.status;
+      if (camera.isGranted) {
+        hasPermission.value = true;
+        await _initializeCamera();
+      } else {
+        final result = await Permission.camera.request();
+        hasPermission.value = result.isGranted;
+        if (result.isGranted) {
+          await _initializeCamera();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking permissions: $e');
+      Get.snackbar('error'.tr, 'error_camera'.tr);
+    }
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        debugPrint('No cameras available');
+        return;
+      }
+
+      // Переконуємося, що індекс в межах доступних камер
+      if (selectedCameraIndex.value >= cameras.length) {
+        selectedCameraIndex.value = 0;
+      }
+
+      final controller = CameraController(
+        cameras[selectedCameraIndex.value],
+        ResolutionPreset.high,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+      );
+
+      await controller.initialize();
+
+      // Встановлюємо правильну орієнтацію
+      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+
+      cameraController.value = controller;
+      isCameraInitialized.value = true;
+    } catch (e) {
+      debugPrint('Error initializing camera: $e');
+      Get.snackbar('error'.tr, 'error_camera'.tr);
+    }
+  }
+
+  Future<void> switchCamera() async {
+    if (cameras.length < 2) return;
+
+    selectedCameraIndex.value = selectedCameraIndex.value == 0 ? 1 : 0;
+
+    // Dispose поточного контролера
+    await cameraController.value?.dispose();
+
+    isCameraInitialized.value = false;
+    await _initializeCamera();
+  }
+
+  Future<String?> takePhoto() async {
+    try {
+      if (!isCameraInitialized.value || cameraController.value == null) {
+        debugPrint('Camera not initialized');
+        return null;
+      }
+
+      final XFile image = await cameraController.value!.takePicture();
+      debugPrint('Photo taken: ${image.path}');
+      return image.path;
+    } catch (e) {
+      debugPrint('Error taking photo: $e');
+      Get.snackbar('error'.tr, 'error_camera'.tr);
+      return null;
+    }
+  }
+
+  Future<String?> pickFromGallery() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      debugPrint('Image picked: ${image?.path}');
+      return image?.path;
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+      Get.snackbar('error'.tr, 'Could not pick image from gallery'.tr);
+      return null;
+    }
+  }
+}
+
+[FILE: marinette/lib/app/modules/camera/camera_screen.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:camera/camera.dart';
+import 'camera_controller.dart';
+
+class CameraScreen extends GetView<CustomCameraController> {
+  const CameraScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Camera Preview
+            Obx(() {
+              if (!controller.isCameraInitialized.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return Center(
+                child: Transform.rotate(
+                  angle: 0, // Прибираємо поворот
+                  child: CameraPreview(controller.cameraController.value!),
+                ),
+              );
+            }),
+
+            // Controls overlay
+            Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Кнопка переключення камери
+                  FloatingActionButton(
+                    heroTag: 'switch_camera',
+                    backgroundColor: Colors.white38,
+                    onPressed: controller.switchCamera,
+                    child: const Icon(Icons.flip_camera_ios),
+                  ),
+                  // Кнопка зйомки
+                  FloatingActionButton(
+                    heroTag: 'capture',
+                    backgroundColor: Colors.white,
+                    onPressed: () async {
+                      final imagePath = await controller.takePhoto();
+                      if (imagePath != null) {
+                        Get.back(result: imagePath);
+                      }
+                    },
+                    child: const Icon(Icons.camera_alt, color: Colors.black),
+                  ),
+                  // Додаємо пустий контейнер для симетрії
+                  const SizedBox(width: 56), // Ширина FloatingActionButton
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/modules/history/history_screen.dart]
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+
+class HistoryScreen extends StatelessWidget {
+  final ResultSaverService _saverService = Get.find<ResultSaverService>();
+  final RxBool _isLoading = false.obs;
+
+  HistoryScreen({super.key});
+
+  Future<void> _refreshResults() async {
+    debugPrint('Refreshing history results');
+    _isLoading.value = true;
+    try {
+      await _saverService.getAllResults();
+    } catch (e) {
+      debugPrint('Error refreshing results: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_loading_results'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  void _openResult(Map<String, dynamic> resultData) {
+    debugPrint('Opening result details');
+    final result = FaceAnalysisResult(
+      faceShape: resultData['faceShape'],
+      colorType: resultData['colorType'],
+      makeupRecommendations:
+          List<String>.from(resultData['makeupRecommendations']),
+      hairstyleRecommendations:
+          List<String>.from(resultData['hairstyleRecommendations']),
+      skincareRecommendations:
+          List<String>.from(resultData['skincareRecommendations']),
+    );
+
+    Get.to(() => AnalysisResultScreen(
+          imagePath: resultData['imagePath'],
+          result: result,
+        ));
+  }
+
+  Future<void> _deleteResult(String imagePath) async {
+    debugPrint('Deleting result: $imagePath');
+    try {
+      await _saverService.deleteResult(imagePath);
+      Get.snackbar(
+        'info'.tr,
+        'Результат видалено успішно',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      debugPrint('Error deleting result: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_deleting_result'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('Building HistoryScreen');
+    // При створенні екрану оновлюємо дані
+    _refreshResults();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('history'.tr),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refreshResults,
+          ),
+        ],
+      ),
+      body: Obx(() {
+        if (_isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: _saverService.getAllResults(),
+          builder: (context, snapshot) {
+            debugPrint(
+                'Building FutureBuilder with state: ${snapshot.connectionState}');
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              debugPrint('Error loading history: ${snapshot.error}');
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'error_loading_results'.tr,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              debugPrint('No history data available');
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.history,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'no_history'.tr,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            debugPrint(
+                'Building history list with ${snapshot.data!.length} items');
+            return RefreshIndicator(
+              onRefresh: _refreshResults,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final result = snapshot.data![index];
+                  debugPrint('Building history item $index');
+
+                  final DateTime date = DateTime.fromMillisecondsSinceEpoch(
+                    result['timestamp'] as int,
+                  );
+                  final String formattedDate =
+                      DateFormat('dd.MM.yyyy HH:mm').format(date);
+
+                  return Dismissible(
+                    key: Key(result['imagePath']),
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 16),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    ),
+                    direction: DismissDirection.endToStart,
+                    confirmDismiss: (direction) async {
+                      return await Get.dialog<bool>(
+                            AlertDialog(
+                              title: Text('confirm_delete'.tr),
+                              content: Text('delete_result_confirmation'.tr),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(result: false),
+                                  child: Text('cancel'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () => Get.back(result: true),
+                                  child: Text(
+                                    'delete'.tr,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ) ??
+                          false;
+                    },
+                    onDismissed: (direction) {
+                      _deleteResult(result['imagePath']);
+                    },
+                    child: Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      elevation: 4,
+                      child: InkWell(
+                        onTap: () => _openResult(result),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Зображення
+                            if (result['imagePath'] != null)
+                              SizedBox(
+                                width: double.infinity,
+                                height: 200,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(4),
+                                  ),
+                                  child: Image.file(
+                                    File(result['imagePath']),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      debugPrint('Error loading image: $error');
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.broken_image,
+                                          size: 64,
+                                          color: Colors.grey,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                            // Інформація
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        formattedDate,
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline),
+                                        onPressed: () =>
+                                            _deleteResult(result['imagePath']),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${result['faceShape']} / ${result['colorType']}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.tips_and_updates_outlined,
+                                        size: 16,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${(result['makeupRecommendations'] as List).length + (result['hairstyleRecommendations'] as List).length + (result['skincareRecommendations'] as List).length} рекомендацій',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/modules/home/home_screen.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:marinette/app/data/services/face_analysis_service.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/data/services/content_service.dart';
+import 'package:marinette/config/translations/app_translations.dart';
+import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
+import 'package:marinette/app/modules/camera/camera_controller.dart';
+import 'package:marinette/app/modules/camera/camera_screen.dart';
+import 'package:marinette/app/modules/history/history_screen.dart';
+import 'package:marinette/app/core/widgets/wave_background_painter.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  void _changeLanguage() {
+    final service = Get.find<LocalizationService>();
+    final newLocale = service.getCurrentLocale() == 'en' ? 'uk' : 'en';
+    service.changeLocale(newLocale);
+  }
+
+  Future<void> _processImage(String? imagePath) async {
+    if (imagePath != null) {
+      try {
+        debugPrint('Starting image processing for path: $imagePath');
+
+        Get.dialog(
+          PopScope(
+            canPop: false,
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          barrierDismissible: false,
+        );
+
+        final analysisService = Get.put(FaceAnalysisService());
+        final result = await analysisService.analyzeFace(imagePath);
+
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        if (result != null) {
+          debugPrint('Saving result to history');
+          try {
+            final resultSaverService = Get.find<ResultSaverService>();
+            await resultSaverService.saveResult(
+              imagePath: imagePath,
+              result: result,
+            );
+            debugPrint('Result saved successfully');
+          } catch (e) {
+            debugPrint('Error saving result: $e');
+            Get.snackbar(
+              'error'.tr,
+              'error_saving_result'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+
+          await Get.to(() => AnalysisResultScreen(
+                imagePath: imagePath,
+                result: result,
+              ));
+        } else {
+          Get.snackbar(
+            'error'.tr,
+            'analysis_failed'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } catch (e) {
+        debugPrint('Error during image processing: $e');
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+        Get.snackbar(
+          'error'.tr,
+          'analysis_failed'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final contentService = Get.find<ContentService>();
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('app_name'.tr),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => Get.to(() => HistoryScreen()),
+          ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: _changeLanguage,
+          ),
+        ],
+      ),
+      body: Container(
+        height: screenHeight,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFDF2F8), Color(0xFFF5F3FF)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: WaveBackgroundPainter(),
+              ),
+            ),
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildFeatureCard(
+                        title: 'take_photo'.tr,
+                        subtitle: 'Get instant beauty analysis',
+                        icon: Icons.camera_alt,
+                        onTap: () async {
+                          Get.lazyPut(() => CustomCameraController());
+                          final imagePath =
+                              await Get.to<String>(() => const CameraScreen());
+                          await _processImage(imagePath);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildFeatureCard(
+                        title: 'choose_from_gallery'.tr,
+                        subtitle: 'Use existing photo',
+                        icon: Icons.photo_library,
+                        onTap: () async {
+                          final controller = Get.put(CustomCameraController());
+                          final imagePath = await controller.pickFromGallery();
+                          await _processImage(imagePath);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildFeatureCard(
+                        title: 'Beauty Hub',
+                        subtitle: 'Articles, guides and tips',
+                        icon: Icons.menu_book,
+                        onTap: () {
+                          Get.snackbar(
+                            'info'.tr,
+                            'Coming soon!',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      _buildTipOfTheDay(contentService),
+                      const SizedBox(height: 24),
+                      _buildTrendsCarousel(contentService),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.pink.withAlpha(76),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                Colors.grey.shade50,
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.pink.withAlpha(25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: Colors.pink,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTipOfTheDay(ContentService contentService) {
+    return Obx(() {
+      final tip = contentService.currentTip.value;
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.pink, Colors.purple],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.pink.withAlpha(76),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  tip.icon,
+                  style: const TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Tip of the Day',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              tip.tip,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildTrendsCarousel(ContentService contentService) {
+    return Obx(() {
+      final trends = contentService.currentTrends;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.trending_up,
+                color: Colors.pink,
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Season Trends',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: trends
+                  .map((trend) => Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: _buildTrendCard(
+                          title: trend.title,
+                          description: trend.description,
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildTrendCard({required String title, required String description}) {
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.pink.withAlpha(25),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/app/modules/shared/hero_photo_view.dart]
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class HeroPhotoView extends StatelessWidget {
+  final String imagePath;
+  final String heroTag;
+
+  const HeroPhotoView({
+    required this.imagePath,
+    required this.heroTag,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTap: () => Get.back(),
+        child: Stack(
+          children: [
+            Center(
+              child: Hero(
+                tag: heroTag,
+                child: InteractiveViewer(
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: Image.file(
+                    File(imagePath),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  onPressed: () => Get.back(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+[FILE: marinette/lib/config/translations/app_translations.dart]
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+class AppTranslations extends Translations {
+  @override
+  Map<String, Map<String, String>> get keys => {};
+}
+
+class LocalizationService extends GetxService {
+  final RxString currentLocale = 'uk'.obs;
+  final Map<String, Map<String, String>> translations = {};
+
+  Future<LocalizationService> init() async {
+    try {
+      await loadTranslations();
+      return this;
+    } catch (e) {
+      print('Error initializing LocalizationService: $e');
+      return this;
+    }
+  }
+
+  Future<void> loadTranslations() async {
+    try {
+      final en = await rootBundle.loadString('assets/i18n/en.json');
+      final uk = await rootBundle.loadString('assets/i18n/uk.json');
+
+      translations['en'] = Map<String, String>.from(json.decode(en));
+      translations['uk'] = Map<String, String>.from(json.decode(uk));
+
+      Get.addTranslations(translations);
+    } catch (e) {
+      print('Error loading translations: $e');
+    }
+  }
+
+  void changeLocale(String locale) {
+    if (locale == currentLocale.value) return;
+
+    currentLocale.value = locale;
+    Get.updateLocale(Locale(locale));
+  }
+
+  String getCurrentLocale() => currentLocale.value;
+}
+
+[FILE: marinette/lib/main.dart]
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:marinette/app/modules/home/home_screen.dart';
+import 'package:marinette/app/core/theme/app_theme.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/data/services/user_preferences_service.dart';
+import 'package:marinette/app/data/services/audio_service.dart';
+import 'package:marinette/app/data/services/content_service.dart';
+import 'package:marinette/config/translations/app_translations.dart';
+
+void main() async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // Initialize Hive
+    await Hive.initFlutter();
+
+    // Initialize essential services
+    await Get.putAsync(() => LocalizationService().init());
+    await Get.putAsync(() => UserPreferencesService().init());
+    await Get.putAsync(() => ResultSaverService().init());
+    await Get.putAsync(() => ContentService().init());
+
+    // Initialize audio service in the background
+    initAudioService();
+
+    runApp(const BeautyRecommendationsApp());
+  } catch (e) {
+    debugPrint('Error during app initialization: $e');
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Error initializing app: $e'),
+        ),
+      ),
+    ));
+  }
+}
+
+void initAudioService() {
+  Future.delayed(const Duration(seconds: 2), () async {
+    try {
+      debugPrint('Starting audio service initialization');
+      await Get.putAsync(
+        () => AudioService().init(),
+        permanent: true,
+      );
+      debugPrint('Audio service initialized successfully');
+    } catch (e) {
+      debugPrint('Failed to initialize audio service: $e');
+    }
+  });
+}
+
+class BeautyRecommendationsApp extends StatelessWidget {
+  const BeautyRecommendationsApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      title: 'Beauty Recommendations',
+      theme: AppTheme.theme,
+      translations: AppTranslations(),
+      locale: const Locale('uk'),
+      fallbackLocale: const Locale('en'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('uk'),
+      ],
+      home: const HomeScreen(),
+    );
+  }
+}
+
+[FILE: marinette/pubspec.yaml]
+name: marinette
+description: A mobile app for beauty recommendations based on facial features analysis.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # State Management
+  get: ^4.6.5
+  
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Image Processing & ML
+  google_mlkit_face_detection: ^0.12.0
+  camera: ^0.11.0+2
+  image_picker: ^1.0.4
+  image: ^4.1.3
+  
+  # Audio
+  just_audio: ^0.9.36
+  audio_session: ^0.1.18
+  
+  # Utils
+  path_provider: ^2.0.15
+  permission_handler: ^11.3.1
+  intl: ^0.19.0
+  share_plus: ^7.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.6
+  hive_generator: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/i18n/
+    - assets/i18n/en.json
+    - assets/i18n/uk.json
+    - assets/audio/
+    - assets/audio/nana.mp3
+    
+  fonts:
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-Regular.ttf
+        - asset: assets/fonts/PlayfairDisplay-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlayfairDisplay-Italic.ttf
+          style: italic

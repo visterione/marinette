@@ -3,19 +3,32 @@ import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:marinette/app/data/services/user_preferences_service.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
 class ResultSaverService extends GetxService {
   static const String resultsFolderName = 'analysis_results';
+  final RxList<Map<String, dynamic>> _results = <Map<String, dynamic>>[].obs;
+  bool _isInitialized = false;
+  late final UserPreferencesService _userPrefs;
 
   Future<ResultSaverService> init() async {
     try {
+      if (_isInitialized) return this;
+
+      _userPrefs = Get.find<UserPreferencesService>();
+      final userId = _userPrefs.getCurrentUserId();
+
       final appDir = await getApplicationDocumentsDirectory();
-      final resultsDir = Directory('${appDir.path}/$resultsFolderName');
+      final resultsDir = Directory('${appDir.path}/$resultsFolderName/$userId');
 
       if (!await resultsDir.exists()) {
         await resultsDir.create(recursive: true);
       }
+
+      await _loadExistingResults();
+
+      _isInitialized = true;
       debugPrint('ResultSaverService initialized successfully');
     } catch (e) {
       debugPrint('Failed to initialize ResultSaverService: $e');
@@ -23,13 +36,58 @@ class ResultSaverService extends GetxService {
     return this;
   }
 
+  // Замінюємо getter на звичайний асинхронний метод
+  Future<String> _getUserResultsPath() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final userId = _userPrefs.getCurrentUserId();
+    return '${appDir.path}/$resultsFolderName/$userId';
+  }
+
+  Future<void> _loadExistingResults() async {
+    try {
+      final resultsDir = Directory(await _getUserResultsPath());
+
+      if (!await resultsDir.exists()) return;
+
+      final List<FileSystemEntity> files = await resultsDir
+          .list()
+          .where((entity) => entity.path.endsWith('.json'))
+          .toList();
+
+      final List<Map<String, dynamic>> loadedResults = [];
+
+      for (var file in files) {
+        try {
+          final content = await File(file.path).readAsString();
+          final data = json.decode(content) as Map<String, dynamic>;
+
+          final imageFile = File(data['imagePath'] as String);
+          if (await imageFile.exists()) {
+            loadedResults.add(data);
+          } else {
+            await file.delete();
+          }
+        } catch (e) {
+          debugPrint('Error reading result file: $e');
+          continue;
+        }
+      }
+
+      loadedResults.sort(
+          (a, b) => (b['timestamp'] as int).compareTo(a['timestamp'] as int));
+
+      _results.value = loadedResults;
+    } catch (e) {
+      debugPrint('Error loading existing results: $e');
+    }
+  }
+
   Future<String> saveResult({
     required String imagePath,
     required FaceAnalysisResult result,
   }) async {
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final resultsDir = Directory('${appDir.path}/$resultsFolderName');
+      final resultsDir = Directory(await _getUserResultsPath());
 
       if (!await resultsDir.exists()) {
         await resultsDir.create(recursive: true);
@@ -38,12 +96,10 @@ class ResultSaverService extends GetxService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final resultPath = '${resultsDir.path}/result_$timestamp';
 
-      // Копіюємо фото
       final File imageFile = File(imagePath);
       final String newImagePath = '$resultPath.jpg';
       await imageFile.copy(newImagePath);
 
-      // Зберігаємо результати аналізу
       final resultData = {
         'imagePath': newImagePath,
         'faceShape': result.faceShape,
@@ -57,6 +113,8 @@ class ResultSaverService extends GetxService {
       final File resultFile = File('$resultPath.json');
       await resultFile.writeAsString(json.encode(resultData));
 
+      _results.insert(0, resultData);
+
       debugPrint('Result saved successfully: $newImagePath');
       return newImagePath;
     } catch (e) {
@@ -66,69 +124,46 @@ class ResultSaverService extends GetxService {
   }
 
   Future<List<Map<String, dynamic>>> getAllResults() async {
-    try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final resultsDir = Directory('${appDir.path}/$resultsFolderName');
-
-      if (!await resultsDir.exists()) {
-        return [];
-      }
-
-      final List<FileSystemEntity> files = await resultsDir
-          .list()
-          .where((entity) => entity.path.endsWith('.json'))
-          .toList();
-
-      List<Map<String, dynamic>> results = [];
-
-      for (var file in files) {
-        try {
-          final content = await File(file.path).readAsString();
-          final data = json.decode(content) as Map<String, dynamic>;
-
-          // Перевіряємо, чи існує зображення
-          final imageFile = File(data['imagePath'] as String);
-          if (await imageFile.exists()) {
-            results.add(data);
-          } else {
-            // Якщо зображення відсутнє, видаляємо JSON файл
-            await file.delete();
-          }
-        } catch (e) {
-          debugPrint('Error reading result file: $e');
-          continue;
-        }
-      }
-
-      // Сортуємо за часом (найновіші спочатку)
-      results.sort(
-          (a, b) => (b['timestamp'] as int).compareTo(a['timestamp'] as int));
-
-      return results;
-    } catch (e) {
-      debugPrint('Error getting results: $e');
-      return [];
+    if (!_isInitialized) {
+      await init();
     }
+
+    await _loadExistingResults();
+    return _results;
   }
 
   Future<void> deleteResult(String imagePath) async {
     try {
-      // Видаляємо фото
-      final File imageFile = File(imagePath);
+      final imageFile = File(imagePath);
       if (await imageFile.exists()) {
         await imageFile.delete();
       }
 
-      // Видаляємо JSON з результатами
       final jsonPath = imagePath.replaceAll('.jpg', '.json');
-      final File resultFile = File(jsonPath);
+      final resultFile = File(jsonPath);
       if (await resultFile.exists()) {
         await resultFile.delete();
       }
 
+      _results.removeWhere((result) => result['imagePath'] == imagePath);
+
       debugPrint('Result deleted successfully: $imagePath');
     } catch (e) {
       debugPrint('Error deleting result: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> clearAllResults() async {
+    try {
+      final resultsDir = Directory(await _getUserResultsPath());
+      if (await resultsDir.exists()) {
+        await resultsDir.delete(recursive: true);
+      }
+      _results.clear();
+      debugPrint('All results cleared successfully');
+    } catch (e) {
+      debugPrint('Error clearing results: $e');
       rethrow;
     }
   }
