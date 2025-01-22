@@ -31,6 +31,7 @@
   "error_loading_results": "Error loading results",
   "error_deleting_result": "Error deleting result",
   "error_sharing": "Error sharing results",
+  "language": "Change Language",
 
   "face_shape_oval": "Oval",
   "face_shape_round": "Round",

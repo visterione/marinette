@@ -1,5 +1,4 @@
 // beauty_hub_service.dart
-import 'package:get/get.dart';
 import 'package:marinette/app/data/models/article.dart';
 
 class BeautyHubService {

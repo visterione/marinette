@@ -1,111 +1,6 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter/material.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
-class NotificationService {
-  static final FlutterLocalNotificationsPlugin
-      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  // Initialize notification service
-  static Future<void> initialize() async {
-    tz.initializeTimeZones();
-
-    const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('app_icon');
-
-    const DarwinInitializationSettings iosInitializationSettings =
-        DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: androidInitializationSettings,
-      iOS: iosInitializationSettings,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) {
-        // Handle notification tap
-      },
-    );
-  }
-
-  // Schedule a daily notification at a specific time
-  static Future<void> scheduleDailyNotification({
-    required int id,
-    required String title,
-    required String body,
-    required int hour,
-    required int minute,
-  }) async {
-    try {
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        _nextInstanceOfTime(hour, minute),
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'daily_notification',
-            'Daily Beauty Tips',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-          iOS: const DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: 'daily_tip',
-      );
-    } catch (e) {
-      // Use debugPrint for development logging
-      debugPrint('Error scheduling notification: $e');
-    }
-  }
-
-  // Calculate the next occurrence of a specific time
-  static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-
-    // If the time has already passed today, schedule for tomorrow
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
-    return scheduledDate;
-  }
-
-  // Cancel a specific notification
-  static Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
-  }
-
-  // Cancel all notifications
-  static Future<void> cancelAllNotifications() async {
-    await _flutterLocalNotificationsPlugin.cancelAll();
-  }
-}
-
-// Helper class to generate beauty tips in Ukrainian
 class BeautyTipGenerator {
   static final List<String> _ukrainianBeautyTips = [
     'Випивайте щодня не менше 8 склянок води для сяючої шкіри',
@@ -128,5 +23,82 @@ class BeautyTipGenerator {
   static String getRandomTip() {
     return _ukrainianBeautyTips[
         DateTime.now().millisecondsSinceEpoch % _ukrainianBeautyTips.length];
+  }
+}
+
+class NotificationService {
+  static Future<void> initialize() async {
+    await AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+          channelKey: 'beauty_tips',
+          channelName: 'Beauty Tips',
+          channelDescription: 'Daily beauty advice notifications',
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Public,
+          defaultColor: Colors.teal,
+          ledColor: Colors.teal,
+          playSound: true,
+          enableVibration: true,
+        )
+      ],
+    );
+
+    // Перевірка дозволів
+    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  }
+
+  static Future<void> scheduleDailyNotifications() async {
+    // Видаляємо попередні заплановані сповіщення
+    await AwesomeNotifications().cancelAll();
+
+    // Щоденні сповіщення
+    await _scheduleNotification(
+      id: 1,
+      hour: 9,
+      minute: 0,
+      title: 'Ранкова порада краси 🌞',
+    );
+
+    await _scheduleNotification(
+      id: 2,
+      hour: 18,
+      minute: 0,
+      title: 'Денна порада краси 🌈',
+    );
+
+    await _scheduleNotification(
+      id: 3,
+      hour: 21,
+      minute: 0,
+      title: 'Вечірня порада краси ✨',
+    );
+  }
+
+  static Future<void> _scheduleNotification({
+    required int id,
+    required int hour,
+    required int minute,
+    required String title,
+  }) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id,
+        channelKey: 'beauty_tips',
+        title: title,
+        body: BeautyTipGenerator.getRandomTip(),
+        notificationLayout: NotificationLayout.Default,
+      ),
+      schedule: NotificationCalendar(
+        hour: hour,
+        minute: minute,
+        second: 0,
+        repeats: true,
+      ),
+    );
   }
 }

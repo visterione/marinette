@@ -9,23 +9,24 @@ class StoriesService {
         id: '1',
         title: 'Літній макіяж',
         imageUrls: [
-          'https://picsum.photos/500/800', // Використовуємо тимчасові фото
-          'https://picsum.photos/500/801',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg', // Використовуємо тимчасові фото
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Трендовий літній мейк',
           'Яскраві та свіжі кольори',
         ],
         category: 'makeup',
-        previewImageUrl: 'https://picsum.photos/200',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
       Story(
         id: '2',
         title: 'Догляд за шкірою',
         imageUrls: [
-          'https://picsum.photos/500/802',
-          'https://picsum.photos/500/803',
-          'https://picsum.photos/500/804',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Ранковий догляд',
@@ -33,91 +34,68 @@ class StoriesService {
           'Маски та пілінги',
         ],
         category: 'skincare',
-        previewImageUrl: 'https://picsum.photos/201',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
       Story(
         id: '3',
         title: 'Зачіски',
         imageUrls: [
-          'https://picsum.photos/500/805',
-          'https://picsum.photos/500/806',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Швидкі укладки',
           'Трендові зачіски',
         ],
         category: 'hair',
-        previewImageUrl: 'https://picsum.photos/202',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
       Story(
         id: '4',
         title: 'Манікюр',
         imageUrls: [
-          'https://picsum.photos/500/807',
-          'https://picsum.photos/500/808',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Літні дизайни',
           'Трендові кольори',
         ],
         category: 'nails',
-        previewImageUrl: 'https://picsum.photos/203',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
       Story(
         id: '5',
         title: 'Тренди сезону',
         imageUrls: [
-          'https://picsum.photos/500/809',
-          'https://picsum.photos/500/810',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Головні тренди',
           'Нові техніки',
         ],
         category: 'trends',
-        previewImageUrl: 'https://picsum.photos/204',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
       Story(
         id: '6',
         title: 'SPA вдома',
         imageUrls: [
-          'https://picsum.photos/500/811',
-          'https://picsum.photos/500/812',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
+          'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
         ],
         captions: [
           'Домашні процедури',
           'Розслаблюючі ритуали',
         ],
         category: 'spa',
-        previewImageUrl: 'https://picsum.photos/205',
-      ),
-      Story(
-        id: '7',
-        title: 'Масаж обличчя',
-        imageUrls: [
-          'https://picsum.photos/500/813',
-          'https://picsum.photos/500/814',
-        ],
-        captions: [
-          'Техніки масажу',
-          'Корисні поради',
-        ],
-        category: 'massage',
-        previewImageUrl: 'https://picsum.photos/206',
-      ),
-      Story(
-        id: '8',
-        title: 'Брови та вії',
-        imageUrls: [
-          'https://picsum.photos/500/815',
-          'https://picsum.photos/500/816',
-        ],
-        captions: [
-          'Форми брів',
-          'Догляд за віями',
-        ],
-        category: 'brows',
-        previewImageUrl: 'https://picsum.photos/207',
+        previewImageUrl:
+            'https://naturalskincare.com/wp-content/uploads/2020/11/clean-organic-customer-type-2-768x512.jpg',
       ),
     ];
   }

@@ -7,11 +7,13 @@ import 'package:marinette/config/translations/app_translations.dart';
 import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
 import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
 import 'package:marinette/app/modules/camera/camera_controller.dart';
+import 'package:marinette/app/modules/camera/camera_screen.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
 import 'package:marinette/app/data/models/story.dart';
 import 'package:marinette/app/data/services/stories_service.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
+import 'package:marinette/app/data/services/background_music_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,8 +22,43 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  final _musicHandler = BackgroundMusicHandler.instance;
   final RxList<Story> _stories = <Story>[].obs;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startBackgroundMusic();
+    _loadStories();
+  }
+
+  @override
+  void dispose() {
+    _musicHandler.stop();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        _musicHandler.stop();
+        break;
+      case AppLifecycleState.resumed:
+        _musicHandler.play();
+        break;
+    }
+  }
+
+  Future<void> _startBackgroundMusic() async {
+    await _musicHandler.play();
+  }
 
   void _changeLanguage() {
     final service = Get.find<LocalizationService>();
@@ -92,12 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadStories();
-  }
-
   Future<void> _loadStories() async {
     try {
       final stories = await StoriesService.getStories();
@@ -128,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_stories.isEmpty) return const SizedBox.shrink();
 
       return Container(
-        height: 85, // Зменшена загальна висота
+        height: 85,
         margin: const EdgeInsets.only(bottom: 24),
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -140,12 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
             return GestureDetector(
               onTap: () => _handleStoryTap(story),
               child: Container(
-                width: 60, // Зменшена ширина
-                margin: const EdgeInsets.only(right: 8), // Зменшений відступ
+                width: 60,
+                margin: const EdgeInsets.only(right: 8),
                 child: Column(
                   children: [
                     Container(
-                      height: 60, // Зменшена висота кружечка
+                      height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: story.isViewed
@@ -172,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       story.title,
                       style: const TextStyle(
-                        fontSize: 11, // Зменшений розмір шрифту
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
@@ -401,9 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ініціалізуємо CustomCameraController
     final cameraController = Get.put(CustomCameraController());
-
     final contentService = Get.find<ContentService>();
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -411,13 +440,60 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('app_name'.tr),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () => Get.to(() => HistoryScreen()),
-          ),
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: _changeLanguage,
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (context) => [
+              // Опція керування звуком (тепер у тому ж стилі)
+              PopupMenuItem<String>(
+                value: 'sound',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.volume_up, // Завжди показуємо одну й ту саму іконку
+                      size: 20,
+                      color: Colors.pink,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
+                  ],
+                ),
+              ),
+              // Опція історії
+              PopupMenuItem<String>(
+                value: 'history',
+                child: Row(
+                  children: [
+                    const Icon(Icons.history, size: 20, color: Colors.pink),
+                    const SizedBox(width: 12),
+                    Text('history'.tr),
+                  ],
+                ),
+              ),
+              // Опція зміни мови
+              PopupMenuItem<String>(
+                value: 'language',
+                child: Row(
+                  children: [
+                    const Icon(Icons.language, size: 20, color: Colors.pink),
+                    const SizedBox(width: 12),
+                    Text('language'.tr),
+                  ],
+                ),
+              ),
+            ],
+            onSelected: (value) {
+              switch (value) {
+                case 'sound':
+                  _musicHandler.toggleMute();
+                  break;
+                case 'history':
+                  Get.to(() => HistoryScreen());
+                  break;
+                case 'language':
+                  _changeLanguage();
+                  break;
+              }
+            },
           ),
         ],
       ),
