@@ -7,13 +7,13 @@ import 'package:marinette/config/translations/app_translations.dart';
 import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
 import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
 import 'package:marinette/app/modules/camera/camera_controller.dart';
-import 'package:marinette/app/modules/camera/camera_screen.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
 import 'package:marinette/app/data/models/story.dart';
 import 'package:marinette/app/data/services/stories_service.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
+import 'package:marinette/app/core/theme/theme_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,9 +61,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _changeLanguage() {
-    final service = Get.find<LocalizationService>();
-    final newLocale = service.getCurrentLocale() == 'en' ? 'uk' : 'en';
-    service.changeLocale(newLocale);
+    final newLocale = Get.locale?.languageCode == 'en' ? 'uk' : 'en';
+    Get.updateLocale(Locale(newLocale));
   }
 
   Future<void> _processImage(String? imagePath) async {
@@ -239,14 +238,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Colors.grey.shade50,
-              ],
-            ),
+            color: Theme.of(context).cardColor,
           ),
           child: Row(
             children: [
@@ -256,18 +248,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   children: [
                     Text(
                       titleKey.tr,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       subtitleKey.tr,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.grey[600]
+                                    : Colors.grey[300],
+                          ),
                     ),
                   ],
                 ),
@@ -397,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       width: 250,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -443,13 +436,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             itemBuilder: (context) => [
-              // Опція керування звуком (тепер у тому ж стилі)
+              // Theme toggle option
+              PopupMenuItem<String>(
+                value: 'theme',
+                child: Row(
+                  children: [
+                    Obx(() {
+                      final themeService = Get.find<ThemeService>();
+                      return Icon(
+                        themeService.isDarkMode
+                            ? Icons.light_mode
+                            : Icons.dark_mode,
+                        size: 20,
+                        color: Colors.pink,
+                      );
+                    }),
+                    const SizedBox(width: 12),
+                    Text('theme'.tr),
+                  ],
+                ),
+              ),
+              // Sound control option
               PopupMenuItem<String>(
                 value: 'sound',
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.volume_up, // Завжди показуємо одну й ту саму іконку
+                      Icons.volume_up,
                       size: 20,
                       color: Colors.pink,
                     ),
@@ -458,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              // Опція історії
+              // History option
               PopupMenuItem<String>(
                 value: 'history',
                 child: Row(
@@ -469,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              // Опція зміни мови
+              // Language option
               PopupMenuItem<String>(
                 value: 'language',
                 child: Row(
@@ -483,6 +496,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ],
             onSelected: (value) {
               switch (value) {
+                case 'theme':
+                  final themeService = Get.find<ThemeService>();
+                  themeService.toggleTheme();
+                  break;
                 case 'sound':
                   _musicHandler.toggleMute();
                   break;
@@ -499,12 +516,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
       body: Container(
         height: screenHeight,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFDF2F8), Color(0xFFF5F3FF)],
-            stops: [0.0, 1.0],
+            colors: [
+              Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFFDF2F8)
+                  : const Color(0xFF1A1A1A),
+              Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFF5F3FF)
+                  : const Color(0xFF262626),
+            ],
+            stops: const [0.0, 1.0],
           ),
         ),
         child: Stack(

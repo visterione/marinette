@@ -1,5 +1,3 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +10,7 @@ import 'package:marinette/app/data/services/content_service.dart';
 import 'package:marinette/app/data/services/notification_service.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
 import 'package:marinette/config/translations/app_translations.dart';
+import 'package:marinette/app/core/theme/theme_service.dart';
 
 Future<void> main() async {
   try {
@@ -41,7 +40,14 @@ Future<void> _initializeServices() async {
   );
   debugPrint('UserPreferences service initialized');
 
-  // 3. Initialize core services concurrently
+  // 3. Initialize ThemeService
+  await Get.putAsync(
+    () => ThemeService().init(),
+    permanent: true,
+  );
+  debugPrint('Theme service initialized');
+
+  // 4. Initialize core services concurrently
   await Future.wait([
     // LocalizationService for translations
     Get.putAsync(
@@ -62,11 +68,11 @@ Future<void> _initializeServices() async {
     ).then((_) => debugPrint('ResultSaver service initialized')),
   ]);
 
-  // 4. Initialize background music (after other core services)
+  // 5. Initialize background music (after other core services)
   await BackgroundMusicHandler.instance.init();
   debugPrint('Background music handler initialized');
 
-  // 5. Initialize notifications (last, as it's less critical)
+  // 6. Initialize notifications (last, as it's less critical)
   await NotificationService.initialize();
   debugPrint('Notification service initialized');
 }
@@ -112,9 +118,13 @@ class BeautyRecommendationsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeService = Get.find<ThemeService>();
+
     return GetMaterialApp(
       title: 'Beauty Recommendations',
-      theme: AppTheme.theme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeService.getThemeMode(),
       translations: AppTranslations(),
       locale: const Locale('uk'),
       fallbackLocale: const Locale('en'),
