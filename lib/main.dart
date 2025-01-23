@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marinette/app/modules/home/home_screen.dart';
 import 'package:marinette/app/core/theme/app_theme.dart';
 import 'package:marinette/app/data/services/result_saver_service.dart';
@@ -14,12 +15,8 @@ import 'package:marinette/app/core/theme/theme_service.dart';
 
 Future<void> main() async {
   try {
-    // Ensure Flutter bindings are initialized
     WidgetsFlutterBinding.ensureInitialized();
-
-    // Initialize services in correct order
     await _initializeServices();
-
     runApp(const BeautyRecommendationsApp());
   } catch (e, stackTrace) {
     debugPrint('Error during app initialization: $e');
@@ -29,52 +26,53 @@ Future<void> main() async {
 }
 
 Future<void> _initializeServices() async {
-  // 1. Initialize Hive (required for local storage)
-  await Hive.initFlutter();
-  debugPrint('Hive initialized');
+  try {
+    // Ініціалізуємо Hive
+    await Hive.initFlutter();
+    debugPrint('Hive initialized');
 
-  // 2. Initialize UserPreferences (other services might depend on user settings)
-  await Get.putAsync(
-    () => UserPreferencesService().init(),
-    permanent: true,
-  );
-  debugPrint('UserPreferences service initialized');
+    // Ініціалізуємо SharedPreferences перед всіма сервісами
+    await SharedPreferences.getInstance();
+    debugPrint('SharedPreferences initialized');
 
-  // 3. Initialize ThemeService
-  await Get.putAsync(
-    () => ThemeService().init(),
-    permanent: true,
-  );
-  debugPrint('Theme service initialized');
-
-  // 4. Initialize core services concurrently
-  await Future.wait([
-    // LocalizationService for translations
-    Get.putAsync(
-      () => LocalizationService().init(),
+    // Тепер ініціалізуємо сервіси
+    await Get.putAsync(
+      () => UserPreferencesService().init(),
       permanent: true,
-    ).then((_) => debugPrint('Localization service initialized')),
+    );
+    debugPrint('UserPreferences service initialized');
 
-    // ContentService for app content
-    Get.putAsync(
-      () => ContentService().init(),
+    await Get.putAsync(
+      () => ThemeService().init(),
       permanent: true,
-    ).then((_) => debugPrint('Content service initialized')),
+    );
+    debugPrint('Theme service initialized');
 
-    // ResultSaverService for storing analysis results
-    Get.putAsync(
-      () => ResultSaverService().init(),
-      permanent: true,
-    ).then((_) => debugPrint('ResultSaver service initialized')),
-  ]);
+    // Ініціалізуємо інші сервіси паралельно
+    await Future.wait([
+      Get.putAsync(
+        () => LocalizationService().init(),
+        permanent: true,
+      ).then((_) => debugPrint('Localization service initialized')),
+      Get.putAsync(
+        () => ContentService().init(),
+        permanent: true,
+      ).then((_) => debugPrint('Content service initialized')),
+      Get.putAsync(
+        () => ResultSaverService().init(),
+        permanent: true,
+      ).then((_) => debugPrint('ResultSaver service initialized')),
+    ]);
 
-  // 5. Initialize background music (after other core services)
-  await BackgroundMusicHandler.instance.init();
-  debugPrint('Background music handler initialized');
+    await BackgroundMusicHandler.instance.init();
+    debugPrint('Background music handler initialized');
 
-  // 6. Initialize notifications (last, as it's less critical)
-  await NotificationService.initialize();
-  debugPrint('Notification service initialized');
+    await NotificationService.initialize();
+    debugPrint('Notification service initialized');
+  } catch (e) {
+    debugPrint('Error during service initialization: $e');
+    rethrow;
+  }
 }
 
 MaterialApp _buildErrorApp(String errorMessage) {
@@ -125,7 +123,7 @@ class BeautyRecommendationsApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeService.getThemeMode(),
-      translations: AppTranslations(),
+      translations: Messages(),
       locale: const Locale('uk'),
       fallbackLocale: const Locale('en'),
       localizationsDelegates: const [
@@ -136,6 +134,8 @@ class BeautyRecommendationsApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('uk'),
+        Locale('pl'),
+        Locale('ka'),
       ],
       home: const HomeScreen(),
     );

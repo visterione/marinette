@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class AppTranslations extends Translations {
+class Messages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {};
 }
@@ -26,9 +26,13 @@ class LocalizationService extends GetxService {
     try {
       final en = await rootBundle.loadString('assets/i18n/en.json');
       final uk = await rootBundle.loadString('assets/i18n/uk.json');
+      final pl = await rootBundle.loadString('assets/i18n/pl.json');
+      final ka = await rootBundle.loadString('assets/i18n/ka.json');
 
       translations['en'] = Map<String, String>.from(json.decode(en));
       translations['uk'] = Map<String, String>.from(json.decode(uk));
+      translations['pl'] = Map<String, String>.from(json.decode(pl));
+      translations['ka'] = Map<String, String>.from(json.decode(ka));
 
       Get.addTranslations(translations);
     } catch (e) {

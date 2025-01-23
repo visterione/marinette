@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:marinette/app/data/models/face_analysis_result.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:marinette/app/data/services/share_card_service.dart';
 
 class AnalysisResultScreen extends StatelessWidget {
   final String imagePath;
@@ -19,26 +18,9 @@ class AnalysisResultScreen extends StatelessWidget {
 
   Future<void> _shareResults() async {
     try {
-      final String shareText = '''
-🎭 ${result.faceShape} / ${result.colorType}
-
-💄 ${result.makeupRecommendations.map((r) => '• $r').join('\n')}
-
-💇‍♀️ ${result.hairstyleRecommendations.map((r) => '• $r').join('\n')}
-
-✨ ${result.skincareRecommendations.map((r) => '• $r').join('\n')}
-
-Проаналізовано за допомогою Beauty Recommendations App
-''';
-
-      final tempDir = await getTemporaryDirectory();
-      final tempImagePath = '${tempDir.path}/shared_image.jpg';
-      await File(imagePath).copy(tempImagePath);
-
-      await Share.shareXFiles(
-        [XFile(tempImagePath)],
-        text: shareText,
-        subject: 'Мої б\'юті-рекомендації',
+      await ShareCardService.shareAnalysisResult(
+        imagePath: imagePath,
+        result: result,
       );
     } catch (e) {
       Get.snackbar(

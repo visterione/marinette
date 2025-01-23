@@ -61,8 +61,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _changeLanguage() {
-    final newLocale = Get.locale?.languageCode == 'en' ? 'uk' : 'en';
-    Get.updateLocale(Locale(newLocale));
+    final service = Get.find<LocalizationService>();
+    final currentLocale = service.getCurrentLocale();
+
+    String newLocale;
+    switch (currentLocale) {
+      case 'uk':
+        newLocale = 'en';
+      case 'en':
+        newLocale = 'pl';
+      case 'pl':
+        newLocale = 'ka';
+      case 'ka':
+        newLocale = 'uk';
+      default:
+        newLocale = 'uk';
+    }
+
+    service.changeLocale(newLocale);
   }
 
   Future<void> _processImage(String? imagePath) async {

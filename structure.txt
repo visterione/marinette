@@ -2,64 +2,75 @@
 marinette/
     - assets/
         - fonts/
-            - PlayfairDisplay-Regular.ttf
-            - PlayfairDisplay-Bold.ttf
-            - PlayfairDisplay-Italic.ttf
+            - PlayfairDisplay-Regular.ttf // Основний шрифт
+            - PlayfairDisplay-Bold.ttf // Жирний шрифт
+            - PlayfairDisplay-Italic.ttf // Курсив шрифт
         - i18n/
-            - en.json
-            - uk.json
+            - en.json // Ключі з текстами англійською мовою
+            - uk.json // Ключі з текстами українською мовою
+            - ka.json // Ключі з грузинською англійською мовою
+            - pl.json // Ключі з текстами польською мовою
         - audio/
-            - nana.mp3    
+            - nana.mp3 // Фонова мелодія додатку   
     - lib/
         - app/
             - core/
                 - theme/
                     - app_theme.dart
+                    - theme_service.dart
                 - utils/
                     - app_navigation.dart
                     - custom_page_route.dart
                     - page_transitions.dart
                 - widgets/
-                    - wave_background_painter.dart    
+                    - wave_background_painter.dart // Малювання фонового зображення додатку
+                    - story_viewer.dart
+                    - stories_section.dart 
             - data/
                 - content/
-                    - beauty_trends.dart
-                    - daily_tips.dart
+                    - beauty_trends.dart // Блок головної сторінки "Тренди сезону"
+                    - daily_tips.dart // Блок головної сторінки "Порада дня"
                 - models/
-                    - article.dart
-                    - face_analysis_results.dart
-                    - facial_features.dart
+                    - article.dart // Конструктор статті
+                    - face_analysis_results.dart // Конструктор результатів аналізу обличчя
+                    - facial_features.dart // Конструктор рис обличчя
+                    - story.dart // Конструктор stories
                 - services/
+                    - app_initializer.dart
                     - audio_service.dart
-                    - beauty_hub_analyzer.dart
+                    - background_music_handler.dart
+                    - beauty_hub_service.dart
                     - color_type_analyzer.dart
                     - content_service.dart
                     - face_analysis_service.dart
                     - face_shape_analyzer.dart
                     - facial_features_analyzer.dart
+                    - localizations_service.dart
+                    - notification_service.dart
                     - recommendations_service.dart
                     - result_saver_service.dart
                     - skin_color_analyzer.dart
+                    - stories_service.dart
                     - user_preferences_service.dart
             - modules/
                 - analysis/
-                    - analysis_result_screen.dart
-                    - loading_screen.dart
+                    - analysis_result_screen.dart // Сторінка з результатами розпізнавання 
+                    - loading_screen.dart // Загрузочний екран
                 - article/
-                    - article_deatils_screen.dart
+                    - article_deatils_screen.dart // Сторінка статті
                 - beauty_hub/
-                    - beauty_hub_screen.dart
+                    - beauty_hub_screen.dart // Сторінка "Б'юті хабу" з статтями
                 - camera/
                     - camera_screen.dart
                     - camera_controller.dart
                 - history/
-                    - history_screen.dart
+                    - history_screen.dart // Сторінка з історією розпізнавань облич
                 - home/
-                    - home_screen.dart
+                    - home_screen.dart // Головна сторінка мобільного додатку
                 shared/
                     - hero_photo_view.dart
         - config/
             - translations/
                 - app_translations.dart
-        - main.dart
-    - pubspec.yaml
+        - main.dart // Точка входу мобільного додатку
+    - pubspec.yaml // Залежності, імпорти та пакети мобільного додатку
