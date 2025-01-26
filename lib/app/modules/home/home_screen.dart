@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:marinette/app/data/services/face_analysis_service.dart';
-import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/core/theme/theme_service.dart';
+import 'package:marinette/app/data/models/story.dart';
+import 'package:marinette/app/data/services/background_music_handler.dart';
 import 'package:marinette/app/data/services/content_service.dart';
-import 'package:marinette/config/translations/app_translations.dart';
+import 'package:marinette/app/data/services/face_analysis_service.dart';
+import 'package:marinette/app/data/services/localization_service.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/data/services/stories_service.dart';
 import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
 import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
 import 'package:marinette/app/modules/camera/camera_controller.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
-import 'package:marinette/app/data/models/story.dart';
-import 'package:marinette/app/data/services/stories_service.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
-import 'package:marinette/app/data/services/background_music_handler.dart';
-import 'package:marinette/app/core/theme/theme_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _changeLanguage() {
     final service = Get.find<LocalizationService>();
-    final currentLocale = service.getCurrentLocale();
+    final currentLocale = service.getCurrentLocale().languageCode;
 
     String newLocale;
     switch (currentLocale) {
@@ -79,6 +79,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
 
     service.changeLocale(newLocale);
+  }
+
+  Future<void> _loadStories() async {
+    try {
+      final stories = await StoriesService.getStories();
+      _stories.value = stories;
+    } catch (e) {
+      debugPrint('Error loading stories: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_loading_stories'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   Future<void> _processImage(String? imagePath) async {
@@ -141,20 +155,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           snackPosition: SnackPosition.BOTTOM,
         );
       }
-    }
-  }
-
-  Future<void> _loadStories() async {
-    try {
-      final stories = await StoriesService.getStories();
-      _stories.value = stories;
-    } catch (e) {
-      debugPrint('Error loading stories: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_loading_stories'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     }
   }
 
@@ -452,7 +452,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             itemBuilder: (context) => [
-              // Theme toggle option
               PopupMenuItem<String>(
                 value: 'theme',
                 child: Row(
@@ -472,7 +471,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              // Sound control option
               PopupMenuItem<String>(
                 value: 'sound',
                 child: Row(
@@ -487,7 +485,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              // History option
               PopupMenuItem<String>(
                 value: 'history',
                 child: Row(
@@ -498,7 +495,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              // Language option
               PopupMenuItem<String>(
                 value: 'language',
                 child: Row(
@@ -515,16 +511,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 case 'theme':
                   final themeService = Get.find<ThemeService>();
                   themeService.toggleTheme();
-                  break;
                 case 'sound':
                   _musicHandler.toggleMute();
-                  break;
                 case 'history':
                   Get.to(() => HistoryScreen());
-                  break;
                 case 'language':
                   _changeLanguage();
-                  break;
               }
             },
           ),
