@@ -13,6 +13,8 @@ import 'package:marinette/app/modules/home/home_screen.dart';
 import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app/data/services/stories_service.dart';
+
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +43,13 @@ Future<void> _initializeServices() async {
   await Get.putAsync(() => ContentService().init());
   debugPrint('Content service initialized');
 
+  // Спочатку ініціалізуємо LocalizationService
   await Get.putAsync(() => ls.LocalizationService().init());
   debugPrint('Localization service initialized');
+
+  // Потім StoriesService
+  Get.put(StoriesService(), permanent: true);
+  debugPrint('Stories service initialized');
 
   await Get.putAsync(() => ResultSaverService().init());
   debugPrint('ResultSaver service initialized');

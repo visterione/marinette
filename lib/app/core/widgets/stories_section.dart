@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:marinette/app/data/models/story.dart';
 
 class StoriesSection extends StatelessWidget {
@@ -57,17 +58,17 @@ class _StoryItem extends StatelessWidget {
                 gradient: story.isViewed
                     ? null
                     : const LinearGradient(
-                        colors: [Colors.pink, Colors.purple],
-                      ),
+                  colors: [Colors.pink, Colors.purple],
+                ),
               ),
               padding: const EdgeInsets.all(2),
               child: CircleAvatar(
-                backgroundImage: NetworkImage(story.previewImageUrl),
+                backgroundImage: NetworkImage(story.previewImageUrl.tr),
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              story.title,
+              story.title.tr,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

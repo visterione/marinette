@@ -1,99 +1,104 @@
+import 'package:get/get.dart';
 import 'package:marinette/app/data/models/story.dart';
+import 'package:marinette/app/data/services/localization_service.dart';
 
-class StoriesService {
-  static Future<List<Story>> getStories() async {
-    return [
+class StoriesService extends GetxController {
+  final RxList<Story> stories = <Story>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadStories();
+    ever(Get.find<LocalizationService>().locale, (_) => loadStories());
+  }
+
+  void loadStories() {
+    stories.value = [
       Story(
         id: '1',
-        title: 'Літній макіяж',
+        title: 'stories_summer_makeup',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg', // Використовуємо тимчасові фото
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_summer_makeup_img_1',
+          'stories_summer_makeup_img_2',
         ],
         captions: [
-          '',
-          '',
+          'stories_summer_makeup_caption_1',
+          'stories_summer_makeup_caption_2',
         ],
         category: 'makeup',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_summer_makeup_preview',
       ),
       Story(
         id: '2',
-        title: 'Догляд за шкірою',
+        title: 'stories_skincare',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_skincare_img_1',
+          'stories_skincare_img_2',
+          'stories_skincare_img_3',
         ],
         captions: [
-          '',
-          '',
-          '',
+          'stories_skincare_caption_1',
+          'stories_skincare_caption_2',
+          'stories_skincare_caption_3',
         ],
         category: 'skincare',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_skincare_preview',
       ),
       Story(
         id: '3',
-        title: 'Зачіски',
+        title: 'stories_hairstyles',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_hairstyles_img_1',
+          'stories_hairstyles_img_2',
         ],
         captions: [
-          '',
-          '',
+          'stories_hairstyles_caption_1',
+          'stories_hairstyles_caption_2',
         ],
         category: 'hair',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_hairstyles_preview',
       ),
       Story(
         id: '4',
-        title: 'Манікюр',
+        title: 'stories_nails',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_nails_img_1',
+          'stories_nails_img_2',
         ],
         captions: [
-          '',
-          '',
+          'stories_nails_caption_1',
+          'stories_nails_caption_2',
         ],
         category: 'nails',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_nails_preview',
       ),
       Story(
         id: '5',
-        title: 'Тренди сезону',
+        title: 'stories_trends',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_trends_img_1',
+          'stories_trends_img_2',
         ],
         captions: [
-          '',
-          '',
+          'stories_trends_caption_1',
+          'stories_trends_caption_2',
         ],
         category: 'trends',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_trends_preview',
       ),
       Story(
         id: '6',
-        title: 'SPA вдома',
+        title: 'stories_spa',
         imageUrls: [
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
-          'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+          'stories_spa_img_1',
+          'stories_spa_img_2',
         ],
         captions: [
-          '',
-          '',
+          'stories_spa_caption_1',
+          'stories_spa_caption_2',
         ],
         category: 'spa',
-        previewImageUrl:
-            'https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg',
+        previewImageUrl: 'stories_spa_preview',
       ),
     ];
   }

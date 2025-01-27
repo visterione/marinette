@@ -24,14 +24,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final _musicHandler = BackgroundMusicHandler.instance;
-  final RxList<Story> _stories = <Story>[].obs;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _startBackgroundMusic();
-    _loadStories();
   }
 
   @override
@@ -81,18 +79,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     service.changeLocale(newLocale);
   }
 
-  Future<void> _loadStories() async {
-    try {
-      final stories = await StoriesService.getStories();
-      _stories.value = stories;
-    } catch (e) {
-      debugPrint('Error loading stories: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_loading_stories'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+  void _handleStoryTap(Story story) {
+    Get.to(
+          () => StoryViewer(
+        story: story,
+        onClose: () => Get.back(),
+      ),
+      fullscreenDialog: true,
+      transition: Transition.fadeIn,
+    );
   }
 
   Future<void> _processImage(String? imagePath) async {
@@ -134,9 +129,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           }
 
           await Get.to(() => AnalysisResultScreen(
-                imagePath: imagePath,
-                result: result,
-              ));
+            imagePath: imagePath,
+            result: result,
+          ));
         } else {
           Get.snackbar(
             'error'.tr,
@@ -158,20 +153,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _handleStoryTap(Story story) {
-    Get.to(
-      () => StoryViewer(
-        story: story,
-        onClose: () => Get.back(),
-      ),
-      fullscreenDialog: true,
-      transition: Transition.fadeIn,
-    );
-  }
-
   Widget _buildStoriesSection() {
+    final storiesService = Get.find<StoriesService>();
+
     return Obx(() {
-      if (_stories.isEmpty) return const SizedBox.shrink();
+      final stories = storiesService.stories;
+      if (stories.isEmpty) return const SizedBox.shrink();
 
       return Container(
         height: 85,
@@ -179,10 +166,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          itemCount: _stories.length,
+          itemCount: stories.length,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           itemBuilder: (context, index) {
-            final story = _stories[index];
+            final story = stories[index];
             return GestureDetector(
               onTap: () => _handleStoryTap(story),
               child: Container(
@@ -197,15 +184,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         gradient: story.isViewed
                             ? null
                             : const LinearGradient(
-                                colors: [Colors.pink, Colors.purple],
-                              ),
+                          colors: [Colors.pink, Colors.purple],
+                        ),
                       ),
                       padding: const EdgeInsets.all(2),
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: NetworkImage(story.previewImageUrl),
+                            image: NetworkImage(story.previewImageUrl.tr),
                             fit: BoxFit.cover,
                           ),
                           border: story.isViewed
@@ -216,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      story.title,
+                      story.title.tr,
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
@@ -265,18 +252,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     Text(
                       titleKey.tr,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       subtitleKey.tr,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? Colors.grey[600]
-                                    : Colors.grey[300],
-                          ),
+                        color:
+                        Theme.of(context).brightness == Brightness.light
+                            ? Colors.grey[600]
+                            : Colors.grey[300],
+                      ),
                     ),
                   ],
                 ),
@@ -386,13 +373,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             child: Row(
               children: trends
                   .map((trend) => Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: _buildTrendCard(
-                          title: trend.title.tr,
-                          description:
-                              '${trend.title.toLowerCase()}_description'.tr,
-                        ),
-                      ))
+                padding: const EdgeInsets.only(right: 16),
+                child: _buildTrendCard(
+                  title: trend.title.tr,
+                  description:
+                  '${trend.title.toLowerCase()}_description'.tr,
+                ),
+              ))
                   .toList(),
             ),
           ),
@@ -446,82 +433,82 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
         title: Text('app_name'.tr),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'theme',
-                child: Row(
-                  children: [
-                    Obx(() {
-                      final themeService = Get.find<ThemeService>();
-                      return Icon(
-                        themeService.isDarkMode
-                            ? Icons.light_mode
-                            : Icons.dark_mode,
-                        size: 20,
-                        color: Colors.pink,
-                      );
-                    }),
-                    const SizedBox(width: 12),
-                    Text('theme'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'sound',
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.volume_up,
-                      size: 20,
-                      color: Colors.pink,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'history',
-                child: Row(
-                  children: [
-                    const Icon(Icons.history, size: 20, color: Colors.pink),
-                    const SizedBox(width: 12),
-                    Text('history'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'language',
-                child: Row(
-                  children: [
-                    const Icon(Icons.language, size: 20, color: Colors.pink),
-                    const SizedBox(width: 12),
-                    Text('language'.tr),
-                  ],
-                ),
-              ),
-            ],
-            onSelected: (value) {
-              switch (value) {
-                case 'theme':
-                  final themeService = Get.find<ThemeService>();
-                  themeService.toggleTheme();
-                case 'sound':
-                  _musicHandler.toggleMute();
-                case 'history':
-                  Get.to(() => HistoryScreen());
-                case 'language':
-                  _changeLanguage();
-              }
-            },
-          ),
-        ],
-      ),
+    actions: [
+    PopupMenuButton<String>(
+    icon: const Icon(Icons.more_vert),
+    itemBuilder: (context) => [
+    PopupMenuItem<String>(
+    value: 'theme',
+    child: Row(
+    children: [
+    Obx(() {
+    final themeService = Get.find<ThemeService>();
+    return Icon(
+    themeService.isDarkMode
+    ? Icons.light_mode
+        : Icons.dark_mode,
+    size: 20,
+    color: Colors.pink,
+    );
+    }),
+    const SizedBox(width: 12),
+    Text('theme'.tr),
+    ],
+    ),
+    ),
+    PopupMenuItem<String>(
+    value: 'sound',
+    child: Row(
+    children: [
+    const Icon(
+    Icons.volume_up,
+    size: 20,
+    color: Colors.pink,
+    ),
+    const SizedBox(width: 12),
+    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
+    ],
+    ),
+    ),
+    PopupMenuItem<String>(
+    value: 'history',
+    child: Row(
+    children: [
+    const Icon(Icons.history, size: 20, color: Colors.pink),
+    const SizedBox(width: 12),
+    Text('history'.tr),
+    ],
+    ),
+    ),
+    PopupMenuItem<String>(
+    value: 'language',
+    child: Row(
+    children: [
+    const Icon(Icons.language, size: 20, color: Colors.pink),
+    const SizedBox(width: 12),
+    Text('language'.tr),
+    ],
+    ),
+    ),
+    ],
+    onSelected: (value) {
+    switch (value) {
+    case 'theme':
+    final themeService = Get.find<ThemeService>();
+    themeService.toggleTheme();
+    case 'sound':
+    _musicHandler.toggleMute();
+    case 'history':
+    Get.to(() => HistoryScreen());
+    case 'language':
+    _changeLanguage();
+    }
+    },
+    ),
+    ],
+    ),
       body: Container(
         height: screenHeight,
         decoration: BoxDecoration(
@@ -572,7 +559,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         icon: Icons.photo_library,
                         onTap: () async {
                           final imagePath =
-                              await cameraController.pickFromGallery();
+                          await cameraController.pickFromGallery();
                           await _processImage(imagePath);
                         },
                       ),

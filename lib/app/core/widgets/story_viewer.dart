@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:marinette/app/data/models/story.dart';
 
 class StoryViewer extends StatefulWidget {
@@ -50,7 +51,7 @@ class _StoryViewerState extends State<StoryViewer> {
                 fit: StackFit.expand,
                 children: [
                   Image.network(
-                    widget.story.imageUrls[index],
+                    widget.story.imageUrls[index].tr,
                     fit: BoxFit.cover,
                   ),
                   Positioned(
@@ -58,7 +59,7 @@ class _StoryViewerState extends State<StoryViewer> {
                     left: 20,
                     right: 20,
                     child: Text(
-                      widget.story.captions[index],
+                      widget.story.captions[index].tr,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -78,7 +79,7 @@ class _StoryViewerState extends State<StoryViewer> {
             child: Row(
               children: List.generate(
                 widget.story.imageUrls.length,
-                (index) => Expanded(
+                    (index) => Expanded(
                   child: Container(
                     height: 2,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
