@@ -38,8 +38,6 @@
   "error_loading_results": "Error loading results",
   "error_deleting_result": "Error deleting result",
   "error_sharing": "Error propagating results",
-  "error_no_face": "Face not found. Try again.",
-  "error_multiple_faces": "Found several faces. Use a photo with one face.",
   "error_camera": "Camera error. Try again.",
   "recommendations": "Recommendations",
   "face_shape": "Face shape",
@@ -303,5 +301,10 @@
   "stories_spa": "SPA at home",
   "stories_spa_img_1": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
   "stories_spa_img_2": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
-  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg"
+  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
+
+  "error_analysis_timeout": "Analysis timeout exceeded. Try again",
+  "error_analyzing": "Failed to analyze photo. Try again",
+  "error_no_face": "No face found in photo. Try another photo",
+  "error_multiple_faces": "Several faces were found. Please select a photo with one face"
 }

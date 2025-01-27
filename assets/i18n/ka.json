@@ -38,8 +38,6 @@
   "error_loading_results": "შეცდომა შედეგების ჩატვირთვისას",
   "error_deleting_result": "შეცდომა შედეგის წაშლისას",
   "error_sharing": "შეცდომა შედეგების გავრცელებისას",
-  "error_no_face": "სახე ვერ მოიძებნა. სცადეთ ხელახლა.",
-  "error_multiple_faces": "იპოვა რამდენიმე სახე. გამოიყენეთ ფოტო ერთი სახეზე.",
   "error_camera": "კამერის შეცდომა. სცადეთ ხელახლა.",
   "recommendations": "რეკომენდაციები",
   "face_shape": "სახის ფორმა",
@@ -303,5 +301,10 @@
   "stories_spa": "SPA სახლში",
   "stories_spa_img_1": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
   "stories_spa_img_2": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
-  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg"
+  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
+
+  "error_analysis_timeout": "ანალიზის დრო გადაჭარბებულია. სცადეთ ხელახლა",
+  "error_analyzing": "ფოტოს ანალიზი ვერ მოხერხდა. სცადეთ ხელახლა",
+  "error_no_face": "ფოტოზე სახე არ მოიძებნა. სცადეთ სხვა ფოტო",
+  "error_multiple_faces": "რამდენიმე სახე იპოვეს. გთხოვთ, აირჩიოთ ერთი სახის ფოტო"
 }

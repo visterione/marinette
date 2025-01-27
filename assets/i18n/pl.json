@@ -38,8 +38,6 @@
   "error_loading_results": "Błąd podczas ładowania wyników",
   "error_deleting_result": "Błąd podczas usuwania wyniku",
   "error_sharing": "Błąd propagowania wyników",
-  "error_no_face": "Nie znaleziono twarzy. Spróbuj ponownie.",
-  "error_multiple_faces": "Znaleziono kilka twarzy. Użyj zdjęcia z jedną twarzą.",
   "error_camera": "Błąd aparatu. Spróbuj ponownie.",
   "recommendations": "Zalecenia",
   "face_shape": "Kształt twarzy",
@@ -303,5 +301,10 @@
   "stories_spa": "SPA w domu",
   "stories_spa_img_1": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
   "stories_spa_img_2": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
-  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg"
+  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
+
+  "error_analysis_timeout": "Przekroczono limit czasu analizy. Spróbuj ponownie",
+  "error_analyzing": "Nie udało się przeanalizować zdjęcia. Spróbuj ponownie",
+  "error_no_face": "Na zdjęciu nie znaleziono twarzy. Spróbuj innego zdjęcia",
+  "error_multiple_faces": "Znaleziono kilka twarzy. Wybierz zdjęcie z jedną twarzą"
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:marinette/app/core/theme/theme_service.dart';
 import 'package:marinette/app/data/models/story.dart';
@@ -90,22 +91,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
+// Модифікуємо метод _processImage в HomeScreen
   Future<void> _processImage(String? imagePath) async {
     if (imagePath != null) {
       try {
         debugPrint('Starting image processing for path: $imagePath');
+        final analysisService = Get.put(FaceAnalysisService());
 
+        // Показуємо індикатор завантаження
         Get.dialog(
           PopScope(
             canPop: false,
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+              ),
+            ),
           ),
           barrierDismissible: false,
         );
 
-        final analysisService = Get.put(FaceAnalysisService());
-        final result = await analysisService.analyzeFace(imagePath);
+        // Встановлюємо таймаут на аналіз обличчя
+        final result = await analysisService.analyzeFace(imagePath)
+            .timeout(
+          const Duration(seconds: 5),
+          onTimeout: () => throw TimeoutException('Face analysis took too long'),
+        );
 
+        // Закриваємо діалог завантаження
         if (Get.isDialogOpen ?? false) {
           Get.back();
         }
@@ -119,6 +132,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               result: result,
             );
             debugPrint('Result saved successfully');
+
+            await Get.to(() => AnalysisResultScreen(
+              imagePath: imagePath,
+              result: result,
+            ));
           } catch (e) {
             debugPrint('Error saving result: $e');
             Get.snackbar(
@@ -127,18 +145,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               snackPosition: SnackPosition.BOTTOM,
             );
           }
-
-          await Get.to(() => AnalysisResultScreen(
-            imagePath: imagePath,
-            result: result,
-          ));
         } else {
           Get.snackbar(
             'error'.tr,
-            'analysis_failed'.tr,
+            'error_no_face'.tr,
             snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
           );
         }
+      } on TimeoutException catch (_) {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+        Get.snackbar(
+          'error'.tr,
+          'error_analysis_timeout'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
       } catch (e) {
         debugPrint('Error during image processing: $e');
         if (Get.isDialogOpen ?? false) {
@@ -146,8 +170,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
         Get.snackbar(
           'error'.tr,
-          'analysis_failed'.tr,
+          'error_analyzing'.tr,
           snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
         );
       }
     }

@@ -38,8 +38,6 @@
   "error_loading_results": "Помилка завантаження результатів",
   "error_deleting_result": "Помилка видалення результату",
   "error_sharing": "Помилка під час поширення результатів",
-  "error_no_face": "Обличчя не знайдено. Спробуйте ще раз.",
-  "error_multiple_faces": "Знайдено декілька облич. Використовуйте фото з одним обличчям.",
   "error_camera": "Помилка камери. Спробуйте ще раз.",
   "recommendations": "Рекомендації",
   "face_shape": "Форма обличчя",
@@ -303,5 +301,10 @@
   "stories_spa": "SPA вдома",
   "stories_spa_img_1": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
   "stories_spa_img_2": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
-  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg"
+  "stories_spa_preview": "https://marketplace.canva.com/EAGQjy-E-_c/1/0/900w/canva-gold-and-beige-elegant-new-year-instagram-story-7GZkoAvBtsw.jpg",
+
+  "error_analysis_timeout": "Перевищено час очікування аналізу. Спробуйте ще раз",
+  "error_analyzing": "Не вдалося проаналізувати фото. Спробуйте ще раз",
+  "error_no_face": "На фото не знайдено обличчя. Спробуйте інше фото",
+  "error_multiple_faces": "Знайдено декілька облич. Будь ласка, виберіть фото з одним обличчям"
 }

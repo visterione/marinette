@@ -25,20 +25,18 @@ class FaceAnalysisService extends GetxService {
       late InputImage inputImage;
 
       if (kIsWeb) {
-        // Отримуємо XFile для веб
         final XFile pickedFile = XFile(imagePath);
         final Uint8List bytes = await pickedFile.readAsBytes();
         inputImage = InputImage.fromBytes(
           bytes: bytes,
           metadata: InputImageMetadata(
-            size: const Size(800, 600), // Приблизний розмір
+            size: const Size(800, 600),
             rotation: InputImageRotation.rotation0deg,
             format: InputImageFormat.bgra8888,
-            bytesPerRow: 800 * 4, // width * 4 bytes per pixel
+            bytesPerRow: 800 * 4,
           ),
         );
       } else {
-        // Для мобільної версії
         final File imageFile = File(imagePath);
         inputImage = InputImage.fromFile(imageFile);
       }
@@ -49,7 +47,6 @@ class FaceAnalysisService extends GetxService {
 
       if (faces.isEmpty) {
         debugPrint('No faces detected');
-        Get.snackbar('error'.tr, 'error_no_face'.tr);
         return null;
       }
 
@@ -66,52 +63,30 @@ class FaceAnalysisService extends GetxService {
       final faceShape = FaceShapeAnalyzer.analyzeFaceShape(face);
       debugPrint('Face shape determined: $faceShape');
 
-      // Визначення кольоротипу
-      final colorType =
-          await ColorTypeAnalyzer.analyzeColorType(imagePath, face);
+      // Визначення кольоротипу (зменшуємо час очікування)
+      final colorType = await ColorTypeAnalyzer.analyzeColorType(imagePath, face)
+          .timeout(const Duration(seconds: 2));
       debugPrint('Color type determined: $colorType');
 
       // Отримання рекомендацій
       debugPrint('Generating recommendations');
       final makeupRecommendations =
-          RecommendationsService.getMakeupRecommendations(faceShape, colorType);
+      RecommendationsService.getMakeupRecommendations(faceShape, colorType);
       final hairstyleRecommendations =
-          RecommendationsService.getHairstyleRecommendations(
-              faceShape, colorType);
+      RecommendationsService.getHairstyleRecommendations(faceShape, colorType);
       final skincareRecommendations =
-          RecommendationsService.getSkincareRecommendations(colorType);
+      RecommendationsService.getSkincareRecommendations(colorType);
 
-      // Отримання персоналізованих порад
-      final personalTips = RecommendationsService.getPersonalizedTips(
-        faceShape: faceShape,
-        colorType: colorType,
-      );
-
-      // Додаємо сезонну рекомендацію
-      final seasonalTip = RecommendationsService.getSeasonalRecommendation();
-
-      // Об'єднуємо всі рекомендації
       return FaceAnalysisResult(
         faceShape: _getFaceShapeName(faceShape),
         colorType: _getColorTypeName(colorType),
-        makeupRecommendations: [
-          ...makeupRecommendations,
-          personalTips[0]
-        ], // Додаємо персоналізовану пораду по макіяжу
-        hairstyleRecommendations: [
-          ...hairstyleRecommendations,
-          personalTips[1]
-        ], // Додаємо пораду по волоссю
-        skincareRecommendations: [
-          ...skincareRecommendations,
-          seasonalTip
-        ], // Додаємо сезонну пораду
+        makeupRecommendations: makeupRecommendations,
+        hairstyleRecommendations: hairstyleRecommendations,
+        skincareRecommendations: skincareRecommendations,
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       debugPrint('Error during analysis: $e');
-      debugPrint('Stack trace: $stackTrace');
-      Get.snackbar('error'.tr, 'error_analyzing'.tr);
-      return null;
+      rethrow;
     }
   }
 
