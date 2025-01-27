@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/face_analysis_result.dart';
-import 'package:marinette/app/data/services/share_card_service.dart';
 
 class AnalysisResultScreen extends StatelessWidget {
   final String imagePath;
@@ -15,21 +14,6 @@ class AnalysisResultScreen extends StatelessWidget {
     required this.result,
     this.heroTag,
   });
-
-  Future<void> _shareResults() async {
-    try {
-      await ShareCardService.shareAnalysisResult(
-        imagePath: imagePath,
-        result: result,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'error'.tr,
-        'error_sharing'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +33,6 @@ class AnalysisResultScreen extends StatelessWidget {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // AppBar
             SliverAppBar(
               expandedHeight: screenWidth,
               floating: false,
@@ -72,7 +55,6 @@ class AnalysisResultScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    // Gradient overlay
                     const DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -85,20 +67,12 @@ class AnalysisResultScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: _shareResults,
-                ),
-              ],
+              actions: [],
             ),
-
-            // Content
             SliverPadding(
               padding: const EdgeInsets.all(16),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Type Info Card
                   Card(
                     elevation: 8,
                     shadowColor: Colors.pink.withAlpha(76),
@@ -123,8 +97,6 @@ class AnalysisResultScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Makeup Recommendations
                   _buildRecommendationSection(
                     title: 'makeup_recommendations'.tr,
                     recommendations: result.makeupRecommendations,
@@ -132,8 +104,6 @@ class AnalysisResultScreen extends StatelessWidget {
                     color: Colors.pink,
                   ),
                   const SizedBox(height: 24),
-
-                  // Hairstyle Recommendations
                   _buildRecommendationSection(
                     title: 'hairstyle_recommendations'.tr,
                     recommendations: result.hairstyleRecommendations,
@@ -141,8 +111,6 @@ class AnalysisResultScreen extends StatelessWidget {
                     color: Colors.purple,
                   ),
                   const SizedBox(height: 24),
-
-                  // Skincare Recommendations
                   _buildRecommendationSection(
                     title: 'skincare_recommendations'.tr,
                     recommendations: result.skincareRecommendations,
@@ -223,31 +191,31 @@ class AnalysisResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ...recommendations.map((recommendation) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        margin: const EdgeInsets.only(top: 8, right: 12),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          recommendation,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                    ],
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(top: 8, right: 12),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
-                )),
+                  Expanded(
+                    child: Text(
+                      recommendation,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ],
         ),
       ),

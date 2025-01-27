@@ -1,8 +1,6 @@
-// article_details_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/article.dart';
-import 'package:share_plus/share_plus.dart';
 
 class ArticleDetailsScreen extends StatelessWidget {
   final Article article;
@@ -14,7 +12,6 @@ class ArticleDetailsScreen extends StatelessWidget {
 
   String _getFullContent() {
     switch (article.id) {
-      // Попередні статті
       case '1':
         return 'colortype_full'.tr;
       case '2':
@@ -23,8 +20,6 @@ class ArticleDetailsScreen extends StatelessWidget {
         return 'makeup_trends_full'.tr;
       case '4':
         return 'skincare_seasons_full'.tr;
-
-      // Лайфхаки
       case 'l1':
         return 'eyebrows_full'.tr;
       case 'l2':
@@ -33,8 +28,6 @@ class ArticleDetailsScreen extends StatelessWidget {
         return 'dry_shampoo_full'.tr;
       case 'l4':
         return 'nails_full'.tr;
-
-      // Гайди
       case 'g1':
         return 'face_shape_guide_full'.tr;
       case 'g2':
@@ -43,8 +36,6 @@ class ArticleDetailsScreen extends StatelessWidget {
         return 'skincare_basics_full'.tr;
       case 'g4':
         return 'wardrobe_colortype_full'.tr;
-
-      // Якщо id не збігається, використовується вміст за замовчуванням
       default:
         return article.contentKey.tr;
     }
@@ -64,32 +55,6 @@ class ArticleDetailsScreen extends StatelessWidget {
     if (difference == 0) return 'today'.tr;
     if (difference == 1) return 'yesterday'.tr;
     return '$difference ${'days_ago'.tr}';
-  }
-
-  Future<void> _shareArticle() async {
-    try {
-      final String shareText = '''
-${article.titleKey.tr}
-
-${article.descriptionKey.tr}
-
-${_getFullContent()}
-
-Shared from Beauty Recommendations App
-''';
-
-      await Share.share(
-        shareText,
-        subject: article.titleKey.tr,
-      );
-    } catch (e) {
-      debugPrint('Error sharing article: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_sharing'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
   }
 
   @override
@@ -132,12 +97,7 @@ Shared from Beauty Recommendations App
                 ),
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.share),
-                onPressed: _shareArticle,
-              ),
-            ],
+            actions: [],
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -148,8 +108,8 @@ Shared from Beauty Recommendations App
                   Text(
                     article.titleKey.tr,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
