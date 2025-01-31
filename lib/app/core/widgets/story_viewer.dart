@@ -28,6 +28,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
 
   int currentIndex = 0;
   bool _isSharing = false;
+  bool _isImageLoading = true;
 
   @override
   void initState() {
@@ -38,7 +39,20 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       duration: const Duration(seconds: 5),
     );
     _animationController.addStatusListener(_onAnimationStatus);
-    _startAnimation();
+    _checkCurrentImageStatus();
+  }
+
+  void _checkCurrentImageStatus() {
+    final currentImageUrl = widget.story.imageUrls[currentIndex].tr;
+    final isPreloaded = _storiesService.isImagePreloaded(currentImageUrl);
+
+    setState(() {
+      _isImageLoading = !isPreloaded;
+    });
+
+    if (isPreloaded) {
+      _startAnimation();
+    }
   }
 
   @override
@@ -49,7 +63,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
   }
 
   void _startAnimation() {
-    _animationController.forward();
+    if (!_isImageLoading && mounted) {
+      _animationController.forward();
+    }
   }
 
   void _onAnimationStatus(AnimationStatus status) {
@@ -71,7 +87,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       currentIndex = index;
     });
     _animationController.reset();
-    _startAnimation();
+    _checkCurrentImageStatus();
 
     if (index == widget.story.imageUrls.length - 1) {
       _storiesService.markStoryAsViewed(widget.story.id);
@@ -87,25 +103,23 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
 
     try {
       final imageUrl = widget.story.imageUrls[currentIndex].tr;
-
-      // Завантажуємо зображення
       final response = await http.get(Uri.parse(imageUrl));
+
       if (response.statusCode != 200) {
         throw Exception('Failed to download image');
       }
 
-      // Зберігаємо зображення тимчасово
       final tempDir = await getTemporaryDirectory();
       final tempImagePath = '${tempDir.path}/share_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
       await File(tempImagePath).writeAsBytes(response.bodyBytes);
 
-      // Ділимося зображенням
       await Share.shareXFiles(
         [XFile(tempImagePath)],
-        text: widget.story.captions[currentIndex].tr,
+        text: widget.story.captions.length > currentIndex
+            ? widget.story.captions[currentIndex].tr
+            : '',
       );
 
-      // Видаляємо тимчасовий файл
       await File(tempImagePath).delete();
     } catch (e) {
       debugPrint('Error sharing image: $e');
@@ -129,7 +143,6 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
         onTapDown: (details) {
           final screenWidth = MediaQuery.of(context).size.width;
           if (details.localPosition.dx < screenWidth / 2) {
-            // Клік на ліву частину екрану
             if (currentIndex > 0) {
               _pageController.previousPage(
                 duration: const Duration(milliseconds: 300),
@@ -137,7 +150,6 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
               );
             }
           } else {
-            // Клік на праву частину екрану
             if (currentIndex < widget.story.imageUrls.length - 1) {
               _pageController.nextPage(
                 duration: const Duration(milliseconds: 300),
@@ -174,21 +186,32 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                           ),
                         );
                       },
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('Error loading image: $error');
+                        return const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.white,
+                            size: 48,
+                          ),
+                        );
+                      },
                     ),
-                    Positioned(
-                      bottom: 40,
-                      left: 20,
-                      right: 20,
-                      child: Text(
-                        widget.story.captions[index].tr,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                    if (widget.story.captions.length > index)
+                      Positioned(
+                        bottom: 40,
+                        left: 20,
+                        right: 20,
+                        child: Text(
+                          widget.story.captions[index].tr,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
                   ],
                 );
               },
@@ -207,7 +230,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                           padding: const EdgeInsets.symmetric(horizontal: 2),
                           child: LinearProgressIndicator(
                             value: index == currentIndex
-                                ? _animationController.value
+                                ? _isImageLoading ? 0 : _animationController.value
                                 : index < currentIndex
                                 ? 1.0
                                 : 0.0,

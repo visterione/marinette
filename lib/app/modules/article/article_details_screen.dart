@@ -13,50 +13,63 @@ class ArticleDetailsScreen extends StatelessWidget {
   String _getFullContent() {
     switch (article.id) {
       case '1':
-        return 'colortype_full'.tr;
+        return 'article_1_full'.tr;
       case '2':
-        return 'face_shape_full'.tr;
+        return 'article_2_full'.tr;
       case '3':
-        return 'makeup_trends_full'.tr;
+        return 'article_3_full'.tr;
       case '4':
-        return 'skincare_seasons_full'.tr;
+        return 'article_4_full'.tr;
+      case '5':
+        return 'article_5_full'.tr;
+      case '6':
+        return 'article_6_full'.tr;
       case 'l1':
-        return 'eyebrows_full'.tr;
+        return 'lifehack_2_full'.tr;
       case 'l2':
-        return 'makeup_lasting_full'.tr;
+        return 'lifehack_1_full'.tr;
       case 'l3':
-        return 'dry_shampoo_full'.tr;
+        return 'lifehack_3_full'.tr;
       case 'l4':
-        return 'nails_full'.tr;
+        return 'lifehack_4_full'.tr;
+      case 'l5':
+        return 'lifehack_5_full'.tr;
+      case 'l6':
+        return 'lifehack_6_full'.tr;
       case 'g1':
-        return 'face_shape_guide_full'.tr;
+        return 'guide_1_full'.tr;
       case 'g2':
-        return 'makeup_event_full'.tr;
+        return 'guide_2_full'.tr;
       case 'g3':
-        return 'skincare_basics_full'.tr;
+        return 'guide_3_full'.tr;
       case 'g4':
-        return 'wardrobe_colortype_full'.tr;
+        return 'guide_4_full'.tr;
+      case 'g5':
+        return 'guide_5_full'.tr;
+      case 'g6':
+        return 'guide_6_full'.tr;
       default:
         return article.contentKey.tr;
     }
   }
 
   int _calculateReadTime() {
-    const wordsPerMinute = 150;
+    const wordsPerMinute = 120;
     final fullContent = _getFullContent();
     final wordCount = fullContent.split(RegExp(r'\s+')).length;
     return (wordCount / wordsPerMinute).ceil();
   }
 
-  String _getTimeAgo(DateTime publishedAt) {
+  String _formatDate(DateTime date) {
     final now = DateTime.now();
-    final difference = now.difference(publishedAt).inDays;
+    final difference = now.difference(date).inDays;
 
     if (difference == 0) return 'today'.tr;
     if (difference == 1) return 'yesterday'.tr;
     return '$difference ${'days_ago'.tr}';
   }
 
+// В ArticleDetailsScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +110,6 @@ class ArticleDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            actions: [],
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -111,7 +123,44 @@ class ArticleDetailsScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        child: ClipOval(
+                          child: Image.network(
+                            article.authorAvatarUrl,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            article.authorNameKey.tr,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            _formatDate(article.publishedAt),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Icon(
@@ -127,17 +176,9 @@ class ArticleDetailsScreen extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Text(
-                        _getTimeAgo(article.publishedAt),
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
                     _getFullContent(),
                     style: Theme.of(context).textTheme.bodyMedium,

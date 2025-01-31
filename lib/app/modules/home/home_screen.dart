@@ -15,6 +15,7 @@ import 'package:marinette/app/modules/camera/camera_controller.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
+import 'package:marinette/app/core/widgets/stories_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -185,64 +186,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final stories = storiesService.stories;
       if (stories.isEmpty) return const SizedBox.shrink();
 
-      return Container(
-        height: 85,
-        margin: const EdgeInsets.only(bottom: 24),
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          itemCount: stories.length,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemBuilder: (context, index) {
-            final story = stories[index];
-            return GestureDetector(
-              onTap: () => _handleStoryTap(story),
-              child: Container(
-                width: 60,
-                margin: const EdgeInsets.only(right: 8),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: story.isViewed
-                            ? null
-                            : const LinearGradient(
-                          colors: [Colors.pink, Colors.purple],
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(2),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: NetworkImage(story.previewImageUrl.tr),
-                            fit: BoxFit.cover,
-                          ),
-                          border: story.isViewed
-                              ? Border.all(color: Colors.grey.shade300)
-                              : null,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      story.title.tr,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+      return StoriesSection(
+        stories: stories,
+        onStoryTap: _handleStoryTap,
       );
     });
   }

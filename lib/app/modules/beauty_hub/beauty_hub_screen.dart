@@ -67,20 +67,20 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
   String _getFullContent(Article article) {
     switch (article.id) {
       case '1':
-        return 'colortype_full'.tr;
+        return 'article_1_full'.tr;
       case '2':
-        return 'face_shape_full'.tr;
+        return 'article_2_full'.tr;
       case '3':
-        return 'makeup_trends_full'.tr;
+        return 'article_3_full'.tr;
       case '4':
-        return 'skincare_seasons_full'.tr;
+        return 'article_4_full'.tr;
       default:
         return article.contentKey;
     }
   }
 
   int _calculateReadTime(Article article) {
-    const wordsPerMinute = 150;
+    const wordsPerMinute = 120;
     final fullContent = _getFullContent(article);
     final wordCount = fullContent.split(RegExp(r'\s+')).length;
     return (wordCount / wordsPerMinute).ceil();
@@ -174,6 +174,7 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
     );
   }
 
+  // В BeautyHubScreen
   Widget _buildArticleCard(Article article) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -219,19 +220,44 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
                   Text(
                     article.titleKey.tr,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     article.descriptionKey.tr,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                      color: Colors.grey[600],
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        child: ClipOval(
+                          child: Image.network(
+                            article.authorAvatarUrl,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        article.authorNameKey.tr,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Icon(
