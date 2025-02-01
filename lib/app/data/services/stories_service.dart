@@ -152,10 +152,11 @@ class StoriesService extends GetxService {
           ],
           category: 'nails',
           previewImageUrl: 'https://drive.google.com/uc?id=13mXrn4EvKncG006I4CuzvvGpD5CmXrPV',
-          isViewed: viewedStories.contains('4'),
+          isViewed: viewedStories.contains('5'),
         ),
       ];
 
+      // Починаємо попереднє завантаження всіх зображень
       _preloadAllImages();
 
       debugPrint('Stories loaded successfully: ${stories.length} stories');

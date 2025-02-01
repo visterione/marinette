@@ -64,8 +64,17 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
     );
   }
 
+  int _calculateReadTime(Article article) {
+    const wordsPerMinute = 120;
+
+    final fullContent = _getFullContent(article);
+    final wordCount = fullContent.split(RegExp(r'\s+')).length;
+    return (wordCount / wordsPerMinute).ceil();
+  }
+
   String _getFullContent(Article article) {
     switch (article.id) {
+    // Статті
       case '1':
         return 'article_1_full'.tr;
       case '2':
@@ -74,16 +83,39 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
         return 'article_3_full'.tr;
       case '4':
         return 'article_4_full'.tr;
+      case '5':
+        return 'article_5_full'.tr;
+      case '6':
+        return 'article_6_full'.tr;
+    // Лайфхаки
+      case 'l1':
+        return 'lifehack_1_full'.tr;
+      case 'l2':
+        return 'lifehack_2_full'.tr;
+      case 'l3':
+        return 'lifehack_3_full'.tr;
+      case 'l4':
+        return 'lifehack_4_full'.tr;
+      case 'l5':
+        return 'lifehack_5_full'.tr;
+      case 'l6':
+        return 'lifehack_6_full'.tr;
+    // Гайди
+      case 'g1':
+        return 'guide_1_full'.tr;
+      case 'g2':
+        return 'guide_2_full'.tr;
+      case 'g3':
+        return 'guide_3_full'.tr;
+      case 'g4':
+        return 'guide_4_full'.tr;
+      case 'g5':
+        return 'guide_5_full'.tr;
+      case 'g6':
+        return 'guide_6_full'.tr;
       default:
-        return article.contentKey;
+        return article.contentKey.tr;
     }
-  }
-
-  int _calculateReadTime(Article article) {
-    const wordsPerMinute = 120;
-    final fullContent = _getFullContent(article);
-    final wordCount = fullContent.split(RegExp(r'\s+')).length;
-    return (wordCount / wordsPerMinute).ceil();
   }
 
   String _formatDate(DateTime date) {
