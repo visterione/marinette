@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/data/models/story.dart';
 
 class StoriesSection extends StatelessWidget {
   final List<Story> stories;
   final Function(Story) onStoryTap;
 
-  // Константи для налаштування розмірів
   static const double _storySize = 75.0;
   static const double _borderWidth = 3.0;
-  static const double _sectionHeight = 130.0; // Збільшили висоту секції
-  static const double _horizontalPadding = 8.0; // Зменшили бокові відступи
-  static const double _storySpacing = 8.0; // Зменшили відступи між кружечками
-  static const double _titleSpacing = 6.0; // Зменшили відступ до тексту
-  static const double _fontSize = 12.0; // Зменшили розмір шрифту
+  static const double _sectionHeight = 130.0;
+  static const double _horizontalPadding = 8.0;
+  static const double _storySpacing = 8.0;
+  static const double _titleSpacing = 6.0;
+  static const double _fontSize = 12.0;
 
   const StoriesSection({
     super.key,
@@ -23,7 +23,7 @@ class StoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox( // Замінили Container на SizedBox
+    return SizedBox(
       height: _sectionHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -56,7 +56,7 @@ class _StoryItem extends StatelessWidget {
         width: StoriesSection._storySize,
         margin: const EdgeInsets.only(right: StoriesSection._storySpacing),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Додали для уникнення overflow
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               height: StoriesSection._storySize,
@@ -82,15 +82,36 @@ class _StoryItem extends StatelessWidget {
                     width: StoriesSection._borderWidth,
                   )
                       : null,
-                  image: DecorationImage(
-                    image: NetworkImage(story.previewImageUrl.tr),
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: story.previewImageUrl.tr,
                     fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.error_outline,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
             SizedBox(height: StoriesSection._titleSpacing),
-            Flexible( // Обгорнули текст у Flexible
+            Flexible(
               child: Text(
                 story.title.tr,
                 style: TextStyle(

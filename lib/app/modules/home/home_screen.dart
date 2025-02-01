@@ -82,10 +82,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _handleStoryTap(Story story) {
+    final storiesService = Get.find<StoriesService>();
+    final storyIndex = storiesService.stories.indexOf(story);
+
     Get.to(
           () => StoryViewer(
         story: story,
         onClose: () => Get.back(),
+        storyIndex: storyIndex,
       ),
       fullscreenDialog: true,
       transition: Transition.fadeIn,

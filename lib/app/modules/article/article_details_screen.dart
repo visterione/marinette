@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/data/models/article.dart';
 
 class ArticleDetailsScreen extends StatelessWidget {
@@ -69,7 +70,6 @@ class ArticleDetailsScreen extends StatelessWidget {
     return '$difference ${'days_ago'.tr}';
   }
 
-// В ArticleDetailsScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,13 +85,19 @@ class ArticleDetailsScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
-                      article.imageUrl,
+                    CachedNetworkImage(
+                      imageUrl: article.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
                         color: Colors.grey[200],
                         child: const Icon(
-                          Icons.image_not_supported,
+                          Icons.error_outline,
                           size: 64,
                           color: Colors.grey,
                         ),
@@ -129,12 +135,25 @@ class ArticleDetailsScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 24,
                         child: ClipOval(
-                          child: Image.network(
-                            article.authorAvatarUrl,
+                          child: CachedNetworkImage(
+                            imageUrl: article.authorAvatarUrl,
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, error, stackTrace) =>
+                            const Icon(Icons.person),
                           ),
                         ),
                       ),
@@ -181,7 +200,9 @@ class ArticleDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   Text(
                     _getFullContent(),
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.6,
+                    ),
                   ),
                 ],
               ),

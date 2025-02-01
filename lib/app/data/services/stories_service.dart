@@ -1,17 +1,20 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:marinette/app/data/models/story.dart';
 import 'package:marinette/app/data/services/localization_service.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 
 class StoriesService extends GetxService {
   final RxList<Story> stories = <Story>[].obs;
   static const String _viewedStoriesKey = 'viewed_stories';
   late SharedPreferences _prefs;
-
-  // Map для зберігання статусу завантаження для кожного URL
   final RxMap<String, bool> preloadedImages = <String, bool>{}.obs;
+  final RxInt _activePreloads = 0.obs;
+  static const int maxConcurrentPreloads = 3;
 
   @override
   void onInit() async {
@@ -41,17 +44,7 @@ class StoriesService extends GetxService {
             'https://drive.google.com/uc?id=1p4XZ3x4wUnA9aX4OomiBz-4cq5i7Haff',
             'https://drive.google.com/uc?id=1aYhNLipXasq5Q83E8Q-l9iBFqxDa9b0F',
           ],
-          captions: [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-          ],
+          captions: ['', '', '', '', '', '', '', '', ''],
           category: 'makeup',
           previewImageUrl: 'https://drive.google.com/uc?id=1Cr4i_NMu_nB94LPTA5tdq_w8xou63FOj',
           isViewed: viewedStories.contains('1'),
@@ -68,15 +61,7 @@ class StoriesService extends GetxService {
             'https://drive.google.com/uc?id=1oQCXB0fEBHNrsvLNuv_GZzIFIHTvOLoG',
             'https://drive.google.com/uc?id=1bpyEuZgo3-_lV9UvsmejQmPpDvt4BLR3',
           ],
-          captions: [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-          ],
+          captions: ['', '', '', '', '', '', ''],
           category: 'skincare',
           previewImageUrl: 'https://drive.google.com/uc?id=1XV2oRMsorxgjTsykz1CxJZmcX6-QYPhd',
           isViewed: viewedStories.contains('2'),
@@ -91,13 +76,7 @@ class StoriesService extends GetxService {
             'https://drive.google.com/uc?id=1E_lGSDjo4OxXGHyR_U6ij3wURVm1lOK8',
             'https://drive.google.com/uc?id=1MEYN981lNLbbbGxgHthdOj055VxYeNnn',
           ],
-          captions: [
-            '',
-            '',
-            '',
-            '',
-            '',
-          ],
+          captions: ['', '', '', '', ''],
           category: 'hair',
           previewImageUrl: 'https://drive.google.com/uc?id=1jGbzmbRuOxBIJSN2PjzJNJIFnwA-C-o6',
           isViewed: viewedStories.contains('3'),
@@ -113,14 +92,7 @@ class StoriesService extends GetxService {
             'https://drive.google.com/uc?id=14wtcNDHvQSUz7I7nZ2G3oGBMlofL9gnA',
             'https://drive.google.com/uc?id=1cJrYoO8ReCjIoncNM2XDEGlvb5ML3jU9',
           ],
-          captions: [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-          ],
+          captions: ['', '', '', '', '', ''],
           category: 'nails',
           previewImageUrl: 'https://drive.google.com/uc?id=1iYkaYGjWIE4zZHLAOXkrPtxmurfYa7nW',
           isViewed: viewedStories.contains('4'),
@@ -139,26 +111,14 @@ class StoriesService extends GetxService {
             'https://drive.google.com/uc?id=1DZQ34sL8ic0bo6_riElSU8P-o5QRxlvZ',
             'https://drive.google.com/uc?id=11IeEhdQIHUch2ArpGYMLvdFa5IC3c8xN',
           ],
-          captions: [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-          ],
+          captions: ['', '', '', '', '', '', '', '', ''],
           category: 'nails',
           previewImageUrl: 'https://drive.google.com/uc?id=13mXrn4EvKncG006I4CuzvvGpD5CmXrPV',
           isViewed: viewedStories.contains('5'),
         ),
       ];
 
-      // Починаємо попереднє завантаження всіх зображень
-      _preloadAllImages();
-
+      _startBackgroundPreloading();
       debugPrint('Stories loaded successfully: ${stories.length} stories');
     } catch (e) {
       debugPrint('Error loading stories: $e');
@@ -166,43 +126,77 @@ class StoriesService extends GetxService {
     }
   }
 
-  Future<void> _preloadAllImages() async {
+  void _startBackgroundPreloading() {
     for (var story in stories) {
-      // Попереднє завантаження preview зображення
-      _preloadImage(story.previewImageUrl.tr);
+      preloadSingleImage(story.previewImageUrl.tr, priority: true);
+    }
 
-      // Попереднє завантаження всіх зображень історії
+    for (var story in stories) {
       for (var imageUrl in story.imageUrls) {
-        _preloadImage(imageUrl.tr);
+        preloadSingleImage(imageUrl.tr, priority: false);
       }
     }
   }
 
-  Future<void> _preloadImage(String imageUrl) async {
+  Future<void> preloadSingleImage(String imageUrl, {bool priority = false}) async {
     if (preloadedImages.containsKey(imageUrl)) return;
 
+    while (_activePreloads.value >= maxConcurrentPreloads && !priority) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+
+    _activePreloads.value++;
     preloadedImages[imageUrl] = false;
 
     try {
-      final imageProvider = NetworkImage(imageUrl);
+      final completer = Completer<void>();
 
-      imageProvider.resolve(const ImageConfiguration()).addListener(
-        ImageStreamListener((info, synchronousCall) {
+      final ImageProvider provider = CachedNetworkImageProvider(imageUrl);
+      final ImageStream stream = provider.resolve(const ImageConfiguration());
+
+      final listener = ImageStreamListener(
+            (ImageInfo info, bool sync) {
           preloadedImages[imageUrl] = true;
+          _activePreloads.value--;
+          if (!completer.isCompleted) completer.complete();
           debugPrint('Successfully preloaded: $imageUrl');
-        }, onError: (dynamic exception, StackTrace? stackTrace) {
+        },
+        onError: (dynamic exception, StackTrace? stackTrace) {
           debugPrint('Error preloading image $imageUrl: $exception');
           preloadedImages[imageUrl] = false;
-        }),
+          _activePreloads.value--;
+          if (!completer.isCompleted) completer.complete();
+        },
       );
+
+      stream.addListener(listener);
+      await completer.future;
+      stream.removeListener(listener);
     } catch (e) {
       debugPrint('Error initiating preload for $imageUrl: $e');
       preloadedImages[imageUrl] = false;
+      _activePreloads.value--;
     }
   }
 
+  bool isStoryReady(Story story) {
+    final previewLoaded = preloadedImages[story.previewImageUrl.tr] ?? false;
+    final firstImageLoaded = preloadedImages[story.imageUrls.first.tr] ?? false;
+    return previewLoaded && firstImageLoaded;
+  }
+
   bool isImagePreloaded(String imageUrl) {
-    return preloadedImages[imageUrl] ?? false;
+    return preloadedImages[imageUrl.tr] ?? false;
+  }
+
+  Future<void> preloadNextStoryImages(int currentStoryIndex) async {
+    if (currentStoryIndex >= stories.length - 1) return;
+
+    final nextStory = stories[currentStoryIndex + 1];
+    await preloadSingleImage(nextStory.previewImageUrl.tr, priority: true);
+    for (var imageUrl in nextStory.imageUrls) {
+      await preloadSingleImage(imageUrl.tr, priority: true);
+    }
   }
 
   Future<void> markStoryAsViewed(String storyId) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/data/models/article.dart';
 import 'package:marinette/app/data/services/beauty_hub_service.dart';
 import 'package:marinette/app/modules/article/article_details_screen.dart';
@@ -11,8 +12,7 @@ class BeautyHubScreen extends StatefulWidget {
   State<BeautyHubScreen> createState() => _BeautyHubScreenState();
 }
 
-class _BeautyHubScreenState extends State<BeautyHubScreen>
-    with SingleTickerProviderStateMixin {
+class _BeautyHubScreenState extends State<BeautyHubScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final RxBool _isLoading = false.obs;
   final RxList<Article> _articles = <Article>[].obs;
@@ -58,15 +58,23 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
 
   void _openArticle(Article article) {
     Get.to(
-      () => ArticleDetailsScreen(article: article),
+          () => ArticleDetailsScreen(article: article),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 300),
     );
   }
 
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+
+    if (difference == 0) return 'today'.tr;
+    if (difference == 1) return 'yesterday'.tr;
+    return '$difference ${'days_ago'.tr}';
+  }
+
   int _calculateReadTime(Article article) {
     const wordsPerMinute = 120;
-
     final fullContent = _getFullContent(article);
     final wordCount = fullContent.split(RegExp(r'\s+')).length;
     return (wordCount / wordsPerMinute).ceil();
@@ -74,7 +82,6 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
 
   String _getFullContent(Article article) {
     switch (article.id) {
-    // Статті
       case '1':
         return 'article_1_full'.tr;
       case '2':
@@ -87,7 +94,6 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
         return 'article_5_full'.tr;
       case '6':
         return 'article_6_full'.tr;
-    // Лайфхаки
       case 'l1':
         return 'lifehack_1_full'.tr;
       case 'l2':
@@ -100,7 +106,6 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
         return 'lifehack_5_full'.tr;
       case 'l6':
         return 'lifehack_6_full'.tr;
-    // Гайди
       case 'g1':
         return 'guide_1_full'.tr;
       case 'g2':
@@ -116,15 +121,6 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
       default:
         return article.contentKey.tr;
     }
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date).inDays;
-
-    if (difference == 0) return 'today'.tr;
-    if (difference == 1) return 'yesterday'.tr;
-    return '$difference ${'days_ago'.tr}';
   }
 
   @override
@@ -206,7 +202,6 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
     );
   }
 
-  // В BeautyHubScreen
   Widget _buildArticleCard(Article article) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -229,13 +224,19 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
                   ),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
-                    child: Image.network(
-                      article.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: article.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, error, stackTrace) => Container(
                         color: Colors.grey[200],
                         child: const Icon(
-                          Icons.image_not_supported,
+                          Icons.error_outline,
                           size: 48,
                           color: Colors.grey,
                         ),
@@ -267,15 +268,27 @@ class _BeautyHubScreenState extends State<BeautyHubScreen>
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 16,
+                      SizedBox(
+                        width: 32,
+                        height: 32,
                         child: ClipOval(
-                          child: Image.network(
-                            article.authorAvatarUrl,
-                            width: 32,
-                            height: 32,
+                          child: CachedNetworkImage(
+                            imageUrl: article.authorAvatarUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, error, stackTrace) =>
+                            const Icon(Icons.person),
                           ),
                         ),
                       ),
