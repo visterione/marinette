@@ -12,7 +12,6 @@ import 'package:marinette/app/data/services/user_preferences_service.dart';
 import 'package:marinette/app/modules/home/home_screen.dart';
 import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'app/data/services/stories_service.dart';
 
 void main() async {

@@ -2,7 +2,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <!-- Додані дозволи для сповіщень -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -31,32 +33,5 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        
-        <!-- Сервіси та ресівери для сповіщень -->
-        <service
-            android:name="me.carda.awesome_notifications.core.services.NotificationService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"/>
-        
-        <service
-            android:name="me.carda.awesome_notifications.core.services.AwesomeServiceIntent"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"/>
-        
-        <receiver
-            android:name="me.carda.awesome_notifications.core.broadcasters.receivers.AwesomeNotificationActionReceiver"
-            android:exported="false"/>
-        
-        <receiver
-            android:name="me.carda.awesome_notifications.core.broadcasters.receivers.AwesomeNotificationReceiver"
-            android:exported="false"/>
-        
-        <receiver
-            android:name="me.carda.awesome_notifications.core.broadcasters.receivers.BootCompletedReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

@@ -2,16 +2,16 @@
 marinette/
     - assets/
         - fonts/
-            - PlayfairDisplay-Regular.ttf // Основний шрифт
-            - PlayfairDisplay-Bold.ttf // Жирний шрифт
-            - PlayfairDisplay-Italic.ttf // Курсив шрифт
+            - PlayfairDisplay-Regular.ttf
+            - PlayfairDisplay-Bold.ttf
+            - PlayfairDisplay-Italic.ttf
         - i18n/
-            - en.json // Ключі з текстами англійською мовою
-            - uk.json // Ключі з текстами українською мовою
-            - ka.json // Ключі з грузинською англійською мовою
-            - pl.json // Ключі з текстами польською мовою
+            - en.json
+            - uk.json
+            - ka.json
+            - pl.json
         - audio/
-            - nana.mp3 // Фонова мелодія додатку   
+            - nana.mp3
     - lib/
         - app/
             - core/
@@ -23,18 +23,18 @@ marinette/
                     - custom_page_route.dart
                     - page_transitions.dart
                 - widgets/
-                    - wave_background_painter.dart // Малювання фонового зображення додатку
+                    - wave_background_painter.dart
                     - story_viewer.dart
                     - stories_section.dart 
             - data/
                 - content/
-                    - beauty_trends.dart // Блок головної сторінки "Тренди сезону"
-                    - daily_tips.dart // Блок головної сторінки "Порада дня"
+                    - beauty_trends.dart
+                    - daily_tips.dart
                 - models/
-                    - article.dart // Конструктор статті
-                    - face_analysis_results.dart // Конструктор результатів аналізу обличчя
-                    - facial_features.dart // Конструктор рис обличчя
-                    - story.dart // Конструктор stories
+                    - article.dart
+                    - face_analysis_results.dart
+                    - facial_features.dart
+                    - story.dart
                 - services/
                     - app_initializer.dart
                     - audio_service.dart
@@ -46,7 +46,6 @@ marinette/
                     - face_shape_analyzer.dart
                     - facial_features_analyzer.dart
                     - localizations_service.dart
-                    - notification_service.dart
                     - recommendations_service.dart
                     - result_saver_service.dart
                     - skin_color_analyzer.dart
@@ -54,23 +53,27 @@ marinette/
                     - user_preferences_service.dart
             - modules/
                 - analysis/
-                    - analysis_result_screen.dart // Сторінка з результатами розпізнавання 
-                    - loading_screen.dart // Загрузочний екран
+                    - analysis_result_screen.dart
+                    - loading_screen.dart
                 - article/
-                    - article_deatils_screen.dart // Сторінка статті
+                    - article_details_screen.dart
                 - beauty_hub/
-                    - beauty_hub_screen.dart // Сторінка "Б'юті хабу" з статтями
+                    - beauty_hub_screen.dart
                 - camera/
                     - camera_screen.dart
                     - camera_controller.dart
                 - history/
-                    - history_screen.dart // Сторінка з історією розпізнавань облич
+                    - history_screen.dart
                 - home/
-                    - home_screen.dart // Головна сторінка мобільного додатку
+                    - home_screen.dart
                 shared/
                     - hero_photo_view.dart
         - config/
             - translations/
                 - app_translations.dart
-        - main.dart // Точка входу мобільного додатку
-    - pubspec.yaml // Залежності, імпорти та пакети мобільного додатку
+        - main.dart
+    - test/
+        - services/
+            - stories_service_test.dart
+        - widget_test.dart
+    - pubspec.yaml
