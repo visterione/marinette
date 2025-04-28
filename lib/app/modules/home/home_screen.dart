@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
@@ -16,6 +17,10 @@ import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
 import 'package:marinette/app/core/widgets/stories_section.dart';
+
+import '../../data/services/auth_service.dart';
+import '../auth/auth_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -406,84 +411,123 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final cameraController = Get.put(CustomCameraController());
     final contentService = Get.find<ContentService>();
     final screenHeight = MediaQuery.of(context).size.height;
+    final authService = Get.find<AuthService>();
 
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: Text('app_name'.tr),
-    actions: [
-    PopupMenuButton<String>(
-    icon: const Icon(Icons.more_vert),
-    itemBuilder: (context) => [
-    PopupMenuItem<String>(
-    value: 'theme',
-    child: Row(
-    children: [
-    Obx(() {
-    final themeService = Get.find<ThemeService>();
-    return Icon(
-    themeService.isDarkMode
-    ? Icons.light_mode
-        : Icons.dark_mode,
-    size: 20,
-    color: Colors.pink,
-    );
-    }),
-    const SizedBox(width: 12),
-    Text('theme'.tr),
-    ],
-    ),
-    ),
-    PopupMenuItem<String>(
-    value: 'sound',
-    child: Row(
-    children: [
-    const Icon(
-    Icons.volume_up,
-    size: 20,
-    color: Colors.pink,
-    ),
-    const SizedBox(width: 12),
-    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
-    ],
-    ),
-    ),
-    PopupMenuItem<String>(
-    value: 'history',
-    child: Row(
-    children: [
-    const Icon(Icons.history, size: 20, color: Colors.pink),
-    const SizedBox(width: 12),
-    Text('history'.tr),
-    ],
-    ),
-    ),
-    PopupMenuItem<String>(
-    value: 'language',
-    child: Row(
-    children: [
-    const Icon(Icons.language, size: 20, color: Colors.pink),
-    const SizedBox(width: 12),
-    Text('language'.tr),
-    ],
-    ),
-    ),
-    ],
-    onSelected: (value) {
-    switch (value) {
-    case 'theme':
-    final themeService = Get.find<ThemeService>();
-    themeService.toggleTheme();
-    case 'sound':
-    _musicHandler.toggleMute();
-    case 'history':
-    Get.to(() => HistoryScreen());
-    case 'language':
-    _changeLanguage();
-    }
-    },
-    ),
-    ],
-    ),
+        leading: Obx(() {
+          if (authService.isLoggedIn) {
+            return GestureDetector(
+              onTap: () {
+                Get.to(() => ProfileScreen());
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: authService.userModel?.photoUrl != null
+                    ? ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: authService.userModel!.photoUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.person),
+                  ),
+                )
+                    : Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey[300],
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return IconButton(
+              icon: const Icon(Icons.person_outline),
+              onPressed: () {
+                Get.to(() => AuthScreen());
+              },
+            );
+          }
+        }),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'theme',
+                child: Row(
+                  children: [
+                    Obx(() {
+                      final themeService = Get.find<ThemeService>();
+                      return Icon(
+                        themeService.isDarkMode
+                            ? Icons.light_mode
+                            : Icons.dark_mode,
+                        size: 20,
+                        color: Colors.pink,
+                      );
+                    }),
+                    const SizedBox(width: 12),
+                    Text('theme'.tr),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'sound',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.volume_up,
+                      size: 20,
+                      color: Colors.pink,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'history',
+                child: Row(
+                  children: [
+                    const Icon(Icons.history, size: 20, color: Colors.pink),
+                    const SizedBox(width: 12),
+                    Text('history'.tr),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'language',
+                child: Row(
+                  children: [
+                    const Icon(Icons.language, size: 20, color: Colors.pink),
+                    const SizedBox(width: 12),
+                    Text('language'.tr),
+                  ],
+                ),
+              ),
+            ],
+            onSelected: (value) {
+              switch (value) {
+                case 'theme':
+                  final themeService = Get.find<ThemeService>();
+                  themeService.toggleTheme();
+                case 'sound':
+                  _musicHandler.toggleMute();
+                case 'history':
+                  Get.to(() => HistoryScreen());
+                case 'language':
+                  _changeLanguage();
+              }
+            },
+          ),
+        ],
+      ),
       body: Container(
         height: screenHeight,
         decoration: BoxDecoration(

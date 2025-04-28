@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "258357895249",
+    "project_id": "beautymarine-6355a",
+    "storage_bucket": "beautymarine-6355a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258357895249:android:41f84bf1b8462adc411870",
+        "android_client_info": {
+          "package_name": "com.example.marinette"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAX8gMrySF5-ehSnDRGf6kFaBfTjImwjlU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
