@@ -12,7 +12,20 @@
           "package_name": "com.example.marinette"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "258357895249-odf3v4pke8396lvkhlasprej0v2p1gvv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.marinette",
+            "certificate_hash": "8505084a0f1e2e4a016554b13c46f7b1316f7585"
+          }
+        },
+        {
+          "client_id": "258357895249-g8h4b5bj742rl3dtlnaj6vkeniq1cmqc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAX8gMrySF5-ehSnDRGf6kFaBfTjImwjlU"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "258357895249-g8h4b5bj742rl3dtlnaj6vkeniq1cmqc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

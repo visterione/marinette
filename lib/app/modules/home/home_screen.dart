@@ -1,26 +1,24 @@
+// lib/app/modules/home/home_screen.dart
+// Оновлено: видалено PopupMenuButton та пов'язані функції
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:marinette/app/core/theme/theme_service.dart';
 import 'package:marinette/app/data/models/story.dart';
-import 'package:marinette/app/data/services/background_music_handler.dart';
+import 'package:marinette/app/data/services/auth_service.dart';
 import 'package:marinette/app/data/services/content_service.dart';
 import 'package:marinette/app/data/services/face_analysis_service.dart';
-import 'package:marinette/app/data/services/localization_service.dart';
 import 'package:marinette/app/data/services/result_saver_service.dart';
 import 'package:marinette/app/data/services/stories_service.dart';
 import 'package:marinette/app/modules/analysis/analysis_result_screen.dart';
 import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
 import 'package:marinette/app/modules/camera/camera_controller.dart';
-import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/core/widgets/wave_background_painter.dart';
 import 'package:marinette/app/core/widgets/story_viewer.dart';
 import 'package:marinette/app/core/widgets/stories_section.dart';
-
-import '../../data/services/auth_service.dart';
-import '../auth/auth_screen.dart';
-import '../profile/profile_screen.dart';
+import 'package:marinette/app/modules/auth/auth_screen.dart';
+import 'package:marinette/app/modules/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,60 +28,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  final _musicHandler = BackgroundMusicHandler.instance;
+  final _authService = Get.find<AuthService>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _startBackgroundMusic();
   }
 
   @override
   void dispose() {
-    _musicHandler.stop();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-        _musicHandler.stop();
-        break;
-      case AppLifecycleState.resumed:
-        _musicHandler.play();
-        break;
-    }
-  }
-
-  Future<void> _startBackgroundMusic() async {
-    await _musicHandler.play();
-  }
-
-  void _changeLanguage() {
-    final service = Get.find<LocalizationService>();
-    final currentLocale = service.getCurrentLocale().languageCode;
-
-    String newLocale;
-    switch (currentLocale) {
-      case 'uk':
-        newLocale = 'en';
-      case 'en':
-        newLocale = 'pl';
-      case 'pl':
-        newLocale = 'ka';
-      case 'ka':
-        newLocale = 'uk';
-      default:
-        newLocale = 'uk';
-    }
-
-    service.changeLocale(newLocale);
   }
 
   void _handleStoryTap(Story story) {
@@ -101,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-// Модифікуємо метод _processImage в HomeScreen
+  // Метод обробки зображення для аналізу
   Future<void> _processImage(String? imagePath) async {
     if (imagePath != null) {
       try {
@@ -411,23 +367,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final cameraController = Get.put(CustomCameraController());
     final contentService = Get.find<ContentService>();
     final screenHeight = MediaQuery.of(context).size.height;
-    final authService = Get.find<AuthService>();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('app_name'.tr),
         leading: Obx(() {
-          if (authService.isLoggedIn) {
+          if (_authService.isLoggedIn) {
             return GestureDetector(
               onTap: () {
                 Get.to(() => ProfileScreen());
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: authService.userModel?.photoUrl != null
+                child: _authService.userModel?.photoUrl != null
                     ? ClipOval(
                   child: CachedNetworkImage(
-                    imageUrl: authService.userModel!.photoUrl!,
+                    imageUrl: _authService.userModel!.photoUrl!,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const CircularProgressIndicator(),
                     errorWidget: (context, url, error) => const Icon(Icons.person),
@@ -454,79 +409,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             );
           }
         }),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'theme',
-                child: Row(
-                  children: [
-                    Obx(() {
-                      final themeService = Get.find<ThemeService>();
-                      return Icon(
-                        themeService.isDarkMode
-                            ? Icons.light_mode
-                            : Icons.dark_mode,
-                        size: 20,
-                        color: Colors.pink,
-                      );
-                    }),
-                    const SizedBox(width: 12),
-                    Text('theme'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'sound',
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.volume_up,
-                      size: 20,
-                      color: Colors.pink,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(_musicHandler.isMuted ? 'unmute'.tr : 'mute'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'history',
-                child: Row(
-                  children: [
-                    const Icon(Icons.history, size: 20, color: Colors.pink),
-                    const SizedBox(width: 12),
-                    Text('history'.tr),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'language',
-                child: Row(
-                  children: [
-                    const Icon(Icons.language, size: 20, color: Colors.pink),
-                    const SizedBox(width: 12),
-                    Text('language'.tr),
-                  ],
-                ),
-              ),
-            ],
-            onSelected: (value) {
-              switch (value) {
-                case 'theme':
-                  final themeService = Get.find<ThemeService>();
-                  themeService.toggleTheme();
-                case 'sound':
-                  _musicHandler.toggleMute();
-                case 'history':
-                  Get.to(() => HistoryScreen());
-                case 'language':
-                  _changeLanguage();
-              }
-            },
-          ),
-        ],
       ),
       body: Container(
         height: screenHeight,

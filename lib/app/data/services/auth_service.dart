@@ -1,14 +1,15 @@
-// lib/app/data/services/auth_service.dart
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:marinette/app/data/models/user_model.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:marinette/app/modules/profile/profile_screen.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final Rxn<User> _firebaseUser = Rxn<User>();
   final Rxn<UserModel> _userModel = Rxn<UserModel>();
@@ -36,75 +37,65 @@ class AuthService extends GetxService {
     }
   }
 
-  // Реєстрація нового користувача
-  Future<bool> registerWithEmailAndPassword(String email, String password) async {
+  // Авторизація через Google
+  Future<bool> signInWithGoogle() async {
     try {
       isLoading.value = true;
-      final UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
 
-      // Створення запису в Firestore
-      final user = result.user;
-      if (user != null) {
-        final userData = UserModel(
-          uid: user.uid,
-          email: user.email!,
-          displayName: user.displayName,
-          photoUrl: user.photoURL,
-          createdAt: DateTime.now(),
-          lastLogin: DateTime.now(),
-        );
-
-        await _firestore.collection('users').doc(user.uid).set(userData.toMap());
-        _userModel.value = userData;
-        return true;
+      // Починаємо процес входу Google
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        // Користувач скасував вхід
+        return false;
       }
-      return false;
-    } catch (e) {
-      debugPrint('Помилка реєстрації: $e');
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
-  // Вхід користувача
-  Future<bool> loginWithEmailAndPassword(String email, String password) async {
-    try {
-      isLoading.value = true;
-      final UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password
+      // Отримуємо дані аутентифікації
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
-      // Оновлення дати останнього входу
-      final user = result.user;
+      // Авторизуємося в Firebase
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
       if (user != null) {
-        try {
-          await _firestore.collection('users').doc(user.uid).update({
-            'lastLogin': DateTime.now().millisecondsSinceEpoch
-          });
-        } catch (e) {
-          // Якщо документ не існує, створіть його
-          final newUser = UserModel(
+        // Перевіряємо, чи існує користувач у Firestore
+        final docRef = _firestore.collection('users').doc(user.uid);
+        final docSnapshot = await docRef.get();
+
+        if (!docSnapshot.exists) {
+          // Створюємо новий документ для користувача
+          final userData = UserModel(
             uid: user.uid,
             email: user.email ?? '',
-            displayName: user.displayName,
+            displayName: user.displayName ?? '',
             photoUrl: user.photoURL,
             createdAt: DateTime.now(),
             lastLogin: DateTime.now(),
           );
-          await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
+
+          await docRef.set(userData.toMap());
+        } else {
+          // Оновлюємо дату останнього входу
+          await docRef.update({
+            'lastLogin': DateTime.now().millisecondsSinceEpoch,
+            'displayName': user.displayName,
+            'photoUrl': user.photoURL,
+          });
         }
 
         await _getUserData();
+
+        // Переходимо на екран профілю
+        Get.off(() => ProfileScreen());
+
         return true;
       }
       return false;
     } catch (e) {
-      debugPrint('Помилка входу: $e');
+      debugPrint('Помилка входу через Google: $e');
       return false;
     } finally {
       isLoading.value = false;
@@ -185,21 +176,11 @@ class AuthService extends GetxService {
   // Вихід з системи
   Future<void> signOut() async {
     try {
+      await _googleSignIn.signOut();
       await _auth.signOut();
       _userModel.value = null;
     } catch (e) {
       debugPrint('Помилка виходу з системи: $e');
-    }
-  }
-
-  // Скидання паролю
-  Future<bool> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-      return true;
-    } catch (e) {
-      debugPrint('Помилка скидання паролю: $e');
-      return false;
     }
   }
 }

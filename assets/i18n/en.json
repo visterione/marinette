@@ -360,5 +360,50 @@
   "photo_update_failed": "Failed to update profile photo",
   "photo_upload_error": "Error uploading photo",
   "profile_updated": "Profile updated successfully",
-  "update_failed": "Update failed"
+  "update_failed": "Update failed",
+
+  "personal_info": "Personal Information",
+  "age": "Age",
+  "skin_type": "Skin Type",
+  "not_specified": "Not specified",
+  "enter_age": "Enter Age",
+  "select_age": "Select Age",
+  "select_skin_type": "Select Skin Type",
+  "skin_type_normal": "Normal",
+  "skin_type_dry": "Dry",
+  "skin_type_oily": "Oily",
+  "skin_type_combination": "Combination",
+  "skin_type_sensitive": "Sensitive",
+
+  "age_updated": "Age updated",
+  "skin_type_updated": "Skin type updated",
+
+  "saved_articles": "Saved Articles",
+  "no_saved_articles": "You don't have any saved articles yet",
+  "browse_articles": "Browse Articles",
+  "view_all": "View All",
+  "article_added_to_favorites": "Article added to favorites",
+  "article_removed_from_favorites": "Article removed from favorites",
+  "login_to_add_favorites": "Please login to add articles to favorites",
+  "error_updating_favorites": "Error updating favorites",
+
+
+
+  "faq": "Frequently Asked Questions",
+  "faq_question_1": "How to get a face analysis?",
+  "faq_answer_1": "Tap the 'Take Photo' button on the home screen and take a picture of your face. You can also choose a photo from your gallery.",
+  "faq_question_2": "What data is analyzed?",
+  "faq_answer_2": "The app analyzes face shape and color type to provide personalized recommendations for makeup, hairstyle, and skincare.",
+  "faq_question_3": "How to save analysis results?",
+  "faq_answer_3": "All results are automatically saved in the analysis history, which can be viewed in your profile.",
+  "faq_question_4": "How to add an article to favorites?",
+  "faq_answer_4": "While viewing an article, tap the bookmark icon in the top right corner of the screen or use the floating button at the bottom.",
+  "faq_question_5": "How to change the app language?",
+  "faq_answer_5": "Go to your profile, select 'Settings' and tap 'Change Language'.",
+
+  "view_all_faq": "View All Questions",
+  "close": "Close",
+
+  "select_language": "Select Language",
+  "view_history": "View History"
 }

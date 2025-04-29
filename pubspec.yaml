@@ -38,10 +38,12 @@ dependencies:
   share_plus: ^7.2.1
   http: ^1.2.0
 
-  firebase_core: ^2.24.0
-  firebase_auth: ^4.15.0
-  cloud_firestore: ^4.13.3
-  firebase_storage: ^11.5.3
+
+  firebase_core: ^3.9.0
+  firebase_auth: ^5.5.3
+  cloud_firestore: ^5.0.1
+  firebase_storage: ^12.4.5
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,7 @@ flutter:
     - assets/i18n/uk.json
     - assets/audio/
     - assets/audio/nana.mp3
+    - assets/images/google_logo.png
 
   fonts:
     - family: PlayfairDisplay
