@@ -412,5 +412,25 @@
   "close": "Закрити",
 
   "select_language": "Оберіть мову",
-  "view_history": "Переглянути історію"
+  "view_history": "Переглянути історію",
+
+  "admin_panel": "Адмін-панель",
+  "admin_access_denied": "Доступ заборонено. Ви не маєте прав адміністратора.",
+  "storage_migration": "Міграція зображень",
+  "migrate_articles": "Мігрувати статті",
+  "migrate_stories": "Мігрувати сторіз",
+  "migrate_all_images": "Мігрувати всі зображення",
+  "migration_in_progress": "Міграція в процесі",
+  "migration_complete": "Міграцію завершено",
+  "migration_failed": "Помилка міграції",
+  "migration_statistics": "Статистика міграції",
+  "total_items": "Всього елементів",
+  "processed_items": "Оброблено елементів",
+  "articles_total": "Всього статей",
+  "articles_migrated": "Мігровано статей",
+  "stories_total": "Всього сторіз",
+  "stories_migrated": "Мігровано сторіз",
+  "google_drive_urls": "URL-адреси Google Drive",
+  "verify_migration": "Перевірити міграцію",
+  "refresh_statistics": "Оновити статистику"
 }

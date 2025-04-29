@@ -405,5 +405,25 @@
   "close": "Close",
 
   "select_language": "Select Language",
-  "view_history": "View History"
+  "view_history": "View History",
+
+  "admin_panel": "Admin Panel",
+  "admin_access_denied": "Access denied. You don't have administrator privileges.",
+  "storage_migration": "Storage Migration",
+  "migrate_articles": "Migrate Articles",
+  "migrate_stories": "Migrate Stories",
+  "migrate_all_images": "Migrate All Images",
+  "migration_in_progress": "Migration in progress",
+  "migration_complete": "Migration completed",
+  "migration_failed": "Migration failed",
+  "migration_statistics": "Migration Statistics",
+  "total_items": "Total items",
+  "processed_items": "Processed items",
+  "articles_total": "Total articles",
+  "articles_migrated": "Migrated articles",
+  "stories_total": "Total stories",
+  "stories_migrated": "Migrated stories",
+  "google_drive_urls": "Google Drive URLs",
+  "verify_migration": "Verify Migration",
+  "refresh_statistics": "Refresh Statistics"
 }

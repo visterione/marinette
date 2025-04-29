@@ -1,4 +1,5 @@
-// Оновлення основного файлу main.dart для ініціалізації Firebase
+// lib/main.dart
+// Оновлений файл з ініціалізацією Firebase Storage сервісів та підтримкою маршрутів
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:marinette/app/core/theme/app_theme.dart';
+import 'package:marinette/app/core/utils/app_bindings.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
 import 'package:marinette/app/data/services/content_service.dart';
 import 'package:marinette/app/data/services/localization_service.dart' as ls;
@@ -13,7 +15,7 @@ import 'package:marinette/app/data/services/result_saver_service.dart';
 import 'package:marinette/app/data/services/auth_service.dart';
 import 'package:marinette/app/core/theme/theme_service.dart';
 import 'package:marinette/app/data/services/user_preferences_service.dart';
-import 'package:marinette/app/modules/home/home_screen.dart';
+import 'package:marinette/app/routes/app_routes.dart'; // Імпорт файлу маршрутів
 import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/stories_service.dart';
@@ -24,11 +26,12 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     try {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       debugPrint('Firebase initialized successfully');
     } catch (e) {
       debugPrint('Error initializing Firebase: $e');
-
     }
 
     await Messages.loadTranslations();
@@ -46,6 +49,10 @@ Future<void> _initializeServices() async {
 
   await SharedPreferences.getInstance();
   debugPrint('SharedPreferences initialized');
+
+  // Ініціалізація AppBindings
+  AppBindings().dependencies();
+  debugPrint('Storage services initialized');
 
   await Get.putAsync(() => UserPreferencesService().init());
   debugPrint('UserPreferences service initialized');
@@ -98,7 +105,8 @@ class MainApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      initialRoute: AppRoutes.HOME, // Використання початкового маршруту
+      getPages: AppRoutes.routes, // Використання маршрутів з визначеного класу
     );
   }
 }

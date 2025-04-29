@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/modules/profile/profile_controller.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
+import 'package:marinette/app/routes/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   final ProfileController controller = Get.put(ProfileController());
@@ -477,6 +478,20 @@ class ProfileScreen extends StatelessWidget {
                 controller.toggleMusic();
               },
             )),
+            const SizedBox(height: 12),
+            // Admin access
+            if (controller.isAdmin) ...[
+              _buildActionButton(
+                icon: Icons.admin_panel_settings,
+                label: 'admin_panel'.tr,
+                color: Colors.pink,
+                onTap: () {
+                  // Відкрити адмін-панель
+                  Get.toNamed(AppRoutes.ADMIN);
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
           ],
         ),
       ),

@@ -44,6 +44,32 @@ class ProfileController extends GetxController {
   DateTime? get userCreatedAt => _authService.userModel?.createdAt;
   DateTime? get userLastLogin => _authService.userModel?.lastLogin;
 
+  // Метод для перевірки, чи має користувач права адміністратора
+  bool get isAdmin {
+    // В реальному додатку потрібно перевіряти роль в базі даних
+    // Для прикладу використовуємо просто перевірку конкретної електронної пошти
+    // або ID користувача
+    if (_authService.currentUser?.email == 'stecenko.work@gmail.com') {
+      return true;
+    }
+
+    // Додаткова перевірка через Firestore
+    return _authService.userModel?.preferences?['isAdmin'] == true;
+  }
+
+// Метод для відкриття адмін-панелі
+  void openAdminPanel() {
+    if (isAdmin) {
+      Get.toNamed('/admin');
+    } else {
+      Get.snackbar(
+        'error'.tr,
+        'admin_access_denied'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
