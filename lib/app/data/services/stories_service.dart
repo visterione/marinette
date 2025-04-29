@@ -16,12 +16,22 @@ class StoriesService extends GetxService {
   final RxInt _activePreloads = 0.obs;
   static const int maxConcurrentPreloads = 3;
 
+  @visibleForTesting
+  set prefs(SharedPreferences value) {
+    _prefs = value;
+  }
+
   @override
   void onInit() async {
     super.onInit();
+    await init();
+  }
+
+  Future<StoriesService> init() async {
     _prefs = await SharedPreferences.getInstance();
-    loadStories();
+    await loadStories();
     ever(Get.find<LocalizationService>().locale, (_) => loadStories());
+    return this;
   }
 
   Future<void> loadStories() async {
@@ -126,7 +136,15 @@ class StoriesService extends GetxService {
     }
   }
 
+  @visibleForTesting
+  bool isTestMode = false;
+
   void _startBackgroundPreloading() {
+    // В тестовому режимі не виконуємо реальне передзавантаження
+    if (isTestMode) {
+      return;
+    }
+
     for (var story in stories) {
       preloadSingleImage(story.previewImageUrl.tr, priority: true);
     }
@@ -139,6 +157,13 @@ class StoriesService extends GetxService {
   }
 
   Future<void> preloadSingleImage(String imageUrl, {bool priority = false}) async {
+    // Якщо це тестове середовище, одразу позначаємо як завантажене
+    if (isTestMode) {
+      preloadedImages[imageUrl] = true;
+      return;
+    }
+
+    // Решта існуючої логіки
     if (preloadedImages.containsKey(imageUrl)) return;
 
     while (_activePreloads.value >= maxConcurrentPreloads && !priority) {
@@ -221,13 +246,12 @@ class StoriesService extends GetxService {
   }
 
   Future<void> resetViewedStories() async {
-    try {
-      debugPrint('Resetting viewed stories');
-      await _prefs.remove(_viewedStoriesKey);
-      await loadStories();
-      debugPrint('Viewed stories reset successfully');
-    } catch (e) {
-      debugPrint('Error resetting viewed stories: $e');
+    // Очищення списку переглянутих історій
+    await _prefs?.remove('viewed_stories');
+
+    // Примусове скидання статусу для всіх історій
+    for (var story in stories) {
+      story.isViewed = false;
     }
   }
 }
