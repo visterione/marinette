@@ -86,12 +86,22 @@ class ArticleEditDirectController extends GetxController {
   late TextEditingController descriptionController;
   late TextEditingController contentController;
   late TextEditingController authorNameController;
-  late TextEditingController authorAvatarUrlController;
 
   // Реактивные переменные
   final RxBool isLoading = false.obs;
   final RxString imageUrl = ''.obs;
   final Rxn<File> imageFile = Rxn<File>();
+  final RxString selectedType = 'article'.obs;
+
+  // Определение списка доступных типов статей
+  final List<Map<String, String>> articleTypes = [
+    {'value': 'article', 'label': 'Article'},
+    {'value': 'lifehack', 'label': 'Lifehack'},
+    {'value': 'guide', 'label': 'Guide'},
+  ];
+
+  // Определение дефолтного URL для аватара автора
+  static const String defaultAuthorAvatarUrl = 'https://firebasestorage.googleapis.com/v0/b/beautymarine-6355a.appspot.com/o/authors%2Fdefault_avatar.jpg?alt=media';
 
   ArticleEditDirectController({
     this.article,
@@ -108,7 +118,20 @@ class ArticleEditDirectController extends GetxController {
     descriptionController = TextEditingController(text: article != null ? article!.descriptionKey : '');
     contentController = TextEditingController(text: article != null ? article!.contentKey : '');
     authorNameController = TextEditingController(text: article != null ? article!.authorNameKey : 'Admin');
-    authorAvatarUrlController = TextEditingController(text: article?.authorAvatarUrl ?? 'https://firebasestorage.googleapis.com/v0/b/beautymarine-6355a.appspot.com/o/authors%2Fdefault_avatar.jpg?alt=media');
+
+    // Инициализация типа статьи
+    if (article != null) {
+      // Определяем тип из существующей статьи
+      if (article!.id.startsWith('l')) {
+        selectedType.value = 'lifehack';
+      } else if (article!.id.startsWith('g')) {
+        selectedType.value = 'guide';
+      } else {
+        selectedType.value = 'article';
+      }
+    } else if (articleType != null) {
+      selectedType.value = articleType!;
+    }
 
     if (article != null) {
       imageUrl.value = article!.imageUrl;
@@ -121,7 +144,6 @@ class ArticleEditDirectController extends GetxController {
     descriptionController.dispose();
     contentController.dispose();
     authorNameController.dispose();
-    authorAvatarUrlController.dispose();
     super.onClose();
   }
 
@@ -207,8 +229,8 @@ class ArticleEditDirectController extends GetxController {
         imageUrl: uploadedImageUrl ?? imageUrl.value,
         publishedAt: article?.publishedAt ?? DateTime.now(),
         authorName: authorNameController.text,
-        authorAvatarUrl: authorAvatarUrlController.text,
-        type: articleType ?? article?.titleKey.split('_')[0] ?? 'article',
+        authorAvatarUrl: defaultAuthorAvatarUrl, // Используем фиксированный URL
+        type: selectedType.value,
       );
 
       // Конвертируем в Map для Firestore
@@ -300,6 +322,17 @@ class ArticleEditDirectScreen extends StatelessWidget {
             _buildImageSection(context, controller),
             const SizedBox(height: 24),
 
+            // Выбор типа статьи
+            Text(
+              'article_type'.tr,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildArticleTypeSelector(controller),
+            const SizedBox(height: 24),
+
             // Основные поля
             _buildTextField(
               controller: controller.titleController,
@@ -342,19 +375,39 @@ class ArticleEditDirectScreen extends StatelessWidget {
               label: 'author_name'.tr,
               hint: 'author_name_hint'.tr,
             ),
-            const SizedBox(height: 16),
-
-            _buildTextField(
-              controller: controller.authorAvatarUrlController,
-              label: 'author_avatar_url'.tr,
-              hint: 'author_avatar_url_hint'.tr,
-            ),
 
             const SizedBox(height: 32),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildArticleTypeSelector(ArticleEditDirectController controller) {
+    return Obx(() => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: controller.selectedType.value,
+          items: controller.articleTypes.map((type) {
+            return DropdownMenuItem<String>(
+              value: type['value'],
+              child: Text(type['label']!.tr),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              controller.selectedType.value = value;
+            }
+          },
+        ),
+      ),
+    ));
   }
 
   Widget _buildImageSection(BuildContext context, ArticleEditDirectController controller) {

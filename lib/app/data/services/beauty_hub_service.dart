@@ -13,7 +13,7 @@ class BeautyHubService extends GetxService {
   // Получение всех статей
   static Future<List<Article>> getArticles() async {
     try {
-      // Обновленный запрос без составного индекса
+      // Обновленный запрос для получения только статей типа 'article'
       final articlesSnapshot = await FirebaseFirestore.instance
           .collection('articles')
           .where('type', isEqualTo: 'article')
@@ -33,7 +33,7 @@ class BeautyHubService extends GetxService {
   // Получение лайфхаков
   static Future<List<Article>> getLifehacks() async {
     try {
-      // Обновленный запрос без составного индекса
+      // Обновленный запрос для получения только статей типа 'lifehack'
       final articlesSnapshot = await FirebaseFirestore.instance
           .collection('articles')
           .where('type', isEqualTo: 'lifehack')
@@ -53,7 +53,7 @@ class BeautyHubService extends GetxService {
   // Получение гайдов
   static Future<List<Article>> getGuides() async {
     try {
-      // Обновленный запрос без составного индекса
+      // Обновленный запрос для получения только статей типа 'guide'
       final articlesSnapshot = await FirebaseFirestore.instance
           .collection('articles')
           .where('type', isEqualTo: 'guide')
@@ -120,7 +120,7 @@ class BeautyHubService extends GetxService {
         'publishedAt': FieldValue.serverTimestamp(),
         'authorName': authorName,
         'authorAvatarUrl': authorAvatarUrl,
-        'type': type, // 'article', 'lifehack', или 'guide'
+        'type': type, // Обязательно указываем тип статьи
         'createdAt': FieldValue.serverTimestamp(),
       });
 

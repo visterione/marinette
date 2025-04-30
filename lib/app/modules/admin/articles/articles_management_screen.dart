@@ -134,94 +134,97 @@ class ArticlesManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('manage_articles'.tr),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: controller.loadAllContent,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('manage_articles'.tr),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: controller.loadAllContent,
+            ),
+          ],
+          bottom: TabBar(
+            onTap: (index) => controller.selectedTabIndex.value = index,
+            tabs: [
+              Tab(text: 'articles'.tr),
+              Tab(text: 'lifehacks'.tr),
+              Tab(text: 'guides'.tr),
+            ],
           ),
-        ],
-        bottom: TabBar(
-          onTap: (index) => controller.selectedTabIndex.value = index,
-          tabs: [
-            Tab(text: 'articles'.tr),
-            Tab(text: 'lifehacks'.tr),
-            Tab(text: 'guides'.tr),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Создание новой статьи с типом, соответствующим выбранной вкладке
+            Get.to(() => ArticleEditDirectScreen(
+              articleType: controller.getArticleType(controller.selectedTabIndex.value),
+              onSave: () => controller.loadAllContent(),
+            ));
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: Column(
+          children: [
+            // Поисковая строка
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'search'.tr,
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onChanged: (value) => controller.searchQuery.value = value,
+              ),
+            ),
+
+            // Список статей
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final articles = controller.getFilteredArticles();
+
+                if (articles.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.article_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          controller.searchQuery.value.isNotEmpty
+                              ? 'no_search_results'.tr
+                              : 'no_articles'.tr,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: articles.length,
+                  itemBuilder: (context, index) => _buildArticleItem(context, articles[index]),
+                );
+              }),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Создание новой статьи с типом, соответствующим выбранной вкладке
-          Get.to(() => ArticleEditDirectScreen(
-            articleType: controller.getArticleType(controller.selectedTabIndex.value),
-            onSave: () => controller.loadAllContent(),
-          ));
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
-        children: [
-          // Поисковая строка
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'search'.tr,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onChanged: (value) => controller.searchQuery.value = value,
-            ),
-          ),
-
-          // Список статей
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final articles = controller.getFilteredArticles();
-
-              if (articles.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.article_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        controller.searchQuery.value.isNotEmpty
-                            ? 'no_search_results'.tr
-                            : 'no_articles'.tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: articles.length,
-                itemBuilder: (context, index) => _buildArticleItem(context, articles[index]),
-              );
-            }),
-          ),
-        ],
       ),
     );
   }
