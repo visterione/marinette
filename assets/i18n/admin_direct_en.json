@@ -1,0 +1,18 @@
+{
+  "title": "Title",
+  "description": "Description",
+  "content": "Content",
+  "author_name": "Author Name",
+  "article_title_hint": "Enter article title",
+  "article_description_hint": "Enter short description of the article",
+  "article_content_hint": "Enter full article content here",
+  "author_name_hint": "Enter author name",
+  "loading_translations": "Loading translations...",
+  "translations_loaded": "Translations loaded successfully",
+  "error_loading_translations": "Error loading translations",
+  "add_translation": "Add Translation",
+  "ukrainian_translation": "Ukrainian Translation",
+  "english_translation": "English Translation",
+  "primary_language": "Primary Language",
+  "secondary_language": "Secondary Language"
+}

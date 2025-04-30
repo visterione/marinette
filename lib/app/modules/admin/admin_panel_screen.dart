@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marinette/app/modules/admin/articles/articles_management_screen.dart';
+import 'package:marinette/app/modules/admin/stories/stories_management_screen.dart';
 import 'package:marinette/app/modules/admin/migration_screen.dart';
 import 'package:marinette/app/data/services/auth_service.dart';
 
@@ -14,7 +16,7 @@ class AdminPanelScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Panel'),
+        title: Text('admin_panel'.tr),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -37,91 +39,84 @@ class AdminPanelScreen extends StatelessWidget {
           child: ListView(
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Admin Tools',
-                style: TextStyle(
+              Text(
+                'admin_tools'.tr,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 24),
 
-              // Storage Migration Tool
+              // Управление статьями
               _buildAdminTool(
                 context: context,
-                title: 'Firebase Storage Migration',
-                description: 'Migrate images from Google Drive to Firebase Storage',
+                title: 'manage_articles'.tr,
+                description: 'manage_articles_description'.tr,
+                icon: Icons.article,
+                onTap: () {
+                  Get.to(() => ArticlesManagementScreen());
+                },
+              ),
+
+              // Управление историями
+              _buildAdminTool(
+                context: context,
+                title: 'manage_stories'.tr,
+                description: 'manage_stories_description'.tr,
+                icon: Icons.auto_stories,
+                onTap: () {
+                  Get.to(() => StoriesManagementScreen());
+                },
+              ),
+
+              // Миграция хранилища
+              _buildAdminTool(
+                context: context,
+                title: 'storage_migration'.tr,
+                description: 'storage_migration_description'.tr,
                 icon: Icons.storage,
                 onTap: () {
                   Get.to(() => const MigrationScreen());
                 },
               ),
 
-              // Можна додати інші інструменти для адміністрування
+              // Управление пользователями (будущая функциональность)
               _buildAdminTool(
                 context: context,
-                title: 'Manage Articles',
-                description: 'Add, edit, or delete articles, lifehacks, and guides',
-                icon: Icons.article,
-                onTap: () {
-                  // Навігація до екрану управління статтями
-                  Get.snackbar(
-                    'Info',
-                    'Article management screen coming soon',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-                },
-              ),
-
-              _buildAdminTool(
-                context: context,
-                title: 'Manage Stories',
-                description: 'Create, edit, or remove stories',
-                icon: Icons.auto_stories,
-                onTap: () {
-                  // Навігація до екрану управління сторіз
-                  Get.snackbar(
-                    'Info',
-                    'Stories management screen coming soon',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-                },
-              ),
-
-              _buildAdminTool(
-                context: context,
-                title: 'User Management',
-                description: 'View and manage user accounts',
+                title: 'manage_users'.tr,
+                description: 'manage_users_description'.tr,
                 icon: Icons.people,
                 onTap: () {
-                  // Навігація до екрану управління користувачами
+                  // Заглушка для будущей функциональности
                   Get.snackbar(
-                    'Info',
-                    'User management screen coming soon',
+                    'info'.tr,
+                    'feature_coming_soon'.tr,
                     snackPosition: SnackPosition.BOTTOM,
                   );
                 },
               ),
 
+              // Аналитика (будущая функциональность)
               _buildAdminTool(
                 context: context,
-                title: 'Analytics',
-                description: 'View application usage statistics',
+                title: 'analytics'.tr,
+                description: 'analytics_description'.tr,
                 icon: Icons.analytics,
                 onTap: () {
-                  // Навігація до екрану аналітики
+                  // Заглушка для будущей функциональности
                   Get.snackbar(
-                    'Info',
-                    'Analytics screen coming soon',
+                    'info'.tr,
+                    'feature_coming_soon'.tr,
                     snackPosition: SnackPosition.BOTTOM,
                   );
                 },
               ),
 
               const SizedBox(height: 32),
-              const Text(
-                'Note: These tools are only available to administrators.',
-                style: TextStyle(
+              Text(
+                'admin_tools_note'.tr,
+                style: const TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),

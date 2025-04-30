@@ -55,9 +55,9 @@ class StoriesService extends GetxService {
       final viewedStories = _prefs.getStringList(_viewedStoriesKey) ?? [];
       debugPrint('Loading stories. Viewed stories: $viewedStories');
 
-      // Завантажуємо сторіз з Firestore замість хардкоду
+      // Загружаем сторис из Firestore
       final storiesSnapshot = await _firestore.collection('stories')
-          .orderBy('order') // якщо є поле для сортування
+          .orderBy('order') // если есть поле для сортировки
           .get();
 
       List<Story> loadedStories = [];
@@ -66,18 +66,18 @@ class StoriesService extends GetxService {
         final data = doc.data();
 
         try {
-          // Отримуємо URL-адреси зображень
+          // Получаем URL-адреса изображений
           List<String> imageUrls = [];
 
-          // Перевіряємо, чи вже є мігровані URL-адреси
+          // Проверяем, есть ли мигрированные URL-адреса
           if (data['migrated'] == true) {
             imageUrls = List<String>.from(data['imageUrls']);
           } else {
-            // Використовуємо URL-адреси з бази даних
+            // Используем URL-адреса из базы данных
             imageUrls = List<String>.from(data['imageUrls']);
           }
 
-          // Отримуємо URL превью
+          // Получаем URL превью
           String previewImageUrl = data['previewImageUrl'] ?? '';
 
           loadedStories.add(Story(
@@ -94,85 +94,60 @@ class StoriesService extends GetxService {
         }
       }
 
-      // Якщо немає даних у Firestore, використовуємо демо-дані
-      if (loadedStories.isEmpty) {
-        loadedStories = _getDemoStories(viewedStories);
-      }
-
       stories.value = loadedStories;
 
       _startBackgroundPreloading();
       debugPrint('Stories loaded successfully: ${stories.length} stories');
     } catch (e) {
       debugPrint('Error loading stories: $e');
-      // Використовуємо демо-дані у випадку помилки
-      final viewedStories = _prefs.getStringList(_viewedStoriesKey) ?? [];
-      stories.value = _getDemoStories(viewedStories);
+      stories.value = []; // В случае ошибки возвращаем пустой список
     }
-  }
-
-  // Допоміжний метод для отримання демо-даних
-  List<Story> _getDemoStories(List<String> viewedStories) {
-    return [
-      Story(
-        id: '1',
-        title: 'stories_A',
-        imageUrls: [
-          'https://drive.google.com/uc?id=1K4LWzw4H3MfkLYms2EhoYz1J7tyJapG6',
-          'https://drive.google.com/uc?id=16ANCQ5oo63v-3wprTjuXoeTwUbn0KaOo',
-          'https://drive.google.com/uc?id=1GVvir2S8XvUxJThJyPELZ56LKZ4-0Y36',
-          'https://drive.google.com/uc?id=1NtNHKVf8jTXrfAsyiNF229m_ujDMNVXj',
-          'https://drive.google.com/uc?id=1sarEtlwlNGhszq6OMgpHRfMI2-0RNoSk',
-        ],
-        captions: ['', '', '', '', ''],
-        category: 'makeup',
-        previewImageUrl: 'https://drive.google.com/uc?id=1Cr4i_NMu_nB94LPTA5tdq_w8xou63FOj',
-        isViewed: viewedStories.contains('1'),
-      ),
-      Story(
-        id: '2',
-        title: 'stories_B',
-        imageUrls: [
-          'https://drive.google.com/uc?id=1eOr1whjLVUDoTPOU80Ur0p34MjLuUsdr',
-          'https://drive.google.com/uc?id=1fg53Y7g1KCy74LfwjxOCTLAIeDQwn9xj',
-          'https://drive.google.com/uc?id=1ItJ2nO872YBPH75r2wvqup6puwcCcu90',
-        ],
-        captions: ['', '', ''],
-        category: 'skincare',
-        previewImageUrl: 'https://drive.google.com/uc?id=1XV2oRMsorxgjTsykz1CxJZmcX6-QYPhd',
-        isViewed: viewedStories.contains('2'),
-      ),
-    ];
   }
 
   @visibleForTesting
   bool isTestMode = false;
 
   void _startBackgroundPreloading() {
-    // В тестовому режимі не виконуємо реальне передзавантаження
+    // В тестовом режиме не выполняем реальное предзагрузку
     if (isTestMode) {
       return;
     }
 
+    // Предзагрузка превью изображений
     for (var story in stories) {
-      preloadSingleImage(story.previewImageUrl.tr, priority: true);
+      // Проверка на пустой URL или некорректный URL
+      if (story.previewImageUrl.isNotEmpty && Uri.tryParse(story.previewImageUrl.tr)?.hasAuthority == true) {
+        preloadSingleImage(story.previewImageUrl.tr, priority: true);
+      }
     }
 
+    // Предзагрузка изображений слайдов
     for (var story in stories) {
       for (var imageUrl in story.imageUrls) {
-        preloadSingleImage(imageUrl.tr, priority: false);
+        // Проверка на пустой URL или некорректный URL
+        if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl.tr)?.hasAuthority == true) {
+          preloadSingleImage(imageUrl.tr, priority: false);
+        }
       }
     }
   }
 
   Future<void> preloadSingleImage(String imageUrl, {bool priority = false}) async {
-    // Якщо це тестове середовище, одразу позначаємо як завантажене
+    // Если это тестовое окружение, сразу помечаем как загруженное
     if (isTestMode) {
       preloadedImages[imageUrl] = true;
       return;
     }
 
-    // Решта існуючої логіки
+    // Проверка на пустой URL или некорректный URL
+    if (imageUrl.isEmpty || !Uri.tryParse(imageUrl)!.hasAuthority) {
+      // Отмечаем как "загруженное", чтобы избежать повторных попыток загрузки
+      preloadedImages[imageUrl] = true;
+      debugPrint('Skipping preload for empty or invalid URL: $imageUrl');
+      return;
+    }
+
+    // Остальная логика загрузки
     if (preloadedImages.containsKey(imageUrl)) return;
 
     while (_activePreloads.value >= maxConcurrentPreloads && !priority) {
@@ -255,16 +230,16 @@ class StoriesService extends GetxService {
   }
 
   Future<void> resetViewedStories() async {
-    // Очищення списку переглянутих історій
+    // Очищение списка просмотренных историй
     await _prefs.remove('viewed_stories');
 
-    // Примусове скидання статусу для всіх історій
+    // Принудительный сброс статуса для всех историй
     for (var i = 0; i < stories.length; i++) {
       stories[i] = stories[i].copyWith(isViewed: false);
     }
   }
 
-  // Метод для додавання нової сторіз через Firebase
+  // Метод для добавления новой истории через Firebase
   Future<bool> addNewStory({
     required String title,
     required List<String> imageUrls,
@@ -273,7 +248,7 @@ class StoriesService extends GetxService {
     required String previewImageUrl,
   }) async {
     try {
-      // Створюємо запис в Firestore
+      // Создаём запись в Firestore
       final docRef = await _firestore.collection('stories').add({
         'title': title,
         'imageUrls': imageUrls,
@@ -281,10 +256,10 @@ class StoriesService extends GetxService {
         'category': category,
         'previewImageUrl': previewImageUrl,
         'createdAt': FieldValue.serverTimestamp(),
-        'order': stories.length, // для сортування
+        'order': stories.length, // для сортировки
       });
 
-      // Додаємо нову сторіз в локальний список
+      // Добавляем новую историю в локальный список
       stories.add(Story(
         id: docRef.id,
         title: title,
@@ -302,7 +277,7 @@ class StoriesService extends GetxService {
     }
   }
 
-  // Метод для оновлення історії
+  // Метод для обновления истории
   Future<bool> updateStory(Story updatedStory) async {
     try {
       await _firestore.collection('stories').doc(updatedStory.id).update({
@@ -313,7 +288,7 @@ class StoriesService extends GetxService {
         'previewImageUrl': updatedStory.previewImageUrl,
       });
 
-      // Оновлюємо локальний список
+      // Обновляем локальный список
       final index = stories.indexWhere((s) => s.id == updatedStory.id);
       if (index != -1) {
         stories[index] = updatedStory;
@@ -326,12 +301,12 @@ class StoriesService extends GetxService {
     }
   }
 
-  // Метод для видалення сторіз
+  // Метод для удаления истории
   Future<bool> deleteStory(String storyId) async {
     try {
       await _firestore.collection('stories').doc(storyId).delete();
 
-      // Видаляємо з локального списку
+      // Удаляем из локального списка
       stories.removeWhere((s) => s.id == storyId);
 
       return true;

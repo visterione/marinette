@@ -1,0 +1,18 @@
+{
+  "title": "Заголовок",
+  "description": "Опис",
+  "content": "Зміст",
+  "author_name": "Ім'я автора",
+  "article_title_hint": "Введіть заголовок статті",
+  "article_description_hint": "Введіть короткий опис статті",
+  "article_content_hint": "Введіть повний текст статті тут",
+  "author_name_hint": "Введіть ім'я автора",
+  "loading_translations": "Завантаження перекладів...",
+  "translations_loaded": "Переклади успішно завантажені",
+  "error_loading_translations": "Помилка завантаження перекладів",
+  "add_translation": "Додати переклад",
+  "ukrainian_translation": "Український переклад",
+  "english_translation": "Англійський переклад",
+  "primary_language": "Основна мова",
+  "secondary_language": "Додаткова мова"
+}
