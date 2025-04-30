@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/modules/admin/articles/articles_management_screen.dart';
 import 'package:marinette/app/modules/admin/stories/stories_management_screen.dart';
-import 'package:marinette/app/modules/admin/migration_screen.dart';
+import 'package:marinette/app/modules/admin/daily_tips/daily_tips_management_screen.dart';
+import 'package:marinette/app/modules/admin/beauty_trends/beauty_trends_management_screen.dart';
 import 'package:marinette/app/data/services/auth_service.dart';
 
 class AdminPanelScreen extends StatelessWidget {
@@ -70,14 +71,25 @@ class AdminPanelScreen extends StatelessWidget {
                 },
               ),
 
-              // Миграция хранилища
+              // Управление ежедневными советами
               _buildAdminTool(
                 context: context,
-                title: 'storage_migration'.tr,
-                description: 'storage_migration_description'.tr,
-                icon: Icons.storage,
+                title: 'manage_daily_tips'.tr,
+                description: 'manage_daily_tips_description'.tr,
+                icon: Icons.tips_and_updates,
                 onTap: () {
-                  Get.to(() => const MigrationScreen());
+                  Get.to(() => DailyTipsManagementScreen());
+                },
+              ),
+
+              // Управление сезонными трендами
+              _buildAdminTool(
+                context: context,
+                title: 'manage_beauty_trends'.tr,
+                description: 'manage_beauty_trends_description'.tr,
+                icon: Icons.trending_up,
+                onTap: () {
+                  Get.to(() => BeautyTrendsManagementScreen());
                 },
               ),
 

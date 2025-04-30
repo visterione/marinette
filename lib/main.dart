@@ -1,5 +1,4 @@
 // lib/main.dart
-// Fixed file with correct initialization order for Firebase Storage services
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,7 +15,6 @@ import 'package:marinette/app/core/theme/theme_service.dart';
 import 'package:marinette/app/data/services/user_preferences_service.dart';
 import 'package:marinette/app/routes/app_routes.dart';
 import 'package:marinette/app/data/services/storage_service.dart';
-import 'package:marinette/app/data/services/storage_migration_service.dart';
 import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/stories_service.dart';
@@ -72,9 +70,6 @@ Future<void> _initializeServices() async {
   debugPrint('Storage service initialized');
 
   // Now we can initialize Firebase-dependent services
-  Get.put(StorageMigrationService(), permanent: true);
-  debugPrint('Storage Migration service initialized');
-
   Get.put(AuthService());
   debugPrint('Auth service initialized');
 
