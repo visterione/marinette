@@ -152,5 +152,65 @@
 
   "content": "Контент",
   "title": "Назва",
-  "description": "Опис"
+  "description": "Опис",
+  
+  "edit_user": "Редагувати користувача",
+  "user_updated": "Інформація користувача оновлена",
+  "error_updating_user": "Помилка при оновленні інформації користувача",
+  "user_deleted": "Користувач видалений",
+  "error_deleting_user": "Помилка при видаленні користувача",
+  "confirm_delete_user": "Ви впевнені, що хочете видалити цього користувача? Ця дія не може бути скасована.",
+
+  "filter_by_role": "Фільтр за роллю",
+  "all_users": "Всі користувачі",
+  "admins": "Адміністратори",
+  "regular_users": "Звичайні користувачі",
+  "search_users": "Пошук користувачів",
+  "no_users_found": "Користувачів не знайдено",
+  "no_users": "Немає користувачів",
+
+  "admin_role_granted": "Права адміністратора надано",
+  "admin_role_revoked": "Права адміністратора відкликано",
+  "admin": "Адмін",
+  "make_admin": "Зробити адміном",
+  "remove_admin": "Видалити з адмінів",
+
+  "profile_information": "Інформація профілю",
+  "user_preferences": "Налаштування користувача",
+  "user_activity": "Активність користувача",
+  "display_name": "Ім'я",
+  "created": "Створено",
+  "last_login": "Останній вхід",
+  "admin_rights": "Права адміністратора",
+  "saved_articles": "Збережені статті",
+  "analysis_results": "Результати аналізу",
+  "recent_activity": "Недавня активність",
+  "view_details": "Детальніше",
+
+  "analytics_dashboard": "Панель аналітики",
+  "time_period": "Часовий період",
+  "last_7_days": "7 днів",
+  "last_30_days": "30 днів",
+  "last_90_days": "90 днів",
+  "last_year": "Рік",
+
+  "user_statistics": "Статистика користувачів",
+  "total_users": "Всього користувачів",
+  "active_users_7days": "Активних за 7 днів",
+  "new_users_30days": "Нових за 30 днів",
+  "user_signups_over_time": "Реєстрації користувачів",
+
+  "content_statistics": "Статистика контенту",
+  "total_articles": "Всього статей",
+  "total_stories": "Всього історій",
+  "total_analyses": "Всього аналізів",
+  "analyses_over_time": "Аналізи з часом",
+
+  "face_analysis_statistics": "Статистика аналізу обличчя",
+  "face_shape_distribution": "Розподіл форм обличчя",
+  "color_type_distribution": "Розподіл кольоротипів",
+
+  "no_data_available": "Немає даних",
+  "error_loading_analytics": "Помилка завантаження аналітики",
+  "error_loading_users": "Помилка завантаження користувачів"
 }

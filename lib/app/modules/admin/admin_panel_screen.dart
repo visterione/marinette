@@ -6,12 +6,79 @@ import 'package:marinette/app/modules/admin/articles/articles_management_screen.
 import 'package:marinette/app/modules/admin/stories/stories_management_screen.dart';
 import 'package:marinette/app/modules/admin/daily_tips/daily_tips_management_screen.dart';
 import 'package:marinette/app/modules/admin/beauty_trends/beauty_trends_management_screen.dart';
+import 'package:marinette/app/modules/admin/users/users_management_screen.dart'; // New import
+import 'package:marinette/app/modules/admin/analytics/analytics_dashboard.dart'; // New import
 import 'package:marinette/app/data/services/auth_service.dart';
 
 class AdminPanelScreen extends StatelessWidget {
   final AuthService _authService = Get.find<AuthService>();
 
   AdminPanelScreen({Key? key}) : super(key: key);
+
+  Widget _buildAdminTool({
+    required BuildContext context,
+    required String title,
+    required String description,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.pink.withAlpha(25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: Colors.pink,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? Colors.grey[600]
+                            : Colors.grey[300],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,35 +160,25 @@ class AdminPanelScreen extends StatelessWidget {
                 },
               ),
 
-              // Управление пользователями (будущая функциональность)
+              // Управление пользователями (новый функционал)
               _buildAdminTool(
                 context: context,
                 title: 'manage_users'.tr,
                 description: 'manage_users_description'.tr,
                 icon: Icons.people,
                 onTap: () {
-                  // Заглушка для будущей функциональности
-                  Get.snackbar(
-                    'info'.tr,
-                    'feature_coming_soon'.tr,
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
+                  Get.to(() => UsersManagementScreen());
                 },
               ),
 
-              // Аналитика (будущая функциональность)
+              // Аналитика (новый функционал)
               _buildAdminTool(
                 context: context,
                 title: 'analytics'.tr,
                 description: 'analytics_description'.tr,
                 icon: Icons.analytics,
                 onTap: () {
-                  // Заглушка для будущей функциональности
-                  Get.snackbar(
-                    'info'.tr,
-                    'feature_coming_soon'.tr,
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
+                  Get.to(() => AnalyticsDashboard());
                 },
               ),
 
@@ -134,71 +191,6 @@ class AdminPanelScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAdminTool({
-    required BuildContext context,
-    required String title,
-    required String description,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.pink.withAlpha(25),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: Colors.pink,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Colors.grey[600]
-                            : Colors.grey[300],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
             ],
           ),
         ),

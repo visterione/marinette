@@ -10,6 +10,8 @@ import 'package:marinette/app/modules/admin/articles/articles_management_screen.
 import 'package:marinette/app/modules/admin/stories/stories_management_screen.dart';
 import 'package:marinette/app/modules/admin/daily_tips/daily_tips_management_screen.dart';
 import 'package:marinette/app/modules/admin/beauty_trends/beauty_trends_management_screen.dart';
+import 'package:marinette/app/modules/admin/users/users_management_screen.dart'; // New import
+import 'package:marinette/app/modules/admin/analytics/analytics_dashboard.dart'; // New import
 import 'package:marinette/app/core/middlewares/auth_middleware.dart';
 
 class AppRoutes {
@@ -22,6 +24,8 @@ class AppRoutes {
   static const String STORIES_MANAGEMENT = '/admin/stories';
   static const String DAILY_TIPS_MANAGEMENT = '/admin/daily-tips';
   static const String BEAUTY_TRENDS_MANAGEMENT = '/admin/beauty-trends';
+  static const String USERS_MANAGEMENT = '/admin/users'; // New route
+  static const String ANALYTICS_DASHBOARD = '/admin/analytics'; // New route
 
   static final routes = [
     GetPage(
@@ -71,6 +75,21 @@ class AppRoutes {
     GetPage(
       name: BEAUTY_TRENDS_MANAGEMENT,
       page: () => BeautyTrendsManagementScreen(),
+      middlewares: [
+        AdminMiddleware(),
+      ],
+    ),
+    // New routes
+    GetPage(
+      name: USERS_MANAGEMENT,
+      page: () => UsersManagementScreen(),
+      middlewares: [
+        AdminMiddleware(),
+      ],
+    ),
+    GetPage(
+      name: ANALYTICS_DASHBOARD,
+      page: () => AnalyticsDashboard(),
       middlewares: [
         AdminMiddleware(),
       ],
