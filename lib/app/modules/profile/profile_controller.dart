@@ -347,36 +347,7 @@ class ProfileController extends GetxController {
     return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute}';
   }
 
-  // Зміна мови
-  void changeLanguage() {
-    final currentLanguage = _localizationService.getCurrentLocale();
-    final languages = LocalizationService.supportedLocales;
-
-    Get.dialog(
-      AlertDialog(
-        title: Text('select_language'.tr),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: languages.map((locale) {
-              final langCode = locale.languageCode;
-              final langName = _localizationService.getLanguageName(langCode);
-              return ListTile(
-                title: Text(langName),
-                trailing: currentLanguage.languageCode == langCode
-                    ? const Icon(Icons.check, color: Colors.green)
-                    : null,
-                onTap: () {
-                  _localizationService.changeLocale(langCode);
-                  Get.back();
-                },
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
+  // Видалено метод changeLanguage, так как он больше не нужен
 
   // Зміна теми
   void toggleTheme() {

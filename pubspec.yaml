@@ -65,9 +65,7 @@ flutter:
 
   assets:
     - assets/i18n/
-    - assets/i18n/en.json
     - assets/i18n/uk.json
-    - assets/i18n/admin_en.json
     - assets/i18n/admin_uk.json
     - assets/audio/
     - assets/audio/nana.mp3

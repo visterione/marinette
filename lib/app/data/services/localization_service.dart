@@ -6,9 +6,6 @@ class LocalizationService extends GetxService {
   static const String _localeKey = 'selected_locale';
   static const List<Locale> supportedLocales = [
     Locale('uk'),
-    Locale('en'),
-    Locale('pl'),
-    Locale('ka'),
   ];
 
   final locale = Rxn<Locale>();
@@ -34,31 +31,21 @@ class LocalizationService extends GetxService {
 
   Locale getCurrentLocale() => locale.value ?? const Locale('uk');
 
+  // Этот метод мы оставляем, но он будет всегда использовать 'uk'
   Future<void> changeLocale(String languageCode) async {
     try {
       if (languageCode == locale.value?.languageCode) return;
 
-      locale.value = Locale(languageCode);
-      await _prefs.setString(_localeKey, languageCode);
+      locale.value = Locale('uk');
+      await _prefs.setString(_localeKey, 'uk');
       Get.updateLocale(locale.value!);
-      debugPrint('Locale changed to: $languageCode');
+      debugPrint('Locale set to: uk');
     } catch (e) {
       debugPrint('Error changing locale: $e');
     }
   }
 
   String getLanguageName(String languageCode) {
-    switch (languageCode) {
-      case 'uk':
-        return 'Українська';
-      case 'en':
-        return 'English';
-      case 'pl':
-        return 'Polski';
-      case 'ka':
-        return 'ქართული';
-      default:
-        return 'Українська';
-    }
+    return 'Українська';
   }
 }

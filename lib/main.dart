@@ -109,7 +109,7 @@ class MainApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeService.getThemeMode(),
       translations: Messages(),
-      locale: localizationService.getCurrentLocale(),
+      locale: const Locale('uk'),
       fallbackLocale: const Locale('uk'),
       supportedLocales: ls.LocalizationService.supportedLocales,
       localizationsDelegates: const [

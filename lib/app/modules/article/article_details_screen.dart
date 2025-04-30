@@ -126,47 +126,9 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
     }
   }
 
+  // Получаем текст статьи напрямую, без tr()
   String _getFullContent() {
-    switch (widget.article.id) {
-      case '1':
-        return 'article_1_full'.tr;
-      case '2':
-        return 'article_2_full'.tr;
-      case '3':
-        return 'article_3_full'.tr;
-      case '4':
-        return 'article_4_full'.tr;
-      case '5':
-        return 'article_5_full'.tr;
-      case '6':
-        return 'article_6_full'.tr;
-      case 'l1':
-        return 'lifehack_2_full'.tr;
-      case 'l2':
-        return 'lifehack_1_full'.tr;
-      case 'l3':
-        return 'lifehack_3_full'.tr;
-      case 'l4':
-        return 'lifehack_4_full'.tr;
-      case 'l5':
-        return 'lifehack_5_full'.tr;
-      case 'l6':
-        return 'lifehack_6_full'.tr;
-      case 'g1':
-        return 'guide_1_full'.tr;
-      case 'g2':
-        return 'guide_2_full'.tr;
-      case 'g3':
-        return 'guide_3_full'.tr;
-      case 'g4':
-        return 'guide_4_full'.tr;
-      case 'g5':
-        return 'guide_5_full'.tr;
-      case 'g6':
-        return 'guide_6_full'.tr;
-      default:
-        return widget.article.contentKey.tr;
-    }
+    return widget.article.contentKey;
   }
 
   int _calculateReadTime() {
@@ -187,7 +149,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
 
   // Поділитися статтею
   Future<void> _shareArticle() async {
-    final title = widget.article.titleKey.tr;
+    final title = widget.article.titleKey;
     final content = _getFullContent();
 
     // Ділимося коротким уривком статті
@@ -270,7 +232,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.article.titleKey.tr,
+                    widget.article.titleKey,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -308,7 +270,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.article.authorNameKey.tr,
+                            widget.article.authorNameKey,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

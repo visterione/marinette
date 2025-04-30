@@ -78,18 +78,19 @@ class BeautyHubService extends GetxService {
       try {
         final data = doc.data() as Map<String, dynamic>;
 
+        // Используем прямые значения полей, а не ключи перевода
         result.add(Article(
           id: doc.id,
-          titleKey: data['titleKey'] ?? '',
-          descriptionKey: data['descriptionKey'] ?? '',
+          titleKey: data['title'] ?? data['titleKey'] ?? '',
+          descriptionKey: data['description'] ?? data['descriptionKey'] ?? '',
           imageUrl: data['imageUrl'] ?? '',
-          contentKey: data['contentKey'] ?? '',
+          contentKey: data['content'] ?? data['contentKey'] ?? '',
           publishedAt: data['publishedAt'] != null
               ? (data['publishedAt'] is Timestamp
               ? (data['publishedAt'] as Timestamp).toDate()
               : DateTime.fromMillisecondsSinceEpoch(data['publishedAt']))
               : DateTime.now(),
-          authorNameKey: data['authorNameKey'] ?? '',
+          authorNameKey: data['authorName'] ?? data['authorNameKey'] ?? '',
           authorAvatarUrl: data['authorAvatarUrl'] ?? '',
         ));
       } catch (e) {
@@ -102,22 +103,22 @@ class BeautyHubService extends GetxService {
 
   // Добавление новой статьи
   Future<bool> addArticle({
-    required String titleKey,
-    required String descriptionKey,
+    required String title,
+    required String description,
     required String imageUrl,
-    required String contentKey,
-    required String authorNameKey,
+    required String content,
+    required String authorName,
     required String authorAvatarUrl,
     required String type,
   }) async {
     try {
       await _firestore.collection('articles').add({
-        'titleKey': titleKey,
-        'descriptionKey': descriptionKey,
+        'title': title,
+        'description': description,
         'imageUrl': imageUrl,
-        'contentKey': contentKey,
+        'content': content,
         'publishedAt': FieldValue.serverTimestamp(),
-        'authorNameKey': authorNameKey,
+        'authorName': authorName,
         'authorAvatarUrl': authorAvatarUrl,
         'type': type, // 'article', 'lifehack', или 'guide'
         'createdAt': FieldValue.serverTimestamp(),
@@ -146,16 +147,16 @@ class BeautyHubService extends GetxService {
 
       return Article(
         id: docSnapshot.id,
-        titleKey: data['titleKey'] ?? '',
-        descriptionKey: data['descriptionKey'] ?? '',
+        titleKey: data['title'] ?? data['titleKey'] ?? '',
+        descriptionKey: data['description'] ?? data['descriptionKey'] ?? '',
         imageUrl: data['imageUrl'] ?? '',
-        contentKey: data['contentKey'] ?? '',
+        contentKey: data['content'] ?? data['contentKey'] ?? '',
         publishedAt: data['publishedAt'] != null
             ? (data['publishedAt'] is Timestamp
             ? (data['publishedAt'] as Timestamp).toDate()
             : DateTime.fromMillisecondsSinceEpoch(data['publishedAt']))
             : DateTime.now(),
-        authorNameKey: data['authorNameKey'] ?? '',
+        authorNameKey: data['authorName'] ?? data['authorNameKey'] ?? '',
         authorAvatarUrl: data['authorAvatarUrl'] ?? '',
       );
     } catch (e) {
@@ -195,7 +196,7 @@ class BeautyHubService extends GetxService {
 
       List<Article> allArticles = _processArticles(articlesSnapshot);
 
-      // Локальный поиск
+      // Локальный поиск по прямым значениям, а не ключам
       return allArticles.where((article) =>
       article.titleKey.toLowerCase().contains(query.toLowerCase()) ||
           article.descriptionKey.toLowerCase().contains(query.toLowerCase()) ||

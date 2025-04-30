@@ -447,16 +447,6 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _buildActionButton(
-              icon: Icons.language,
-              label: 'change_language'.tr,
-              color: Colors.pink,
-              onTap: () {
-                // Логіка зміни мови
-                controller.changeLanguage();
-              },
-            ),
-            const SizedBox(height: 12),
             Obx(() => _buildToggleButton(
               icon: Icons.brightness_6,
               label: 'change_theme'.tr,

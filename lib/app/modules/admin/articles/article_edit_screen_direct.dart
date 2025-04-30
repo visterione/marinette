@@ -36,26 +36,22 @@ class ArticleModel {
   });
 
   // Создаем ключи на основе ID или UUID
-  String get titleKey => 'content_${id}_title';
-  String get descriptionKey => 'content_${id}_desc';
-  String get contentKey => 'content_${id}_full';
-  String get authorNameKey => 'author_${authorName.toLowerCase().replaceAll(' ', '_')}';
+  String get titleKey => title;
+  String get descriptionKey => description;
+  String get contentKey => content;
+  String get authorNameKey => authorName;
 
   // Преобразование ArticleModel в Map для Firestore
   Map<String, dynamic> toFirestore() {
     return {
-      'titleKey': titleKey,
-      'descriptionKey': descriptionKey,
-      'contentKey': contentKey,
-      'imageUrl': imageUrl,
-      'authorNameKey': authorNameKey,
-      'authorAvatarUrl': authorAvatarUrl,
-      'type': type,
-      'publishedAt': publishedAt,
       'title': title,
       'description': description,
       'content': content,
+      'imageUrl': imageUrl,
       'authorName': authorName,
+      'authorAvatarUrl': authorAvatarUrl,
+      'type': type, // 'article', 'lifehack', или 'guide'
+      'publishedAt': publishedAt,
     };
   }
 
@@ -63,12 +59,12 @@ class ArticleModel {
   factory ArticleModel.fromArticle(Article article, {String type = 'article'}) {
     return ArticleModel(
       id: article.id,
-      title: article.titleKey.tr,
-      description: article.descriptionKey.tr,
-      content: article.contentKey.tr,
+      title: article.titleKey,
+      description: article.descriptionKey,
+      content: article.contentKey,
       imageUrl: article.imageUrl,
       publishedAt: article.publishedAt,
-      authorName: article.authorNameKey.tr,
+      authorName: article.authorNameKey,
       authorAvatarUrl: article.authorAvatarUrl,
       type: type,
     );
@@ -107,11 +103,11 @@ class ArticleEditDirectController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // Инициализация контроллеров
-    titleController = TextEditingController(text: article != null ? article!.titleKey.tr : '');
-    descriptionController = TextEditingController(text: article != null ? article!.descriptionKey.tr : '');
-    contentController = TextEditingController(text: article != null ? article!.contentKey.tr : '');
-    authorNameController = TextEditingController(text: article != null ? article!.authorNameKey.tr : 'Admin');
+    // Инициализация контроллеров с непосредственным текстом, а не ключами
+    titleController = TextEditingController(text: article != null ? article!.titleKey : '');
+    descriptionController = TextEditingController(text: article != null ? article!.descriptionKey : '');
+    contentController = TextEditingController(text: article != null ? article!.contentKey : '');
+    authorNameController = TextEditingController(text: article != null ? article!.authorNameKey : 'Admin');
     authorAvatarUrlController = TextEditingController(text: article?.authorAvatarUrl ?? 'https://firebasestorage.googleapis.com/v0/b/beautymarine-6355a.appspot.com/o/authors%2Fdefault_avatar.jpg?alt=media');
 
     if (article != null) {
@@ -222,9 +218,6 @@ class ArticleEditDirectController extends GetxController {
         // Создание новой статьи
         await _firestore.collection('articles').add(articleData);
 
-        // Добавляем переводы в коллекцию translations
-        await _addTranslations(articleModel);
-
         Get.snackbar(
           'success'.tr,
           'article_created'.tr,
@@ -233,9 +226,6 @@ class ArticleEditDirectController extends GetxController {
       } else {
         // Обновление существующей статьи
         await _firestore.collection('articles').doc(article!.id).update(articleData);
-
-        // Обновляем переводы
-        await _addTranslations(articleModel);
 
         Get.snackbar(
           'success'.tr,
@@ -259,31 +249,6 @@ class ArticleEditDirectController extends GetxController {
       );
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  // Добавление переводов в коллекцию translations
-  Future<void> _addTranslations(ArticleModel model) async {
-    try {
-      // Создаем или обновляем переводы для английского языка
-      await _firestore.collection('translations').doc('en').set({
-        model.titleKey: model.title,
-        model.descriptionKey: model.description,
-        model.contentKey: model.content,
-        model.authorNameKey: model.authorName,
-      }, SetOptions(merge: true));
-
-      // Создаем или обновляем те же переводы для украинского языка
-      // В реальном приложении здесь могла бы быть отдельная форма для украинского перевода
-      await _firestore.collection('translations').doc('uk').set({
-        model.titleKey: model.title,
-        model.descriptionKey: model.description,
-        model.contentKey: model.content,
-        model.authorNameKey: model.authorName,
-      }, SetOptions(merge: true));
-
-    } catch (e) {
-      debugPrint('Error adding translations: $e');
     }
   }
 }
