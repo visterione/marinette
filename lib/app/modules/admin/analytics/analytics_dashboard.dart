@@ -323,7 +323,7 @@ class AnalyticsDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Time filter selection
-              _buildTimeFilterSection(),
+              _buildTimeFilterSection(context),
               const SizedBox(height: 24),
 
               // Users statistics
@@ -335,36 +335,72 @@ class AnalyticsDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'total_users'.tr,
-                      value: controller.formatStatCount(controller.totalUsers.value),
-                      icon: Icons.people,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'active_users_7days'.tr,
-                      value: controller.formatStatCount(controller.activeUsersLast7Days.value),
-                      icon: Icons.person_outline,
-                      color: Colors.green,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'new_users_30days'.tr,
-                      value: controller.formatStatCount(controller.newUsersLast30Days.value),
-                      icon: Icons.person_add,
-                      color: Colors.orange,
-                    ),
-                  ),
-                ],
+
+              // Use a responsive layout for the stats cards
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // For narrow screens, stack cards vertically
+                  if (constraints.maxWidth < 600) {
+                    return Column(
+                      children: [
+                        _buildStatCard(
+                          title: 'total_users'.tr,
+                          value: controller.formatStatCount(controller.totalUsers.value),
+                          icon: Icons.people,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatCard(
+                          title: 'active_users_7days'.tr,
+                          value: controller.formatStatCount(controller.activeUsersLast7Days.value),
+                          icon: Icons.person_outline,
+                          color: Colors.green,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatCard(
+                          title: 'new_users_30days'.tr,
+                          value: controller.formatStatCount(controller.newUsersLast30Days.value),
+                          icon: Icons.person_add,
+                          color: Colors.orange,
+                        ),
+                      ],
+                    );
+                  } else {
+                    // For wider screens, use a row
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'total_users'.tr,
+                            value: controller.formatStatCount(controller.totalUsers.value),
+                            icon: Icons.people,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'active_users_7days'.tr,
+                            value: controller.formatStatCount(controller.activeUsersLast7Days.value),
+                            icon: Icons.person_outline,
+                            color: Colors.green,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'new_users_30days'.tr,
+                            value: controller.formatStatCount(controller.newUsersLast30Days.value),
+                            icon: Icons.person_add,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
+
               const SizedBox(height: 24),
 
               // User signups over time
@@ -380,36 +416,72 @@ class AnalyticsDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'total_articles'.tr,
-                      value: controller.formatStatCount(controller.totalArticles.value),
-                      icon: Icons.article,
-                      color: Colors.purple,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'total_stories'.tr,
-                      value: controller.formatStatCount(controller.totalStories.value),
-                      icon: Icons.auto_stories,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'total_analyses'.tr,
-                      value: controller.formatStatCount(controller.totalAnalyses.value),
-                      icon: Icons.face,
-                      color: Colors.pink,
-                    ),
-                  ),
-                ],
+
+              // Use a responsive layout for the stats cards
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // For narrow screens, stack cards vertically
+                  if (constraints.maxWidth < 600) {
+                    return Column(
+                      children: [
+                        _buildStatCard(
+                          title: 'total_articles'.tr,
+                          value: controller.formatStatCount(controller.totalArticles.value),
+                          icon: Icons.article,
+                          color: Colors.purple,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatCard(
+                          title: 'total_stories'.tr,
+                          value: controller.formatStatCount(controller.totalStories.value),
+                          icon: Icons.auto_stories,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatCard(
+                          title: 'total_analyses'.tr,
+                          value: controller.formatStatCount(controller.totalAnalyses.value),
+                          icon: Icons.face,
+                          color: Colors.pink,
+                        ),
+                      ],
+                    );
+                  } else {
+                    // For wider screens, use a row
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'total_articles'.tr,
+                            value: controller.formatStatCount(controller.totalArticles.value),
+                            icon: Icons.article,
+                            color: Colors.purple,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'total_stories'.tr,
+                            value: controller.formatStatCount(controller.totalStories.value),
+                            icon: Icons.auto_stories,
+                            color: Colors.amber,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            title: 'total_analyses'.tr,
+                            value: controller.formatStatCount(controller.totalAnalyses.value),
+                            icon: Icons.face,
+                            color: Colors.pink,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
+
               const SizedBox(height: 24),
 
               // Analyses over time
@@ -462,7 +534,7 @@ class AnalyticsDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeFilterSection() {
+  Widget _buildTimeFilterSection(BuildContext context) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -479,30 +551,70 @@ class AnalyticsDashboard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Obx(() => SegmentedButton<TimeFilter>(
-              segments: [
-                ButtonSegment(
-                  value: TimeFilter.last7Days,
-                  label: Text('last_7_days'.tr),
-                ),
-                ButtonSegment(
-                  value: TimeFilter.last30Days,
-                  label: Text('last_30_days'.tr),
-                ),
-                ButtonSegment(
-                  value: TimeFilter.last90Days,
-                  label: Text('last_90_days'.tr),
-                ),
-                ButtonSegment(
-                  value: TimeFilter.lastYear,
-                  label: Text('last_year'.tr),
-                ),
-              ],
-              selected: {controller.selectedTimeFilter.value},
-              onSelectionChanged: (Set<TimeFilter> selection) {
-                controller.setTimeFilter(selection.first);
-              },
-            )),
+            Obx(() {
+              // Responsive time filter selector
+              if (MediaQuery.of(context).size.width < 600) {
+                // Use a dropdown for narrow screens
+                return DropdownButtonFormField<TimeFilter>(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  value: controller.selectedTimeFilter.value,
+                  items: [
+                    DropdownMenuItem(
+                      value: TimeFilter.last7Days,
+                      child: Text('last_7_days'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: TimeFilter.last30Days,
+                      child: Text('last_30_days'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: TimeFilter.last90Days,
+                      child: Text('last_90_days'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: TimeFilter.lastYear,
+                      child: Text('last_year'.tr),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      controller.setTimeFilter(value);
+                    }
+                  },
+                );
+              } else {
+                // Use segmented buttons for wider screens
+                return SegmentedButton<TimeFilter>(
+                  segments: [
+                    ButtonSegment(
+                      value: TimeFilter.last7Days,
+                      label: Text('last_7_days'.tr),
+                    ),
+                    ButtonSegment(
+                      value: TimeFilter.last30Days,
+                      label: Text('last_30_days'.tr),
+                    ),
+                    ButtonSegment(
+                      value: TimeFilter.last90Days,
+                      label: Text('last_90_days'.tr),
+                    ),
+                    ButtonSegment(
+                      value: TimeFilter.lastYear,
+                      label: Text('last_year'.tr),
+                    ),
+                  ],
+                  selected: {controller.selectedTimeFilter.value},
+                  onSelectionChanged: (Set<TimeFilter> selection) {
+                    controller.setTimeFilter(selection.first);
+                  },
+                );
+              }
+            }),
           ],
         ),
       ),
@@ -523,7 +635,9 @@ class AnalyticsDashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            // Use Wrap to handle potentially long titles
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Icon(icon, color: color),
                 const SizedBox(width: 8),
@@ -533,6 +647,7 @@ class AnalyticsDashboard extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -628,48 +743,60 @@ class AnalyticsDashboard extends StatelessWidget {
         ? 1
         : data.map((item) => item['count'] as int).reduce((a, b) => a > b ? a : b);
 
+    // Determine how many bars to show based on data length
+    final int displayCount = data.length > 10 ? 10 : data.length;
+    final displayData = data.length > 10
+        ? data.sublist(data.length - 10) // Show only the last 10 items if we have too many
+        : data;
+
     return Container(
       padding: const EdgeInsets.only(top: 20, bottom: 10),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: data.map((item) {
-              final value = item['count'] as int;
-              final date = item['date'] as String;
-              final height = (value / maxValue) * 150; // Scale height
+          final barWidth = (constraints.maxWidth / displayCount) - 8;
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    value.toString(),
-                    style: const TextStyle(fontSize: 10),
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: displayData.map((item) {
+                final value = item['count'] as int;
+                final date = item['date'] as String;
+                final height = (value / maxValue) * 150; // Scale height
+
+                return Container(
+                  width: barWidth,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        value.toString(),
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: barWidth - 8,
+                        height: height,
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatDateLabel(date),
+                        style: const TextStyle(fontSize: 10),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Container(
-                    width: constraints.maxWidth / (data.length * 2),
-                    height: height,
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: 40,
-                    child: Text(
-                      _formatDateLabel(date),
-                      style: const TextStyle(fontSize: 10),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           );
         },
       ),
@@ -752,7 +879,7 @@ class AnalyticsDashboard extends StatelessWidget {
 
       items.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.only(bottom: 12),
           child: Row(
             children: [
               Container(
@@ -765,23 +892,33 @@ class AnalyticsDashboard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
+                flex: 3,
                 child: Text(
                   '${entry.key.tr}',
                   style: const TextStyle(fontSize: 14),
-                ),
-              ),
-              Text(
-                '${percentage.toStringAsFixed(1)}%',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                '(${entry.value})',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
+              Container(
+                width: 60,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '${percentage.toStringAsFixed(1)}%',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Container(
+                width: 50,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '(${entry.value})',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],

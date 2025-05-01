@@ -189,35 +189,78 @@ class UsersManagementScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Role filter
-                Row(
-                  children: [
-                    Text('filter_by_role'.tr + ':'),
-                    const SizedBox(width: 12),
-                    Obx(() => SegmentedButton<String>(
-                      segments: [
-                        ButtonSegment(
-                          value: 'all',
-                          label: Text('all_users'.tr),
-                          icon: const Icon(Icons.people),
-                        ),
-                        ButtonSegment(
-                          value: 'admin',
-                          label: Text('admins'.tr),
-                          icon: const Icon(Icons.admin_panel_settings),
-                        ),
-                        ButtonSegment(
-                          value: 'regular',
-                          label: Text('regular_users'.tr),
-                          icon: const Icon(Icons.person),
-                        ),
-                      ],
-                      selected: {controller.selectedRoleFilter.value},
-                      onSelectionChanged: (Set<String> selection) {
-                        controller.selectedRoleFilter.value = selection.first;
-                      },
-                    )),
-                  ],
+                // Role filter - adapt based on screen size
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 500) {
+                      // Use dropdown for small screens
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Obx(() => DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'filter_by_role'.tr,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                          value: controller.selectedRoleFilter.value,
+                          items: [
+                            DropdownMenuItem(
+                              value: 'all',
+                              child: Text('all_users'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'admin',
+                              child: Text('admins'.tr),
+                            ),
+                            DropdownMenuItem(
+                              value: 'regular',
+                              child: Text('regular_users'.tr),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.selectedRoleFilter.value = value;
+                            }
+                          },
+                        )),
+                      );
+                    } else {
+                      // Use segmented button for larger screens
+                      return Row(
+                        children: [
+                          Text('filter_by_role'.tr + ':'),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Obx(() => SegmentedButton<String>(
+                              segments: [
+                                ButtonSegment(
+                                  value: 'all',
+                                  label: Text('all_users'.tr),
+                                  icon: const Icon(Icons.people),
+                                ),
+                                ButtonSegment(
+                                  value: 'admin',
+                                  label: Text('admins'.tr),
+                                  icon: const Icon(Icons.admin_panel_settings),
+                                ),
+                                ButtonSegment(
+                                  value: 'regular',
+                                  label: Text('regular_users'.tr),
+                                  icon: const Icon(Icons.person),
+                                ),
+                              ],
+                              selected: {controller.selectedRoleFilter.value},
+                              onSelectionChanged: (Set<String> selection) {
+                                controller.selectedRoleFilter.value = selection.first;
+                              },
+                            )),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -271,6 +314,7 @@ class UsersManagementScreen extends StatelessWidget {
 
   Widget _buildUserItem(BuildContext context, UserModel user) {
     final bool isAdmin = controller.isUserAdmin(user);
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -282,6 +326,7 @@ class UsersManagementScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // User info and avatar row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -298,7 +343,7 @@ class UsersManagementScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
 
-                // User info
+                // User basic info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,13 +352,14 @@ class UsersManagementScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              user.displayName ?? user.email,
+                              user.displayName ?? 'No Name',
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (isAdmin)
+                          if (isAdmin && !isSmallScreen)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -338,15 +384,45 @@ class UsersManagementScreen extends StatelessWidget {
                             ),
                         ],
                       ),
+                      // Show admin badge on a new line for small screens
+                      if (isAdmin && isSmallScreen)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withAlpha(25),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.admin_panel_settings, size: 16, color: Colors.pink),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'admin'.tr,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.pink,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 4),
+                      // Email with ellipsis for overflow
                       Text(
                         user.email,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
+                      // Dates in a smaller font with better formatting
                       Text(
                         '${'created'.tr}: ${controller.formatDateTime(user.createdAt)}',
                         style: TextStyle(
@@ -366,62 +442,133 @@ class UsersManagementScreen extends StatelessWidget {
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
+            const Divider(),
 
-            // Action buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // View user details
-                OutlinedButton.icon(
-                  onPressed: () {
-                    Get.to(() => UserEditScreen(user: user));
-                  },
-                  icon: const Icon(Icons.visibility),
-                  label: Text('view_details'.tr),
-                ),
-                const SizedBox(width: 8),
-
-                // Toggle admin role
-                TextButton.icon(
-                  onPressed: () {
-                    controller.toggleAdminRole(user.uid, !isAdmin);
-                  },
-                  icon: Icon(isAdmin ? Icons.person : Icons.admin_panel_settings),
-                  label: Text(isAdmin ? 'remove_admin'.tr : 'make_admin'.tr),
-                ),
-                const SizedBox(width: 8),
-
-                // Delete user
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // Confirmation dialog
-                    Get.dialog(
-                      AlertDialog(
-                        title: Text('confirm_delete'.tr),
-                        content: Text('confirm_delete_user'.tr),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: Text('cancel'.tr),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Get.back();
-                              controller.deleteUser(user.uid);
-                            },
-                            child: Text(
-                              'delete'.tr,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
+            // Action buttons - show in a column for small screens, row for larger screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 450) {
+                  // Column layout for small screens
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Get.to(() => UserEditScreen(user: user));
+                        },
+                        icon: const Icon(Icons.visibility),
+                        label: Text('view_details'.tr),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ],
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          controller.toggleAdminRole(user.uid, !isAdmin);
+                        },
+                        icon: Icon(isAdmin ? Icons.person : Icons.admin_panel_settings),
+                        label: Text(isAdmin ? 'remove_admin'.tr : 'make_admin'.tr),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: () {
+                          // Confirmation dialog
+                          Get.dialog(
+                            AlertDialog(
+                              title: Text('confirm_delete'.tr),
+                              content: Text('confirm_delete_user'.tr),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: Text('cancel'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                    controller.deleteUser(user.uid);
+                                  },
+                                  child: Text(
+                                    'delete'.tr,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        label: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Row layout for larger screens
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // View user details
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Get.to(() => UserEditScreen(user: user));
+                        },
+                        icon: const Icon(Icons.visibility),
+                        label: Text('view_details'.tr),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Toggle admin role
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          controller.toggleAdminRole(user.uid, !isAdmin);
+                        },
+                        icon: Icon(isAdmin ? Icons.person : Icons.admin_panel_settings),
+                        label: Text(isAdmin ? 'remove_admin'.tr : 'make_admin'.tr),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Delete user
+                      TextButton.icon(
+                        onPressed: () {
+                          // Confirmation dialog
+                          Get.dialog(
+                            AlertDialog(
+                              title: Text('confirm_delete'.tr),
+                              content: Text('confirm_delete_user'.tr),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: Text('cancel'.tr),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                    controller.deleteUser(user.uid);
+                                  },
+                                  child: Text(
+                                    'delete'.tr,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        label: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ],
         ),
