@@ -258,7 +258,6 @@ class BeautyTrendsService extends GetxService {
     }
   }
 
-  // Получить тренды для текущего сезона
   List<BeautyTrend> getCurrentSeasonTrends() {
     final currentMonth = DateTime.now().month;
     String season;

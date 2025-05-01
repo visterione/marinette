@@ -4,15 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/beauty_trend.dart';
 import 'package:marinette/app/data/services/beauty_trends_service.dart';
-import 'package:marinette/app/modules/admin/beauty_trends/trend_edit_screen.dart';
+import 'package:reorderables/reorderables.dart';
 
 class BeautyTrendsManagementController extends GetxController {
-  final BeautyTrendsService _trendsService = Get.put(BeautyTrendsService());
+  final BeautyTrendsService _trendsService = Get.find<BeautyTrendsService>();
 
+  // Reactive variables
   final RxList<BeautyTrend> trends = <BeautyTrend>[].obs;
   final RxBool isLoading = false.obs;
-  final RxString searchQuery = ''.obs;
-  final RxString selectedSeason = 'all'.obs;
+  final RxString selectedSeason = 'spring'.obs;
+
+  // Form controllers
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+
+  // Season options for filtering and selection
+  final List<String> seasons = ['spring', 'summer', 'autumn', 'winter'];
 
   @override
   void onInit() {
@@ -20,13 +27,22 @@ class BeautyTrendsManagementController extends GetxController {
     loadTrends();
   }
 
+  @override
+  void onClose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.onClose();
+  }
+
+  // Load all beauty trends
   Future<void> loadTrends() async {
     isLoading.value = true;
     try {
       await _trendsService.loadTrends();
-      trends.value = _trendsService.trends;
+      trends.value = _trendsService.trends.toList();
+      trends.sort((a, b) => a.order.compareTo(b.order));
     } catch (e) {
-      debugPrint('Error loading trends: $e');
+      debugPrint('Error loading beauty trends: $e');
       Get.snackbar(
         'error'.tr,
         'error_loading_trends'.tr,
@@ -37,96 +53,445 @@ class BeautyTrendsManagementController extends GetxController {
     }
   }
 
-  Future<bool> deleteTrend(String trendId) async {
-    final success = await _trendsService.deleteTrend(trendId);
-
-    if (success) {
-      Get.snackbar(
-        'success'.tr,
-        'trend_deleted'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } else {
-      Get.snackbar(
-        'error'.tr,
-        'error_deleting_trend'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-
-    return success;
+  // Get filtered trends by season
+  List<BeautyTrend> getFilteredTrends(String season) {
+    return trends.where((trend) => trend.season == season).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
   }
 
-  Future<void> reorderTrends(int oldIndex, int newIndex) async {
-    final filteredTrends = getFilteredTrends();
-
-    // Получаем реальные индексы в полном списке
-    final realOldIndex = trends.indexWhere((t) => t.id == filteredTrends[oldIndex].id);
-    final realNewIndex = trends.indexWhere((t) => t.id == filteredTrends[newIndex < filteredTrends.length ? newIndex : filteredTrends.length - 1].id);
-
-    final success = await _trendsService.reorderTrends(realOldIndex, realNewIndex);
-
-    if (!success) {
+  // Add a new trend
+  Future<bool> addTrend() async {
+    if (titleController.text.trim().isEmpty ||
+        descriptionController.text.trim().isEmpty) {
       Get.snackbar(
         'error'.tr,
-        'error_reordering_trends'.tr,
+        'all_fields_required'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
-    }
-  }
-
-  List<BeautyTrend> getFilteredTrends() {
-    List<BeautyTrend> filteredTrends = trends;
-
-    // Фильтрация по сезону
-    if (selectedSeason.value != 'all') {
-      filteredTrends = filteredTrends.where((trend) =>
-      trend.season == selectedSeason.value
-      ).toList();
+      return false;
     }
 
-    // Фильтрация по поисковому запросу
-    final query = searchQuery.value.toLowerCase();
-    if (query.isNotEmpty) {
-      filteredTrends = filteredTrends.where((trend) =>
-      trend.title.toLowerCase().contains(query) ||
-          trend.description.toLowerCase().contains(query)
-      ).toList();
-    }
-
-    return filteredTrends;
-  }
-
-  // Синхронизация локальных данных с Firestore
-  Future<void> synchronizeWithFirestore() async {
     isLoading.value = true;
-
     try {
-      final success = await _trendsService.synchronizeLocalTrends();
+      final success = await _trendsService.addTrend(
+        titleController.text.trim(),
+        descriptionController.text.trim(),
+        selectedSeason.value,
+      );
 
       if (success) {
+        // Clear form
+        titleController.clear();
+        descriptionController.clear();
+
+        // Show success message
+        Get.back(); // Close dialog
         Get.snackbar(
           'success'.tr,
-          'trends_synchronized'.tr,
+          'trend_added_successfully'.tr,
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
         Get.snackbar(
           'error'.tr,
-          'error_synchronizing_trends'.tr,
+          'error_adding_trend'.tr,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
+
+      return success;
     } catch (e) {
-      debugPrint('Error synchronizing trends: $e');
+      debugPrint('Error adding beauty trend: $e');
       Get.snackbar(
         'error'.tr,
-        'error_synchronizing_trends'.tr,
+        'error_adding_trend'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
+      return false;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // Update an existing trend
+  Future<bool> updateTrend(BeautyTrend trend, String title, String description, String season) async {
+    if (title.trim().isEmpty || description.trim().isEmpty) {
+      Get.snackbar(
+        'error'.tr,
+        'all_fields_required'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    isLoading.value = true;
+    try {
+      final updatedTrend = trend.copyWith(
+        title: title.trim(),
+        description: description.trim(),
+        season: season,
+      );
+
+      final success = await _trendsService.updateTrend(updatedTrend);
+
+      if (success) {
+        Get.back(); // Close dialog
+        Get.snackbar(
+          'success'.tr,
+          'trend_updated_successfully'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_updating_trend'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error updating beauty trend: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_updating_trend'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Delete a trend
+  Future<bool> deleteTrend(String trendId) async {
+    isLoading.value = true;
+    try {
+      final success = await _trendsService.deleteTrend(trendId);
+
+      if (success) {
+        Get.snackbar(
+          'success'.tr,
+          'trend_deleted_successfully'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_deleting_trend'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error deleting beauty trend: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_deleting_trend'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Reorder trends within a season
+  Future<bool> reorderTrends(int oldIndex, int newIndex, String season) async {
+    // Get filtered trends by season
+    final filteredTrends = getFilteredTrends(season);
+
+    // Map to global indices
+    final trendToMove = filteredTrends[oldIndex];
+    final globalOldIndex = trends.indexWhere((t) => t.id == trendToMove.id);
+
+    // Calculate global new index
+    int globalNewIndex;
+    if (oldIndex < newIndex) {
+      // Moving down
+      final targetTrend = filteredTrends[newIndex - 1];
+      globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id) + 1;
+    } else {
+      // Moving up
+      final targetTrend = filteredTrends[newIndex];
+      globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id);
+    }
+
+    isLoading.value = true;
+    try {
+      final success = await _trendsService.reorderTrends(globalOldIndex, globalNewIndex);
+
+      if (!success) {
+        Get.snackbar(
+          'error'.tr,
+          'error_reordering_trends'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error reordering beauty trends: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_reordering_trends'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Show dialog to add a new trend
+  void showAddTrendDialog() {
+    // Clear form first
+    titleController.clear();
+    descriptionController.clear();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(24),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'add_new_trend'.tr,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Title field
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: 'title'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Description field
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'description'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+
+                // Season dropdown
+                Obx(() => DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'season'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  value: selectedSeason.value,
+                  items: seasons.map((season) {
+                    return DropdownMenuItem(
+                      value: season,
+                      child: Text(season.tr),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      selectedSeason.value = value;
+                    }
+                  },
+                )),
+
+                const SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text('cancel'.tr),
+                    ),
+                    const SizedBox(width: 16),
+                    Obx(() => ElevatedButton(
+                      onPressed: isLoading.value ? null : addTrend,
+                      child: isLoading.value
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                          : Text('add'.tr),
+                    )),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Show dialog to edit an existing trend
+  void showEditTrendDialog(BeautyTrend trend) {
+    // Set form values
+    titleController.text = trend.title;
+    descriptionController.text = trend.description;
+    selectedSeason.value = trend.season;
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(24),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'edit_trend'.tr,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Title field
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: 'title'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Description field
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'description'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+
+                // Season dropdown
+                Obx(() => DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'season'.tr,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  value: selectedSeason.value,
+                  items: seasons.map((season) {
+                    return DropdownMenuItem(
+                      value: season,
+                      child: Text(season.tr),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      selectedSeason.value = value;
+                    }
+                  },
+                )),
+
+                const SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text('cancel'.tr),
+                    ),
+                    const SizedBox(width: 16),
+                    Obx(() => ElevatedButton(
+                      onPressed: isLoading.value
+                          ? null
+                          : () => updateTrend(
+                        trend,
+                        titleController.text,
+                        descriptionController.text,
+                        selectedSeason.value,
+                      ),
+                      child: isLoading.value
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                          : Text('save'.tr),
+                    )),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Show confirmation dialog for deletion
+  void showDeleteConfirmation(BeautyTrend trend) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('confirm_delete'.tr),
+        content: Text('confirm_delete_trend'.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              deleteTrend(trend.id);
+            },
+            child: Text(
+              'delete'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -142,136 +507,97 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
         title: Text('manage_beauty_trends'.tr),
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync),
-            tooltip: 'synchronize_with_firestore'.tr,
-            onPressed: controller.synchronizeWithFirestore,
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: controller.loadTrends,
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Создание нового тренда
-          Get.to(() => TrendEditScreen(
-            onSave: () => controller.loadTrends(),
-          ));
-        },
+        onPressed: controller.showAddTrendDialog,
         child: const Icon(Icons.add),
       ),
-      body: Column(
-        children: [
-          // Фильтры и поисковая строка
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFFDF2F8)
+                  : const Color(0xFF1A1A1A),
+              Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFF5F3FF)
+                  : const Color(0xFF262626),
+            ],
+            stops: const [0.0, 1.0],
+          ),
+        ),
+        child: Obx(() {
+          if (controller.isLoading.value && controller.trends.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return DefaultTabController(
+            length: 4,
             child: Column(
               children: [
-                // Поисковая строка
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'search'.tr,
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  onChanged: (value) => controller.searchQuery.value = value,
+                TabBar(
+                  labelColor: Colors.pink,
+                  unselectedLabelColor: Colors.grey,
+                  tabs: controller.seasons.map((season) => Tab(
+                    text: season.tr,
+                  )).toList(),
                 ),
+                Expanded(
+                  child: TabBarView(
+                    children: controller.seasons.map((season) {
+                      final filteredTrends = controller.getFilteredTrends(season);
 
-                const SizedBox(height: 12),
-
-                // Фильтр по сезону
-                Obx(() => DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'filter_by_season'.tr,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                      return filteredTrends.isEmpty
+                          ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.trending_up,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'no_trends_for_season'.trParams({'season': season.tr}),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: controller.showAddTrendDialog,
+                              icon: const Icon(Icons.add),
+                              label: Text('add_new_trend'.tr),
+                            ),
+                          ],
+                        ),
+                      )
+                          : ReorderableListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredTrends.length,
+                        onReorder: (oldIndex, newIndex) {
+                          controller.reorderTrends(oldIndex, newIndex, season);
+                        },
+                        itemBuilder: (context, index) {
+                          final trend = filteredTrends[index];
+                          return _buildTrendItem(context, trend, index);
+                        },
+                      );
+                    }).toList(),
                   ),
-                  value: controller.selectedSeason.value,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'all',
-                      child: Text('all_seasons'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: 'spring',
-                      child: Text('spring'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: 'summer',
-                      child: Text('summer'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: 'autumn',
-                      child: Text('autumn'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: 'winter',
-                      child: Text('winter'.tr),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      controller.selectedSeason.value = value;
-                    }
-                  },
-                )),
+                ),
               ],
             ),
-          ),
-
-          // Список трендов
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final trends = controller.getFilteredTrends();
-
-              if (trends.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.trending_up,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        controller.searchQuery.value.isNotEmpty || controller.selectedSeason.value != 'all'
-                            ? 'no_search_results'.tr
-                            : 'no_trends'.tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              // Используем ReorderableListView для возможности перетаскивания
-              return ReorderableListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: trends.length,
-                onReorder: controller.reorderTrends,
-                itemBuilder: (context, index) => _buildTrendItem(context, trends[index], index),
-              );
-            }),
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
@@ -279,179 +605,38 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
   Widget _buildTrendItem(BuildContext context, BeautyTrend trend, int index) {
     return Card(
       key: Key(trend.id),
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          // Редактирование тренда
-          Get.to(() => TrendEditScreen(
-            trend: trend,
-            onSave: () => controller.loadTrends(),
-          ));
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Иконка сезона
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: _getSeasonColor(trend.season).withAlpha(25),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    _getSeasonEmoji(trend.season),
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-
-              // Содержимое тренда
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      trend.title.tr,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      trend.description.tr,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _getSeasonColor(trend.season).withAlpha(25),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            trend.season.tr,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _getSeasonColor(trend.season),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${'position'.tr}: ${trend.order + 1}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Кнопки действий
-              Column(
-                children: [
-                  // Кнопка редактирования
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      Get.to(() => TrendEditScreen(
-                        trend: trend,
-                        onSave: () => controller.loadTrends(),
-                      ));
-                    },
-                  ),
-
-                  // Кнопка удаления
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      // Диалог подтверждения удаления
-                      Get.dialog(
-                        AlertDialog(
-                          title: Text('confirm_delete'.tr),
-                          content: Text('confirm_delete_trend'.tr),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Get.back(),
-                              child: Text('cancel'.tr),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Get.back();
-                                controller.deleteTrend(trend.id);
-                              },
-                              child: Text(
-                                'delete'.tr,
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-              // Иконка для перетаскивания
-              Icon(
-                Icons.drag_handle,
-                color: Colors.grey[400],
-              ),
-            ],
-          ),
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        title: Text(trend.title.tr), // Translation key
+        subtitle: Text(
+          trend.description.tr, // Translation key
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.pink.withAlpha(30),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Icon(Icons.trending_up, color: Colors.pink),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => controller.showEditTrendDialog(trend),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => controller.showDeleteConfirmation(trend),
+            ),
+          ],
+        ),
+        onTap: () => controller.showEditTrendDialog(trend),
       ),
     );
-  }
-
-  Color _getSeasonColor(String season) {
-    switch (season) {
-      case 'spring':
-        return Colors.green;
-      case 'summer':
-        return Colors.orange;
-      case 'autumn':
-        return Colors.brown;
-      case 'winter':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getSeasonEmoji(String season) {
-    switch (season) {
-      case 'spring':
-        return '🌸';
-      case 'summer':
-        return '☀️';
-      case 'autumn':
-        return '🍂';
-      case 'winter':
-        return '❄️';
-      default:
-        return '🌟';
-    }
   }
 }
