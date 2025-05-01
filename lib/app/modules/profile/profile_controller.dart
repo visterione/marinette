@@ -12,8 +12,12 @@ import 'package:marinette/app/data/models/article.dart';
 import 'package:marinette/app/modules/beauty_hub/beauty_hub_screen.dart';
 import 'package:marinette/app/modules/article/article_details_screen.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
+import 'package:marinette/app/data/services/result_saver_service.dart';
+import 'package:marinette/app/data/services/firestore_analysis_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
+
+import '../../data/services/firebase_analysis_service.dart';
 
 class ProfileController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
@@ -57,7 +61,7 @@ class ProfileController extends GetxController {
     return _authService.userModel?.preferences?['isAdmin'] == true;
   }
 
-// Метод для відкриття адмін-панелі
+  // Метод для відкриття адмін-панелі
   void openAdminPanel() {
     if (isAdmin) {
       Get.toNamed('/admin');
@@ -346,8 +350,6 @@ class ProfileController extends GetxController {
     if (date == null) return 'unknown'.tr;
     return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute}';
   }
-
-  // Видалено метод changeLanguage, так как он больше не нужен
 
   // Зміна теми
   void toggleTheme() {

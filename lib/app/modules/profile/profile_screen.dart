@@ -6,11 +6,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/modules/profile/profile_controller.dart';
 import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
+import 'package:marinette/app/data/services/auth_service.dart';
 import 'package:marinette/app/routes/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   final ProfileController controller = Get.put(ProfileController());
   final BackgroundMusicHandler _musicHandler = BackgroundMusicHandler.instance;
+  final AuthService _authService = Get.find<AuthService>();
 
   ProfileScreen({super.key});
 
@@ -468,9 +470,9 @@ class ProfileScreen extends StatelessWidget {
                 controller.toggleMusic();
               },
             )),
-            const SizedBox(height: 12),
             // Admin access
             if (controller.isAdmin) ...[
+              const SizedBox(height: 12),
               _buildActionButton(
                 icon: Icons.admin_panel_settings,
                 label: 'admin_panel'.tr,
@@ -480,7 +482,6 @@ class ProfileScreen extends StatelessWidget {
                   Get.toNamed(AppRoutes.ADMIN);
                 },
               ),
-              const SizedBox(height: 12),
             ],
           ],
         ),

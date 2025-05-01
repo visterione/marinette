@@ -15,6 +15,7 @@ import 'package:marinette/app/core/theme/theme_service.dart';
 import 'package:marinette/app/data/services/user_preferences_service.dart';
 import 'package:marinette/app/routes/app_routes.dart';
 import 'package:marinette/app/data/services/storage_service.dart';
+import 'package:marinette/app/data/services/firestore_analysis_service.dart';
 import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/stories_service.dart';
@@ -72,6 +73,10 @@ Future<void> _initializeServices() async {
   // Now we can initialize Firebase-dependent services
   Get.put(AuthService());
   debugPrint('Auth service initialized');
+
+  // Initialize FirestoreAnalysisService
+  await Get.putAsync(() => FirestoreAnalysisService().init());
+  debugPrint('FirestoreAnalysisService initialized');
 
   // 3. Initialize remaining services
   await Get.putAsync(() => ls.LocalizationService().init());
