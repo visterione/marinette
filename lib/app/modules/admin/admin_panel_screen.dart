@@ -106,14 +106,6 @@ class AdminPanelScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: ListView(
             children: [
-              const SizedBox(height: 16),
-              Text(
-                'admin_tools'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               const SizedBox(height: 24),
 
               // Управление статьями

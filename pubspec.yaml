@@ -70,6 +70,7 @@ flutter:
     - assets/audio/
     - assets/audio/nana.mp3
     - assets/images/google_logo.png
+    - assets/images/app_logo.png
 
   fonts:
     - family: PlayfairDisplay

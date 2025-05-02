@@ -1,3 +1,4 @@
+// lib/app/modules/auth/auth_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/modules/auth/auth_controller.dart';
@@ -9,96 +10,218 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for proper positioning
+    final size = MediaQuery.of(context).size;
+    final double screenHeight = size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('login'.tr),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).brightness == Brightness.light
-                  ? const Color(0xFFFDF2F8)
-                  : const Color(0xFF1A1A1A),
-              Theme.of(context).brightness == Brightness.light
-                  ? const Color(0xFFF5F3FF)
-                  : const Color(0xFF262626),
+              const Color(0xFFFDF2F8),  // Light pink
+              const Color(0xFFFFE4E1),  // Lighter pink
             ],
             stops: const [0.0, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Center(
-              child: SingleChildScrollView(
+          bottom: true,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Top section with logo and text
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                height: screenHeight * 0.7, // Use 70% of the screen height
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Лого чи ілюстрація
-                    Icon(
-                      Icons.face_retouching_natural,
-                      size: 80,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
-                    // Назва
+                    // Logo with shadow
+                    Container(
+                      height: 130,
+                      width: 130,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.pink.withOpacity(0.4),
+                            blurRadius: 25,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                        color: Colors.white,
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      // Replace with your logo image (the makeup bag icon)
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback if logo image not found
+                          return Icon(
+                            Icons.spa,
+                            size: 80,
+                            color: Colors.pink[600],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // App name with Playfair Display font
                     Text(
-                      'Marinette',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      'Beautymarine',
+                      style: TextStyle(
+                        fontSize: 38,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.pink[700],
+                        fontFamily: 'PlayfairDisplay',
+                        letterSpacing: 1.2,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
+                    // Subtitle text
                     Text(
                       'welcome_message'.tr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
+                      style: TextStyle(
+                        color: Colors.pink[700],
+                        fontSize: 16,
+                        height: 1.5,
+                        letterSpacing: 0.5,
+                        fontFamily: 'PlayfairDisplay',
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 64),
-
-                    // Кнопка входу через Google
-                    Obx(() => ElevatedButton.icon(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : controller.signInWithGoogle,
-                      icon: controller.isLoading.value
-                          ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                          : Image.asset(
-                        'assets/images/google_logo.png',
-                        height: 24,
-                      ),
-                      label: Text(
-                        'sign_in_with_google'.tr,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    )),
                   ],
                 ),
               ),
-            ),
+
+              // Bottom section with buttons
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    // Google sign-in button
+                    Obx(() => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.pink.shade300,
+                            Colors.pink.shade400,
+                            Colors.pink.shade600,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.pink.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(2),
+                      child: ElevatedButton(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : controller.signInWithGoogle,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.pink[700],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(48),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'PlayfairDisplay',
+                          ),
+                        ),
+                        child: controller.isLoading.value
+                            ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.pink[300],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'signing_in'.tr,
+                              style: const TextStyle(
+                                fontFamily: 'PlayfairDisplay',
+                              ),
+                            ),
+                          ],
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/google_logo.png',
+                              height: 24,
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'sign_in_with_google'.tr,
+                              style: const TextStyle(
+                                fontFamily: 'PlayfairDisplay',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+
+                    const SizedBox(height: 16),
+
+                    // Continue without signing in
+                    TextButton(
+                      onPressed: () => Get.offAllNamed('/'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.pink[400],
+                        textStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'PlayfairDisplay',
+                        ),
+                      ),
+                      child: Text('continue_without_account'.tr),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Copyright text
+                    Text(
+                      '© 2025 Beautymarine',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        fontFamily: 'PlayfairDisplay',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

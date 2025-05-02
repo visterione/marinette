@@ -365,6 +365,8 @@
   "sign_in_with_google": "Увійти через Google",
   "google_sign_in_failed": "Помилка входу через Google",
   "welcome_message": "Увійдіть за допомогою свого облікового запису Google, щоб отримати персоналізовані рекомендації краси",
+  "signing_in": "Авторизація...",
+  "continue_without_account": "Продовжити як Гість",
 
   "personal_info": "Особиста інформація",
   "age": "Вік",

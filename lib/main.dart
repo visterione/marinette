@@ -1,5 +1,4 @@
-// lib/main.dart
-
+// lib/main.dart (modified to include first launch check)
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -20,6 +19,20 @@ import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/stories_service.dart';
 import 'firebase_options.dart';
+
+// Add this function to check if it's the first launch
+Future<bool> isFirstLaunch() async {
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('first_launch') ?? true;
+
+  if (isFirstLaunch) {
+    // Set first_launch to false for next time
+    await prefs.setBool('first_launch', false);
+    return true;
+  }
+
+  return false;
+}
 
 void main() async {
   try {
@@ -50,7 +63,10 @@ void main() async {
     // Initialize all services in the correct order
     await _initializeServices();
 
-    runApp(const MainApp());
+    // Check if this is the first launch
+    final showAuthScreen = await isFirstLaunch();
+
+    runApp(MainApp(showAuthScreen: showAuthScreen));
   } catch (e, stackTrace) {
     debugPrint('Error during app initialization: $e');
     debugPrint('Stack trace: $stackTrace');
@@ -96,7 +112,9 @@ Future<void> _initializeServices() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final bool showAuthScreen;
+
+  const MainApp({super.key, this.showAuthScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +122,7 @@ class MainApp extends StatelessWidget {
     final localizationService = Get.find<ls.LocalizationService>();
 
     return GetMaterialApp(
-      title: 'Marinette',
+      title: 'Beautymarine', // Updated app name
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeService.getThemeMode(),
@@ -118,7 +136,7 @@ class MainApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.HOME,
+      initialRoute: showAuthScreen ? AppRoutes.AUTH : AppRoutes.HOME,
       getPages: AppRoutes.routes,
     );
   }
