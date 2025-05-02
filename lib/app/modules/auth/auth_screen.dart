@@ -35,7 +35,7 @@ class AuthScreen extends StatelessWidget {
               // Top section with logo and text
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                height: screenHeight * 0.7, // Use 70% of the screen height
+                height: screenHeight * 0.6, // Use 60% of the screen height to make room for extra button
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -180,6 +180,89 @@ class AuthScreen extends StatelessWidget {
                             const SizedBox(width: 16),
                             Text(
                               'sign_in_with_google'.tr,
+                              style: const TextStyle(
+                                fontFamily: 'PlayfairDisplay',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+
+                    const SizedBox(height: 16),
+
+                    // GitHub sign-in button
+                    Obx(() => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.grey.shade700,
+                            Colors.grey.shade800,
+                            Colors.grey.shade900,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(2),
+                      child: ElevatedButton(
+                        onPressed: controller.isGithubLoading.value
+                            ? null
+                            : controller.signInWithGitHub,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.grey[800],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(48),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'PlayfairDisplay',
+                          ),
+                        ),
+                        child: controller.isGithubLoading.value
+                            ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'signing_in'.tr,
+                              style: const TextStyle(
+                                fontFamily: 'PlayfairDisplay',
+                              ),
+                            ),
+                          ],
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/github_logo.png',
+                              height: 24,
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'sign_in_with_github'.tr,
                               style: const TextStyle(
                                 fontFamily: 'PlayfairDisplay',
                               ),

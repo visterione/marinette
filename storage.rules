@@ -1,0 +1,32 @@
+// Правила безпеки Firebase Storage - збережіть у файл storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Базові функції для перевірки автентифікації
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+    
+    // Публічний доступ до зображень статей
+    match /articles/{imageId} {
+      allow read: if true;  // Будь-хто може читати
+      allow write: if isAdmin(); // Тільки адміністратори можуть завантажувати
+    }
+    
+    // Публічний доступ до зображень сторіз
+    match /stories/{storyId}/{imageFile=**} {
+      allow read: if true;  // Будь-хто може читати
+      allow write: if isAdmin(); // Тільки адміністратори можуть завантажувати
+    }
+    
+    // Зображення профілів користувачів
+    match /profile_images/{userId} {
+      allow read: if true; // Публічний доступ на читання
+      allow write: if isAuthenticated() && request.auth.uid == userId; // Запис тільки для власника
+    }
+  }
+}

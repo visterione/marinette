@@ -1,0 +1,2 @@
+D:/marinette/android/app/.cxx/RelWithDebInfo/5y5p4i1s/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/marinette/android/app/.cxx/RelWithDebInfo/5y5p4i1s/armeabi-v7a/CMakeFiles/rebuild_cache.dir
