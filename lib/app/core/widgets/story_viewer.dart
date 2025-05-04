@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' show min;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -137,36 +138,91 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       _isSharing = true;
     });
 
+    http.Client? client;
+    File? tempFile;
+
     try {
-      final imageUrl = widget.story.imageUrls[currentIndex].tr;
-      final response = await http.get(Uri.parse(imageUrl));
+      // Локальная копия URL
+      final String imageUrl = widget.story.imageUrls[currentIndex].tr;
+      debugPrint('Начало загрузки изображения: $imageUrl');
+
+      // Создаем HTTP-клиент
+      client = http.Client();
+
+      // Загружаем данные изображения
+      final response = await client.get(Uri.parse(imageUrl))
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to download image');
+        throw Exception('Ошибка загрузки: ${response.statusCode}');
       }
 
+      // Получаем доступную директорию
       final tempDir = await getTemporaryDirectory();
-      final tempImagePath = '${tempDir.path}/share_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      await File(tempImagePath).writeAsBytes(response.bodyBytes);
+      if (tempDir == null) {
+        throw Exception('Не удалось получить временную директорию');
+      }
 
+      // Проверяем, что директория существует
+      if (!await tempDir.exists()) {
+        await tempDir.create(recursive: true);
+      }
+
+      // Создаем уникальное имя файла
+      final tempFileName = 'share_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final tempFilePath = '${tempDir.path}/$tempFileName';
+
+      // Создаем и записываем файл
+      tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(response.bodyBytes);
+
+      // Дополнительная проверка существования файла
+      if (!await tempFile.exists() || await tempFile.length() == 0) {
+        throw Exception('Не удалось создать временный файл или файл пустой');
+      }
+
+      // Подготавливаем данные для Share
+      String? shareText;
+      if (widget.story.captions.isNotEmpty && currentIndex < widget.story.captions.length) {
+        shareText = widget.story.captions[currentIndex].tr;
+      }
+
+      // Делимся файлом
+      final xFile = XFile(tempFilePath);
       await Share.shareXFiles(
-        [XFile(tempImagePath)],
-        text: widget.story.captions.length > currentIndex
-            ? widget.story.captions[currentIndex].tr
-            : '',
+        [xFile],
+        text: shareText,
       );
-      await File(tempImagePath).delete();
+
+      debugPrint('Успешно выполнен share изображения');
     } catch (e) {
-      debugPrint('Error sharing image: $e');
+      debugPrint('Ошибка при попытке поделиться: $e');
       Get.snackbar(
         'error'.tr,
         'error_sharing'.tr,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
     } finally {
-      setState(() {
-        _isSharing = false;
-      });
+      // Освобождаем ресурсы
+      if (client != null) {
+        client.close();
+      }
+
+      // Удаляем временный файл, если он был создан
+      try {
+        if (tempFile != null && await tempFile.exists()) {
+          await tempFile.delete();
+        }
+      } catch (e) {
+        debugPrint('Ошибка удаления временного файла: $e');
+      }
+
+      if (mounted) {
+        setState(() {
+          _isSharing = false;
+        });
+      }
     }
   }
 

@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "258357895249-odf3v4pke8396lvkhlasprej0v2p1gvv.apps.googleusercontent.com",
+          "client_id": "258357895249-k3b9creiajvvuptjt6tgs60koobnpjv7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.marinette",
-            "certificate_hash": "8505084a0f1e2e4a016554b13c46f7b1316f7585"
+            "certificate_hash": "12cec27bb8685eb76d44d05118ca3546ae7d0280"
           }
         },
         {

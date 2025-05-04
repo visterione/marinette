@@ -442,16 +442,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildStoriesSection(),
-                      _buildFeatureCard(
-                        titleKey: 'take_photo',
-                        subtitleKey: 'take_photo_subtitle',
-                        icon: Icons.camera_alt,
-                        onTap: () async {
-                          final imagePath = await cameraController.takePhoto();
-                          await _processImage(imagePath);
-                        },
-                      ),
-                      const SizedBox(height: 16),
+                      // "Take Photo" button removed
+                      // Only leave the "Choose from Gallery" button
                       _buildFeatureCard(
                         titleKey: 'choose_from_gallery',
                         subtitleKey: 'choose_from_gallery_subtitle',
