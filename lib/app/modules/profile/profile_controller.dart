@@ -81,11 +81,10 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     nameController.text = userName;
-    // Track theme and music state
+
+    // Initialize with locally stored values first
     isDarkMode.value = _themeService.isDarkMode;
     isMusicMuted.value = _musicHandler.isMuted;
-
-    // Initialize language
     currentLanguage.value = _localizationService.getCurrentLanguage() ?? 'uk';
 
     // Load data
@@ -113,13 +112,31 @@ class ProfileController extends GetxController {
       if (prefs.containsKey('skinType')) {
         userSkinType.value = prefs['skinType'] as String?;
       }
-    }
-  }
 
-  // Load saved articles (local test data)
-  void _loadFavoriteArticles() {
-    // Initialize empty array (real data will be loaded from Firebase)
-    favoriteArticles.value = [];
+      // Load theme preference
+      if (prefs.containsKey('isDarkMode')) {
+        bool savedIsDarkMode = prefs['isDarkMode'] as bool? ?? false;
+
+        // Only update if different from current setting
+        if (savedIsDarkMode != isDarkMode.value) {
+          // Update local theme service
+          _themeService.changeThemeMode(savedIsDarkMode ? ThemeMode.dark : ThemeMode.light);
+          isDarkMode.value = savedIsDarkMode;
+        }
+      }
+
+      // Load language preference
+      if (prefs.containsKey('language')) {
+        String savedLanguage = prefs['language'] as String? ?? 'uk';
+
+        // Only update if different from current setting
+        if (savedLanguage != currentLanguage.value) {
+          // Update local language service
+          _localizationService.changeLanguage(savedLanguage);
+          currentLanguage.value = savedLanguage;
+        }
+      }
+    }
   }
 
   // Load saved articles from Firebase
@@ -357,15 +374,39 @@ class ProfileController extends GetxController {
     return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute}';
   }
 
-  // Change theme
-  void toggleTheme() {
+  // Toggle theme and save to Firebase
+  Future<void> toggleTheme() async {
     _themeService.toggleTheme();
     isDarkMode.value = _themeService.isDarkMode;
-    Get.snackbar(
-      'info'.tr,
-      'theme_changed'.tr,
-      snackPosition: SnackPosition.BOTTOM,
-    );
+
+    // Save to Firebase
+    try {
+      // Update in database
+      final Map<String, dynamic> preferences =
+          _authService.userModel?.preferences?.cast<String, dynamic>() ?? {};
+
+      preferences['isDarkMode'] = isDarkMode.value;
+
+      final success = await _authService.updateUserProfile(
+        preferences: preferences,
+      );
+
+      if (success) {
+        Get.snackbar(
+          'success'.tr,
+          'theme_changed'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error saving theme preference: $e');
+      // Still show success message for local theme change
+      Get.snackbar(
+        'info'.tr,
+        'theme_changed'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   // Toggle music
@@ -379,18 +420,42 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Toggle language
+  // Toggle language and save to Firebase
   Future<void> toggleLanguage() async {
     final newLang = currentLanguage.value == 'uk' ? 'en' : 'uk';
     final success = await _localizationService.changeLanguage(newLang);
 
     if (success) {
       currentLanguage.value = newLang;
-      Get.snackbar(
-        'success'.tr,
-        'language_changed'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+
+      // Save to Firebase
+      try {
+        // Update in database
+        final Map<String, dynamic> preferences =
+            _authService.userModel?.preferences?.cast<String, dynamic>() ?? {};
+
+        preferences['language'] = newLang;
+
+        final saveSuccess = await _authService.updateUserProfile(
+          preferences: preferences,
+        );
+
+        if (saveSuccess) {
+          Get.snackbar(
+            'success'.tr,
+            'language_changed'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } catch (e) {
+        debugPrint('Error saving language preference: $e');
+        // Still show success message for local language change
+        Get.snackbar(
+          'success'.tr,
+          'language_changed'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     } else {
       Get.snackbar(
         'error'.tr,

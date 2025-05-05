@@ -47,46 +47,6 @@ class UsersManagementController extends GetxController {
     }
   }
 
-  Future<bool> toggleAdminRole(String userId, bool isAdmin) async {
-    try {
-      isLoading.value = true;
-
-      // Update the user's preferences in Firestore
-      await _firestore.collection('users').doc(userId).update({
-        'preferences.isAdmin': isAdmin,
-      });
-
-      // Update the local list
-      final index = users.indexWhere((user) => user.uid == userId);
-      if (index != -1) {
-        final preferences = users[index].preferences?.cast<String, dynamic>() ?? {};
-        preferences['isAdmin'] = isAdmin;
-
-        users[index] = users[index].copyWith(
-          preferences: preferences,
-        );
-      }
-
-      Get.snackbar(
-        'success'.tr,
-        isAdmin ? 'admin_role_granted'.tr : 'admin_role_revoked'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      return true;
-    } catch (e) {
-      debugPrint('Error toggling admin role: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_updating_user'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   Future<bool> deleteUser(String userId) async {
     try {
       // Note: Deleting a user from Firebase Authentication requires
@@ -465,17 +425,6 @@ class UsersManagementScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          controller.toggleAdminRole(user.uid, !isAdmin);
-                        },
-                        icon: Icon(isAdmin ? Icons.person : Icons.admin_panel_settings),
-                        label: Text(isAdmin ? 'remove_admin'.tr : 'make_admin'.tr),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
                       TextButton.icon(
                         onPressed: () {
                           // Confirmation dialog
@@ -522,16 +471,6 @@ class UsersManagementScreen extends StatelessWidget {
                         },
                         icon: const Icon(Icons.visibility),
                         label: Text('view_details'.tr),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Toggle admin role
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          controller.toggleAdminRole(user.uid, !isAdmin);
-                        },
-                        icon: Icon(isAdmin ? Icons.person : Icons.admin_panel_settings),
-                        label: Text(isAdmin ? 'remove_admin'.tr : 'make_admin'.tr),
                       ),
                       const SizedBox(width: 8),
 

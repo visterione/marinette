@@ -10,12 +10,10 @@ class UserEditController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final UserModel user;
 
-  // For editing user data
+  // For user data
   late TextEditingController displayNameController;
 
   // For editing user preferences
-  final RxnInt userAge = RxnInt();
-  final Rxn<String> userSkinType = Rxn<String>();
   final RxBool isAdmin = false.obs;
 
   // Activity tracking
@@ -35,8 +33,6 @@ class UserEditController extends GetxController {
 
     // Initialize preferences
     if (user.preferences != null) {
-      userAge.value = user.preferences!['age'] as int?;
-      userSkinType.value = user.preferences!['skinType'] as String?;
       isAdmin.value = user.preferences!['isAdmin'] == true;
     }
 
@@ -102,13 +98,11 @@ class UserEditController extends GetxController {
       // Update user preferences
       final Map<String, dynamic> preferences = user.preferences?.cast<String, dynamic>() ?? {};
 
-      preferences['age'] = userAge.value;
-      preferences['skinType'] = userSkinType.value;
+      // Only update the admin status
       preferences['isAdmin'] = isAdmin.value;
 
       // Update user in Firestore
       await _firestore.collection('users').doc(user.uid).update({
-        'displayName': displayNameController.text.trim(),
         'preferences': preferences,
       });
 
@@ -163,7 +157,7 @@ class UserEditScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('edit_user'.tr),
+        title: Text('user_details'.tr),
         actions: [
           Obx(() => controller.isSaving.value
               ? Container(
@@ -235,21 +229,32 @@ class UserEditScreen extends StatelessWidget {
                                   width: double.infinity,
                                   child: Column(
                                     children: [
-                                      // Display name field
-                                      TextField(
-                                        controller: controller.displayNameController,
-                                        decoration: InputDecoration(
-                                          labelText: 'display_name'.tr,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                      const SizedBox(height: 12),
+                                      // Display name (read-only)
+                                      _buildInfoRow('display_name'.tr + ':', user.displayName ?? 'N/A', context),
+                                      const SizedBox(height: 8),
 
                                       // Email (read-only)
                                       _buildInfoRow('Email:', user.email, context),
+                                      const SizedBox(height: 8),
+
+                                      // Age (read-only)
+                                      _buildInfoRow(
+                                        'age'.tr + ':',
+                                        user.preferences?['age'] != null
+                                            ? user.preferences!['age'].toString()
+                                            : 'not_specified'.tr,
+                                        context,
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // Skin type (read-only)
+                                      _buildInfoRow(
+                                        'skin_type'.tr + ':',
+                                        user.preferences?['skinType'] != null
+                                            ? 'skin_type_${user.preferences!['skinType']}'.tr
+                                            : 'not_specified'.tr,
+                                        context,
+                                      ),
                                       const SizedBox(height: 8),
 
                                       // User ID (for reference)
@@ -299,21 +304,33 @@ class UserEditScreen extends StatelessWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // Display name field
-                                      TextField(
-                                        controller: controller.displayNameController,
-                                        decoration: InputDecoration(
-                                          labelText: 'display_name'.tr,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                      ),
+                                      // Display name (read-only)
+                                      _buildInfoRow('display_name'.tr + ':', user.displayName ?? 'N/A', context),
                                       const SizedBox(height: 8),
 
                                       // Email (read-only)
                                       _buildInfoRow('Email:', user.email, context),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 8),
+
+                                      // Age (read-only)
+                                      _buildInfoRow(
+                                        'age'.tr + ':',
+                                        user.preferences?['age'] != null
+                                            ? user.preferences!['age'].toString()
+                                            : 'not_specified'.tr,
+                                        context,
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // Skin type (read-only)
+                                      _buildInfoRow(
+                                        'skin_type'.tr + ':',
+                                        user.preferences?['skinType'] != null
+                                            ? 'skin_type_${user.preferences!['skinType']}'.tr
+                                            : 'not_specified'.tr,
+                                        context,
+                                      ),
+                                      const SizedBox(height: 8),
 
                                       // User ID (for reference)
                                       _buildInfoRow('User ID:', user.uid, context, isSecondary: true),
@@ -346,7 +363,7 @@ class UserEditScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // User preferences
+              // Admin privileges
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -358,7 +375,7 @@ class UserEditScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'user_preferences'.tr,
+                        'admin_rights'.tr,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -366,122 +383,25 @@ class UserEditScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // Age preference - adaptive layout
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (constraints.maxWidth < 450) {
-                            // For small screens, stack vertically
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'age'.tr + ':',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 8),
-                                _buildAgeDropdown(controller),
-                                const SizedBox(height: 16),
-
-                                Text(
-                                  'skin_type'.tr + ':',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 8),
-                                _buildSkinTypeDropdown(controller),
-                                const SizedBox(height: 16),
-
-                                Text(
-                                  'admin_rights'.tr + ':',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Obx(() => Switch(
-                                      value: controller.isAdmin.value,
-                                      onChanged: (value) {
-                                        controller.isAdmin.value = value;
-                                      },
-                                      activeColor: Colors.pink,
-                                    )),
-                                    Text(
-                                      controller.isAdmin.value ? 'enabled'.tr : 'disabled'.tr,
-                                      style: TextStyle(
-                                        color: controller.isAdmin.value ? Colors.pink : Colors.grey[600],
-                                        fontWeight: controller.isAdmin.value ? FontWeight.bold : FontWeight.normal,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          } else {
-                            // For larger screens, use rows
-                            return Column(
-                              children: [
-                                // Age preference
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 120,
-                                      child: Text(
-                                        'age'.tr + ':',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(child: _buildAgeDropdown(controller)),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Skin type preference
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 120,
-                                      child: Text(
-                                        'skin_type'.tr + ':',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(child: _buildSkinTypeDropdown(controller)),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Admin role toggle
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 120,
-                                      child: Text(
-                                        'admin_rights'.tr + ':',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Obx(() => Switch(
-                                      value: controller.isAdmin.value,
-                                      onChanged: (value) {
-                                        controller.isAdmin.value = value;
-                                      },
-                                      activeColor: Colors.pink,
-                                    )),
-                                    Text(
-                                      controller.isAdmin.value ? 'enabled'.tr : 'disabled'.tr,
-                                      style: TextStyle(
-                                        color: controller.isAdmin.value ? Colors.pink : Colors.grey[600],
-                                        fontWeight: controller.isAdmin.value ? FontWeight.bold : FontWeight.normal,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          }
-                        },
+                      // Admin role toggle
+                      Row(
+                        children: [
+                          Obx(() => Switch(
+                            value: controller.isAdmin.value,
+                            onChanged: (value) {
+                              controller.isAdmin.value = value;
+                            },
+                            activeColor: Colors.pink,
+                          )),
+                          const SizedBox(width: 8),
+                          Obx(() => Text(
+                            controller.isAdmin.value ? 'enabled'.tr : 'disabled'.tr,
+                            style: TextStyle(
+                              color: controller.isAdmin.value ? Colors.pink : Colors.grey[600],
+                              fontWeight: controller.isAdmin.value ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          )),
+                        ],
                       ),
                     ],
                   ),
@@ -603,78 +523,6 @@ class UserEditScreen extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  // Helper to build age dropdown
-  Widget _buildAgeDropdown(UserEditController controller) {
-    return Obx(() => DropdownButtonFormField<int?>(
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      ),
-      value: controller.userAge.value,
-      items: [
-        DropdownMenuItem<int?>(
-          value: null,
-          child: Text('not_specified'.tr),
-        ),
-        ...List.generate(70, (index) => index + 15).map((age) =>
-            DropdownMenuItem<int?>(
-              value: age,
-              child: Text('$age'),
-            )
-        ),
-      ],
-      onChanged: (value) {
-        controller.userAge.value = value;
-      },
-      isExpanded: true,
-    ));
-  }
-
-  // Helper to build skin type dropdown
-  Widget _buildSkinTypeDropdown(UserEditController controller) {
-    return Obx(() => DropdownButtonFormField<String?>(
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      ),
-      value: controller.userSkinType.value,
-      items: [
-        DropdownMenuItem<String?>(
-          value: null,
-          child: Text('not_specified'.tr),
-        ),
-        DropdownMenuItem<String?>(
-          value: 'normal',
-          child: Text('skin_type_normal'.tr),
-        ),
-        DropdownMenuItem<String?>(
-          value: 'dry',
-          child: Text('skin_type_dry'.tr),
-        ),
-        DropdownMenuItem<String?>(
-          value: 'oily',
-          child: Text('skin_type_oily'.tr),
-        ),
-        DropdownMenuItem<String?>(
-          value: 'combination',
-          child: Text('skin_type_combination'.tr),
-        ),
-        DropdownMenuItem<String?>(
-          value: 'sensitive',
-          child: Text('skin_type_sensitive'.tr),
-        ),
-      ],
-      onChanged: (value) {
-        controller.userSkinType.value = value;
-      },
-      isExpanded: true,
-    ));
   }
 
   Widget _buildStatisticItem({

@@ -1,101 +1,66 @@
+// lib/app/core/widgets/stories_section.dart
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:marinette/app/data/models/story.dart';
+import 'package:get/get.dart';
 
 class StoriesSection extends StatelessWidget {
   final List<Story> stories;
   final Function(Story) onStoryTap;
 
-  static const double _storySize = 75.0;
-  static const double _borderWidth = 3.0;
-  static const double _sectionHeight = 130.0;
-  static const double _horizontalPadding = 8.0;
-  static const double _storySpacing = 8.0;
-  static const double _titleSpacing = 6.0;
-  static const double _fontSize = 12.0;
-
   const StoriesSection({
-    super.key,
+    Key? key,
     required this.stories,
     required this.onStoryTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: _sectionHeight,
+      height: 140, // Increased height to accommodate larger circles and text
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
         itemCount: stories.length,
-        padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
-        itemBuilder: (context, index) => _StoryItem(
-          story: stories[index],
-          onTap: () => onStoryTap(stories[index]),
-        ),
+        itemBuilder: (context, index) {
+          final story = stories[index];
+          return _buildStoryItem(context, story);
+        },
       ),
     );
   }
-}
 
-class _StoryItem extends StatelessWidget {
-  final Story story;
-  final VoidCallback onTap;
-
-  const _StoryItem({
-    required this.story,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildStoryItem(BuildContext context, Story story) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => onStoryTap(story),
       child: Container(
-        width: StoriesSection._storySize,
-        margin: const EdgeInsets.only(right: StoriesSection._storySpacing),
+        width: 100, // Increased width for the story item container
+        margin: const EdgeInsets.only(right: 16),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
+            // Story circle with larger size
             Container(
-              height: StoriesSection._storySize,
-              width: StoriesSection._storySize,
+              width: 100, // Significantly larger circle
+              height: 100, // Significantly larger circle
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: story.isViewed
-                    ? null
-                    : const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.pink, Colors.purple],
+                border: Border.all(
+                  color: story.isViewed ? Colors.grey : Colors.pink,
+                  width: 3, // Thicker border
                 ),
               ),
-              padding: const EdgeInsets.all(StoriesSection._borderWidth),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: story.isViewed
-                      ? Border.all(
-                    color: Colors.grey.shade300,
-                    width: StoriesSection._borderWidth,
-                  )
-                      : null,
-                ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
                 child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: story.previewImageUrl.tr,
+                  child: story.previewImageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                    imageUrl: story.previewImageUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
                       color: Colors.grey[200],
                       child: const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
                         ),
                       ),
                     ),
@@ -103,24 +68,38 @@ class _StoryItem extends StatelessWidget {
                       color: Colors.grey[200],
                       child: const Icon(
                         Icons.error_outline,
-                        size: 20,
+                        size: 30, // Larger icon
+                        color: Colors.grey,
                       ),
+                    ),
+                  )
+                      : Container(
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      Icons.image,
+                      size: 30, // Larger icon
+                      color: Colors.grey,
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: StoriesSection._titleSpacing),
-            Flexible(
+
+            // Added more space between circle and text
+            const SizedBox(height: 8),
+
+            // Story title with overflow handling
+            Expanded(
               child: Text(
                 story.title.tr,
                 style: TextStyle(
-                  fontSize: StoriesSection._fontSize,
+                  fontSize: 13, // Slightly larger font
                   fontWeight: FontWeight.w500,
+                  color: story.isViewed ? Colors.grey : null,
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                maxLines: 2, // Allow two lines for title
+                overflow: TextOverflow.ellipsis, // Add ellipsis for text overflow
               ),
             ),
           ],

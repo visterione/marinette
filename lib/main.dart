@@ -59,13 +59,15 @@ void main() async {
 
     // Load translations
     await Messages.loadTranslations();
+    debugPrint('Translations loaded');
 
-    // Initialize all services in the correct order
+    // Initialize services in the correct order
     await _initializeServices();
 
     // Check if this is the first launch
     final showAuthScreen = await isFirstLaunch();
 
+    // Run the app with proper services already initialized
     runApp(MainApp(showAuthScreen: showAuthScreen));
   } catch (e, stackTrace) {
     debugPrint('Error during app initialization: $e');
@@ -74,29 +76,31 @@ void main() async {
 }
 
 Future<void> _initializeServices() async {
-  // 1. Initialize basic services first
+  // Initialize basic services first - sequence matters!
   await Get.putAsync(() => UserPreferencesService().init());
   debugPrint('UserPreferences service initialized');
 
+  // Initialize theme service before auth service
   await Get.putAsync(() => ThemeService().init());
   debugPrint('Theme service initialized');
 
-  // 2. Initialize Firebase-dependent services
-  // Initialize Firebase Storage first since other services depend on it
+  // Initialize localization service before auth service
+  await Get.putAsync(() => ls.LocalizationService().init());
+  debugPrint('Localization service initialized');
+
+  // Initialize Firebase Storage service
   await Get.putAsync(() => StorageService().init(), permanent: true);
   debugPrint('Storage service initialized');
 
-  // Now we can initialize Firebase-dependent services
-  Get.put(AuthService());
+  // Initialize Auth Service manually
+  final authService = Get.put(AuthService());
+  // Since the AuthService doesn't have an init() method, we need to rely on its onInit()
+  // which is automatically called when the service is put in GetX
   debugPrint('Auth service initialized');
 
-  // Initialize FirestoreAnalysisService
+  // Initialize remaining services
   await Get.putAsync(() => FirestoreAnalysisService().init());
   debugPrint('FirestoreAnalysisService initialized');
-
-  // 3. Initialize remaining services
-  await Get.putAsync(() => ls.LocalizationService().init());
-  debugPrint('Localization service initialized');
 
   await Get.putAsync(() => ContentService().init());
   debugPrint('Content service initialized');
@@ -128,7 +132,7 @@ class MainApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeService.getThemeMode(),
       translations: Messages(),
-      locale: const Locale('uk'),
+      locale: Locale(localizationService.getCurrentLanguage() ?? 'uk'),
       fallbackLocale: const Locale('uk'),
       supportedLocales: ls.LocalizationService.supportedLocales,
       localizationsDelegates: const [

@@ -1,11 +1,14 @@
 // lib/app/data/services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:marinette/app/data/models/user_model.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:marinette/app/modules/profile/profile_screen.dart';
+import 'package:marinette/app/core/theme/theme_service.dart';
+import 'package:marinette/app/data/services/localization_service.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -33,9 +36,55 @@ class AuthService extends GetxService {
     if (user != null) {
       // Користувач увійшов в систему, отримуємо дані з Firestore
       await _getUserData();
+
+      // Load and apply user preferences immediately
+      await _loadAndApplyUserPreferences();
     } else {
       // Користувач не увійшов в систему
       _userModel.value = null;
+    }
+  }
+
+  // Method to load and apply user preferences
+  Future<void> _loadAndApplyUserPreferences() async {
+    try {
+      if (_userModel.value?.preferences != null) {
+        final prefs = _userModel.value!.preferences!;
+
+        // Apply theme preference if it exists
+        if (prefs.containsKey('isDarkMode')) {
+          final isDarkMode = prefs['isDarkMode'] as bool? ?? false;
+          debugPrint('AuthService: Applying theme preference: ${isDarkMode ? "dark" : "light"}');
+
+          // Get ThemeService and apply preference
+          if (Get.isRegistered<ThemeService>()) {
+            final themeService = Get.find<ThemeService>();
+            themeService.changeThemeMode(isDarkMode ? ThemeMode.dark : ThemeMode.light);
+          } else {
+            debugPrint('AuthService: ThemeService not registered yet');
+          }
+        }
+
+        // Apply language preference if it exists
+        if (prefs.containsKey('language')) {
+          final language = prefs['language'] as String? ?? 'uk';
+          debugPrint('AuthService: Applying language preference: $language');
+
+          // Get LocalizationService and apply preference
+          if (Get.isRegistered<LocalizationService>()) {
+            final localizationService = Get.find<LocalizationService>();
+            await localizationService.changeLanguage(language);
+          } else {
+            debugPrint('AuthService: LocalizationService not registered yet');
+          }
+        }
+
+        debugPrint('AuthService: User preferences applied successfully');
+      } else {
+        debugPrint('AuthService: No preferences found for user');
+      }
+    } catch (e) {
+      debugPrint('AuthService: Error applying user preferences: $e');
     }
   }
 
@@ -89,6 +138,9 @@ class AuthService extends GetxService {
         }
 
         await _getUserData();
+
+        // Load and apply user preferences right after login
+        await _loadAndApplyUserPreferences();
 
         // Переходимо на екран профілю
         Get.off(() => ProfileScreen());
@@ -149,6 +201,9 @@ class AuthService extends GetxService {
         }
 
         await _getUserData();
+
+        // Load and apply user preferences right after login
+        await _loadAndApplyUserPreferences();
 
         // Переходимо на екран профілю
         Get.off(() => ProfileScreen());
@@ -225,6 +280,12 @@ class AuthService extends GetxService {
       if (updates.isNotEmpty) {
         await _firestore.collection('users').doc(_firebaseUser.value!.uid).update(updates);
         await _getUserData(); // Оновлюємо локальні дані
+
+        // Apply user preferences if they were updated
+        if (preferences != null) {
+          await _loadAndApplyUserPreferences();
+        }
+
         return true;
       }
 

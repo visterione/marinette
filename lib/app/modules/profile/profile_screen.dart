@@ -8,6 +8,7 @@ import 'package:marinette/app/modules/history/history_screen.dart';
 import 'package:marinette/app/data/services/background_music_handler.dart';
 import 'package:marinette/app/data/services/auth_service.dart';
 import 'package:marinette/app/routes/app_routes.dart';
+import 'package:marinette/app/modules/home/home_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final ProfileController controller = Get.put(ProfileController());
@@ -21,6 +22,13 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('profile'.tr),
+        // Add a back button here
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Get.offAll(() => const HomeScreen());
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -83,10 +91,6 @@ class ProfileScreen extends StatelessWidget {
 
                   // Додаткова інформація про користувача
                   _buildAdditionalInfoCard(context),
-                  const SizedBox(height: 24),
-
-                  // Історія аналізу
-                  _buildHistoryCard(context),
                   const SizedBox(height: 24),
 
                   // Збережені статті
@@ -296,44 +300,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Історія аналізу
-  Widget _buildHistoryCard(BuildContext context) {
-    return Card(
-      elevation: 8,
-      shadowColor: Colors.pink.withAlpha(50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.history, color: Colors.pink),
-                const SizedBox(width: 8),
-                Text(
-                  'analysis_history'.tr,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildActionButton(
-              icon: Icons.timeline,
-              label: 'view_history'.tr,
-              color: Colors.pink,
-              onTap: () => Get.to(() => HistoryScreen()),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   // Збережені статті
   Widget _buildFavoritesCard(BuildContext context) {
     return Card(
@@ -459,28 +425,24 @@ class ProfileScreen extends StatelessWidget {
               },
             )),
             const SizedBox(height: 12),
-            Obx(() => _buildToggleButton(
-              icon: Icons.music_note,
-              label: 'background_music'.tr,
-              color: Colors.pink,
-              value: !controller.isMusicMuted.value,
-              onChanged: (value) {
-                // Enable/disable background music
-                controller.toggleMusic();
-              },
-            )),
-            const SizedBox(height: 12),
-            // Add this language toggle button
-            Obx(() => _buildToggleButton(
+            // Language selection button
+            _buildActionButton(
               icon: Icons.language,
-              label: 'language'.tr,
+              label: 'change_language'.tr,
               color: Colors.pink,
-              value: controller.currentLanguage.value == 'en',
-              onChanged: (value) {
-                // Language switching logic
-                controller.toggleLanguage();
+              onTap: () {
+                // Show language selection dialog
+                _showLanguageSelectionDialog(context);
               },
-            )),
+            ),
+            const SizedBox(height: 12),
+            // Analysis history button (moved from main view)
+            _buildActionButton(
+              icon: Icons.history,
+              label: 'analysis_history'.tr,
+              color: Colors.pink,
+              onTap: () => Get.to(() => HistoryScreen()),
+            ),
             // Admin access
             if (controller.isAdmin) ...[
               const SizedBox(height: 12),
@@ -786,6 +748,76 @@ class ProfileScreen extends StatelessWidget {
                 }
               }
               Get.back();
+            },
+            child: Text('save'.tr),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageSelectionDialog(BuildContext context) {
+    // Create a local RxString to track the selected value in the dialog
+    // Initialize it with the current language
+    final selectedLanguage = RxString(controller.currentLanguage.value);
+
+    Get.dialog(
+      AlertDialog(
+        title: Text('select_language'.tr),
+        content: Obx(() => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Ukrainian option
+            ListTile(
+              title: const Text('Українська'),
+              leading: Radio<String>(
+                value: 'uk',
+                groupValue: selectedLanguage.value,  // Use the local reactive value
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedLanguage.value = value;  // Update the local value
+                  }
+                },
+              ),
+              onTap: () {
+                selectedLanguage.value = 'uk';  // Update the local value
+              },
+            ),
+            // English option
+            ListTile(
+              title: const Text('English'),
+              leading: Radio<String>(
+                value: 'en',
+                groupValue: selectedLanguage.value,  // Use the local reactive value
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedLanguage.value = value;  // Update the local value
+                  }
+                },
+              ),
+              onTap: () {
+                selectedLanguage.value = 'en';  // Update the local value
+              },
+            ),
+          ],
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () {
+              // Apply language change only if different from current
+              if (selectedLanguage.value != controller.currentLanguage.value) {
+                // Close dialog first to avoid UI issues during language change
+                Get.back();
+                // Then change the language
+                controller.toggleLanguage();
+              } else {
+                // Just close the dialog if no change
+                Get.back();
+              }
             },
             child: Text('save'.tr),
           ),
