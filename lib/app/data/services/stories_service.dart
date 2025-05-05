@@ -1,5 +1,5 @@
 // lib/app/data/services/stories_service.dart
-// Оновлена версія з підтримкою Firebase Storage
+// Updated version with Firebase Storage support
 
 import 'dart:async';
 import 'package:get/get.dart';
@@ -42,7 +42,30 @@ class StoriesService extends GetxService {
       _storageService = Get.find<StorageService>();
 
       await loadStories();
-      ever(Get.find<LocalizationService>().locale, (_) => loadStories());
+
+      // Fix for the locale getter error
+      // Instead of directly accessing the locale property, we'll set up a manual event listener
+      try {
+        // Register a callback for when the app is resumed
+        // This ensures stories are refreshed when the app comes back to foreground
+        SystemChannels.lifecycle.setMessageHandler((msg) {
+          if (msg == AppLifecycleState.resumed.toString()) {
+            loadStories();
+          }
+          return Future.value(null);
+        });
+
+        // Additionally, we can periodically refresh stories
+        // This is a simple workaround until we can properly listen to locale changes
+        Timer.periodic(const Duration(minutes: 30), (_) {
+          loadStories();
+        });
+
+        debugPrint('Set up alternative refresh mechanisms for stories');
+      } catch (e) {
+        debugPrint('Error setting up story refresh mechanisms: $e');
+      }
+
       return this;
     } catch (e) {
       debugPrint('Error initializing StoriesService: $e');
@@ -55,9 +78,9 @@ class StoriesService extends GetxService {
       final viewedStories = _prefs.getStringList(_viewedStoriesKey) ?? [];
       debugPrint('Loading stories. Viewed stories: $viewedStories');
 
-      // Загружаем сторис из Firestore
+      // Load stories from Firestore
       final storiesSnapshot = await _firestore.collection('stories')
-          .orderBy('order') // если есть поле для сортировки
+          .orderBy('order') // if sorting field exists
           .get();
 
       List<Story> loadedStories = [];
@@ -66,18 +89,18 @@ class StoriesService extends GetxService {
         final data = doc.data();
 
         try {
-          // Получаем URL-адреса изображений
+          // Get image URLs
           List<String> imageUrls = [];
 
-          // Проверяем, есть ли мигрированные URL-адреса
+          // Check if there are migrated URLs
           if (data['migrated'] == true) {
             imageUrls = List<String>.from(data['imageUrls']);
           } else {
-            // Используем URL-адреса из базы данных
+            // Use URLs from the database
             imageUrls = List<String>.from(data['imageUrls']);
           }
 
-          // Получаем URL превью
+          // Get preview URL
           String previewImageUrl = data['previewImageUrl'] ?? '';
 
           loadedStories.add(Story(
@@ -100,7 +123,7 @@ class StoriesService extends GetxService {
       debugPrint('Stories loaded successfully: ${stories.length} stories');
     } catch (e) {
       debugPrint('Error loading stories: $e');
-      stories.value = []; // В случае ошибки возвращаем пустой список
+      stories.value = []; // Return empty list in case of error
     }
   }
 
@@ -108,46 +131,48 @@ class StoriesService extends GetxService {
   bool isTestMode = false;
 
   void _startBackgroundPreloading() {
-    // В тестовом режиме не выполняем реальное предзагрузку
+    // Don't perform actual preloading in test mode
     if (isTestMode) {
       return;
     }
 
-    // Предзагрузка превью изображений
+    // Preload preview images
     for (var story in stories) {
-      // Проверка на пустой URL или некорректный URL
-      if (story.previewImageUrl.isNotEmpty && Uri.tryParse(story.previewImageUrl.tr)?.hasAuthority == true) {
-        preloadSingleImage(story.previewImageUrl.tr, priority: true);
+      // Check for empty URL or invalid URL
+      // Note: Removed the .tr calls since image URLs are not translation keys
+      if (story.previewImageUrl.isNotEmpty && Uri.tryParse(story.previewImageUrl)?.hasAuthority == true) {
+        preloadSingleImage(story.previewImageUrl, priority: true);
       }
     }
 
-    // Предзагрузка изображений слайдов
+    // Preload slide images
     for (var story in stories) {
       for (var imageUrl in story.imageUrls) {
-        // Проверка на пустой URL или некорректный URL
-        if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl.tr)?.hasAuthority == true) {
-          preloadSingleImage(imageUrl.tr, priority: false);
+        // Check for empty URL or invalid URL
+        // Note: Removed the .tr calls since image URLs are not translation keys
+        if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasAuthority == true) {
+          preloadSingleImage(imageUrl, priority: false);
         }
       }
     }
   }
 
   Future<void> preloadSingleImage(String imageUrl, {bool priority = false}) async {
-    // Если это тестовое окружение, сразу помечаем как загруженное
+    // If in test environment, mark as loaded immediately
     if (isTestMode) {
       preloadedImages[imageUrl] = true;
       return;
     }
 
-    // Проверка на пустой URL или некорректный URL
+    // Check for empty URL or invalid URL
     if (imageUrl.isEmpty || !Uri.tryParse(imageUrl)!.hasAuthority) {
-      // Отмечаем как "загруженное", чтобы избежать повторных попыток загрузки
+      // Mark as "loaded" to avoid repeated loading attempts
       preloadedImages[imageUrl] = true;
       debugPrint('Skipping preload for empty or invalid URL: $imageUrl');
       return;
     }
 
-    // Остальная логика загрузки
+    // Rest of loading logic
     if (preloadedImages.containsKey(imageUrl)) return;
 
     while (_activePreloads.value >= maxConcurrentPreloads && !priority) {
@@ -189,22 +214,24 @@ class StoriesService extends GetxService {
   }
 
   bool isStoryReady(Story story) {
-    final previewLoaded = preloadedImages[story.previewImageUrl.tr] ?? false;
-    final firstImageLoaded = preloadedImages[story.imageUrls.first.tr] ?? false;
+    // Note: Removed the .tr calls since image URLs are not translation keys
+    final previewLoaded = preloadedImages[story.previewImageUrl] ?? false;
+    final firstImageLoaded = preloadedImages[story.imageUrls.first] ?? false;
     return previewLoaded && firstImageLoaded;
   }
 
   bool isImagePreloaded(String imageUrl) {
-    return preloadedImages[imageUrl.tr] ?? false;
+    // Note: Removed the .tr call since image URLs are not translation keys
+    return preloadedImages[imageUrl] ?? false;
   }
 
   Future<void> preloadNextStoryImages(int currentStoryIndex) async {
     if (currentStoryIndex >= stories.length - 1) return;
 
     final nextStory = stories[currentStoryIndex + 1];
-    await preloadSingleImage(nextStory.previewImageUrl.tr, priority: true);
+    await preloadSingleImage(nextStory.previewImageUrl, priority: true);
     for (var imageUrl in nextStory.imageUrls) {
-      await preloadSingleImage(imageUrl.tr, priority: true);
+      await preloadSingleImage(imageUrl, priority: true);
     }
   }
 
@@ -230,16 +257,16 @@ class StoriesService extends GetxService {
   }
 
   Future<void> resetViewedStories() async {
-    // Очищение списка просмотренных историй
+    // Clear list of viewed stories
     await _prefs.remove('viewed_stories');
 
-    // Принудительный сброс статуса для всех историй
+    // Force reset status for all stories
     for (var i = 0; i < stories.length; i++) {
       stories[i] = stories[i].copyWith(isViewed: false);
     }
   }
 
-  // Метод для добавления новой истории через Firebase
+  // Method for adding a new story via Firebase
   Future<bool> addNewStory({
     required String title,
     required List<String> imageUrls,
@@ -248,7 +275,7 @@ class StoriesService extends GetxService {
     required String previewImageUrl,
   }) async {
     try {
-      // Создаём запись в Firestore
+      // Create entry in Firestore
       final docRef = await _firestore.collection('stories').add({
         'title': title,
         'imageUrls': imageUrls,
@@ -256,10 +283,10 @@ class StoriesService extends GetxService {
         'category': category,
         'previewImageUrl': previewImageUrl,
         'createdAt': FieldValue.serverTimestamp(),
-        'order': stories.length, // для сортировки
+        'order': stories.length, // for sorting
       });
 
-      // Добавляем новую историю в локальный список
+      // Add new story to local list
       stories.add(Story(
         id: docRef.id,
         title: title,
@@ -277,7 +304,7 @@ class StoriesService extends GetxService {
     }
   }
 
-  // Метод для обновления истории
+  // Method for updating a story
   Future<bool> updateStory(Story updatedStory) async {
     try {
       await _firestore.collection('stories').doc(updatedStory.id).update({
@@ -288,7 +315,7 @@ class StoriesService extends GetxService {
         'previewImageUrl': updatedStory.previewImageUrl,
       });
 
-      // Обновляем локальный список
+      // Update local list
       final index = stories.indexWhere((s) => s.id == updatedStory.id);
       if (index != -1) {
         stories[index] = updatedStory;
@@ -301,12 +328,12 @@ class StoriesService extends GetxService {
     }
   }
 
-  // Метод для удаления истории
+  // Method for deleting a story
   Future<bool> deleteStory(String storyId) async {
     try {
       await _firestore.collection('stories').doc(storyId).delete();
 
-      // Удаляем из локального списка
+      // Remove from local list
       stories.removeWhere((s) => s.id == storyId);
 
       return true;

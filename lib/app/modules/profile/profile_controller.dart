@@ -30,38 +30,41 @@ class ProfileController extends GetxController {
   final RxBool isEditingName = false.obs;
   final RxBool isLoading = false.obs;
 
-  // Нові додаткові змінні користувача
+  // User additional variables
   final RxnInt userAge = RxnInt();
   final Rxn<String> userSkinType = Rxn<String>();
 
-  // Змінні для реактивного інтерфейсу
+  // Variables for reactive UI
   final RxBool isDarkMode = false.obs;
   final RxBool isMusicMuted = false.obs;
 
-  // Збережені статті
+  // Language-related variables
+  final RxString currentLanguage = ''.obs;
+
+  // Saved articles
   final RxList<Article> favoriteArticles = <Article>[].obs;
 
-  // Геттери для доступу до даних користувача
+  // Getters for user data access
   String get userEmail => _authService.userModel?.email ?? '';
   String get userName => _authService.userModel?.displayName ?? 'user'.tr;
   String? get userPhotoUrl => _authService.userModel?.photoUrl;
   DateTime? get userCreatedAt => _authService.userModel?.createdAt;
   DateTime? get userLastLogin => _authService.userModel?.lastLogin;
 
-  // Метод для перевірки, чи має користувач права адміністратора
+  // Method to check if the user has admin rights
   bool get isAdmin {
-    // В реальному додатку потрібно перевіряти роль в базі даних
-    // Для прикладу використовуємо просто перевірку конкретної електронної пошти
-    // або ID користувача
+    // In a real app, check role in the database
+    // For example, just check a specific email
+    // or user ID
     if (_authService.currentUser?.email == 'stecenko.work@gmail.com') {
       return true;
     }
 
-    // Додаткова перевірка через Firestore
+    // Additional check via Firestore
     return _authService.userModel?.preferences?['isAdmin'] == true;
   }
 
-  // Метод для відкриття адмін-панелі
+  // Method to open admin panel
   void openAdminPanel() {
     if (isAdmin) {
       Get.toNamed('/admin');
@@ -78,11 +81,14 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     nameController.text = userName;
-    // Відстеження стану теми та музики
+    // Track theme and music state
     isDarkMode.value = _themeService.isDarkMode;
     isMusicMuted.value = _musicHandler.isMuted;
 
-    // Завантаження даних
+    // Initialize language
+    currentLanguage.value = _localizationService.getCurrentLanguage() ?? 'uk';
+
+    // Load data
     _loadUserPreferences();
     _loadFavoritesFromFirestore();
   }
@@ -93,30 +99,30 @@ class ProfileController extends GetxController {
     super.onClose();
   }
 
-  // Завантаження збережених налаштувань користувача
+  // Load saved user preferences
   void _loadUserPreferences() {
     if (_authService.userModel?.preferences != null) {
       final prefs = _authService.userModel!.preferences!;
 
-      // Завантаження віку
+      // Load age
       if (prefs.containsKey('age')) {
         userAge.value = prefs['age'] as int?;
       }
 
-      // Завантаження типу шкіри
+      // Load skin type
       if (prefs.containsKey('skinType')) {
         userSkinType.value = prefs['skinType'] as String?;
       }
     }
   }
 
-  // Завантаження збережених статей (локальні тестові дані)
+  // Load saved articles (local test data)
   void _loadFavoriteArticles() {
-    // Ініціалізація пустого масиву (реальні дані будуть завантажені з Firebase)
+    // Initialize empty array (real data will be loaded from Firebase)
     favoriteArticles.value = [];
   }
 
-  // Завантаження збережених статей з Firebase
+  // Load saved articles from Firebase
   Future<void> _loadFavoritesFromFirestore() async {
     if (_authService.currentUser == null) return;
 
@@ -152,19 +158,19 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Вихід з облікового запису
+  // Sign out from account
   Future<void> signOut() async {
     await _authService.signOut();
-    Get.back(); // Повертаємося на попередній екран
+    Get.back(); // Return to previous screen
   }
 
-  // Початок редагування імені
+  // Start editing name
   void startEditingName() {
     nameController.text = userName;
     isEditingName.value = true;
   }
 
-  // Збереження зміненого імені
+  // Save changed name
   Future<void> saveName() async {
     if (nameController.text.trim().isEmpty) {
       Get.snackbar(
@@ -207,19 +213,19 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Скасування редагування імені
+  // Cancel name editing
   void cancelEditingName() {
     isEditingName.value = false;
   }
 
-  // Оновлення віку користувача
+  // Update user age
   Future<void> updateUserAge(int? age) async {
     isLoading.value = true;
     try {
-      // Оновлюємо локальне значення
+      // Update local value
       userAge.value = age;
 
-      // Оновлюємо в базі даних
+      // Update in database
       final Map<String, dynamic> preferences =
           _authService.userModel?.preferences?.cast<String, dynamic>() ?? {};
 
@@ -252,14 +258,14 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Оновлення типу шкіри
+  // Update skin type
   Future<void> updateUserSkinType(String? skinType) async {
     isLoading.value = true;
     try {
-      // Оновлюємо локальне значення
+      // Update local value
       userSkinType.value = skinType;
 
-      // Оновлюємо в базі даних
+      // Update in database
       final Map<String, dynamic> preferences =
           _authService.userModel?.preferences?.cast<String, dynamic>() ?? {};
 
@@ -292,7 +298,7 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Вибір і завантаження фото профілю
+  // Pick and upload profile photo
   Future<void> pickAndUploadImage() async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -306,7 +312,7 @@ class ProfileController extends GetxController {
 
       isLoading.value = true;
 
-      // Завантаження у Firebase Storage
+      // Upload to Firebase Storage
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('profile_images')
@@ -315,7 +321,7 @@ class ProfileController extends GetxController {
       await storageRef.putFile(File(image.path));
       final downloadUrl = await storageRef.getDownloadURL();
 
-      // Оновлення URL фото у профілі
+      // Update photo URL in profile
       final success = await _authService.updateUserProfile(
         photoUrl: downloadUrl,
       );
@@ -345,13 +351,13 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Форматування дати для відображення
+  // Format date for display
   String formatDate(DateTime? date) {
     if (date == null) return 'unknown'.tr;
     return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute}';
   }
 
-  // Зміна теми
+  // Change theme
   void toggleTheme() {
     _themeService.toggleTheme();
     isDarkMode.value = _themeService.isDarkMode;
@@ -362,7 +368,7 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Увімкнення/вимкнення музики
+  // Toggle music
   void toggleMusic() {
     _musicHandler.toggleMute();
     isMusicMuted.value = _musicHandler.isMuted;
@@ -373,18 +379,39 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Відкрити статтю
+  // Toggle language
+  Future<void> toggleLanguage() async {
+    final newLang = currentLanguage.value == 'uk' ? 'en' : 'uk';
+    final success = await _localizationService.changeLanguage(newLang);
+
+    if (success) {
+      currentLanguage.value = newLang;
+      Get.snackbar(
+        'success'.tr,
+        'language_changed'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } else {
+      Get.snackbar(
+        'error'.tr,
+        'language_change_failed'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  // Open article
   void openArticle(Article article) {
     Get.to(() => ArticleDetailsScreen(article: article));
   }
 
-  // Видалити статтю з обраного
+  // Remove article from favorites
   Future<void> removeFromFavorites(String articleId) async {
-    // Локальне видалення
+    // Local removal
     favoriteArticles.removeWhere((article) => article.id == articleId);
 
     try {
-      // Видалення з бази даних
+      // Database removal
       if (_authService.currentUser != null) {
         await FirebaseFirestore.instance
             .collection('users')
@@ -409,9 +436,9 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Переглянути всі збережені статті
+  // View all saved articles
   void viewAllFavoriteArticles() {
-    // Реалізація перегляду всіх збережених статей
+    // Implementation of viewing all saved articles
     Get.dialog(
       AlertDialog(
         title: Text('saved_articles'.tr),
@@ -473,14 +500,14 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Перейти до Beauty Hub
+  // Go to Beauty Hub
   void navigateToBeautyHub() {
     Get.to(() => const BeautyHubScreen());
   }
 
-  // Переглянути всі FAQ
+  // View all FAQ
   void viewAllFaq() {
-    // Реалізація перегляду всіх FAQ
+    // Implementation of viewing all FAQ
     Get.dialog(
       AlertDialog(
         title: Text('faq'.tr),

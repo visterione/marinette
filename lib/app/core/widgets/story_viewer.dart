@@ -383,36 +383,13 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        if (!_isSharing)
-                          IconButton(
-                            icon: const Icon(Icons.share, color: Colors.white),
-                            onPressed: _shareCurrentImage,
-                          )
-                        else
-                          const SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          onPressed: () {
-                            _animationController.stop();
-                            widget.onClose();
-                          },
-                        ),
-                      ],
+                    // Only the close button remains
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        _animationController.stop();
+                        widget.onClose();
+                      },
                     ),
                   ],
                 ),

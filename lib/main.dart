@@ -1,4 +1,4 @@
-// lib/main.dart (modified to include first launch check)
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -107,6 +107,7 @@ Future<void> _initializeServices() async {
   await Get.putAsync(() => ResultSaverService().init());
   debugPrint('ResultSaver service initialized');
 
+  // Initialize and start background music
   await BackgroundMusicHandler.instance.init();
   debugPrint('Background music handler initialized');
 }

@@ -423,7 +423,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Налаштування
   Widget _buildSettingsCard(BuildContext context) {
     return Card(
       elevation: 8,
@@ -455,7 +454,7 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.pink,
               value: controller.isDarkMode.value,
               onChanged: (value) {
-                // Логіка зміни теми
+                // Theme change logic
                 controller.toggleTheme();
               },
             )),
@@ -466,8 +465,20 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.pink,
               value: !controller.isMusicMuted.value,
               onChanged: (value) {
-                // Увімкнення/вимкнення фонової музики
+                // Enable/disable background music
                 controller.toggleMusic();
+              },
+            )),
+            const SizedBox(height: 12),
+            // Add this language toggle button
+            Obx(() => _buildToggleButton(
+              icon: Icons.language,
+              label: 'language'.tr,
+              color: Colors.pink,
+              value: controller.currentLanguage.value == 'en',
+              onChanged: (value) {
+                // Language switching logic
+                controller.toggleLanguage();
               },
             )),
             // Admin access
@@ -478,7 +489,7 @@ class ProfileScreen extends StatelessWidget {
                 label: 'admin_panel'.tr,
                 color: Colors.pink,
                 onTap: () {
-                  // Відкрити адмін-панель
+                  // Open admin panel
                   Get.toNamed(AppRoutes.ADMIN);
                 },
               ),

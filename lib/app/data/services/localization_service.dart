@@ -1,51 +1,64 @@
-import 'package:flutter/material.dart';
+// lib/app/data/services/localization_service.dart
+import 'dart:ui';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marinette/config/translations/app_translations.dart';
 
 class LocalizationService extends GetxService {
-  static const String _localeKey = 'selected_locale';
+  static const String _languageKey = 'selected_language';
   static const List<Locale> supportedLocales = [
-    Locale('uk'),
+    Locale('uk'), // Ukrainian
+    Locale('en'), // English
   ];
 
-  final locale = Rxn<Locale>();
-  late SharedPreferences _prefs;
-
+  // Initialize the service
   Future<LocalizationService> init() async {
+    // Load the current language from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final savedLanguage = prefs.getString(_languageKey);
+
+    // If there's a saved language, update the app locale
+    if (savedLanguage != null) {
+      await updateLocale(Locale(savedLanguage));
+    }
+
+    return this;
+  }
+
+  // Get the current language
+  String? getCurrentLanguage() {
+    return Get.locale?.languageCode;
+  }
+
+  // Change the language and update the UI
+  Future<bool> changeLanguage(String languageCode) async {
     try {
-      _prefs = await SharedPreferences.getInstance();
-      final savedLocale = _prefs.getString(_localeKey);
-      if (savedLocale != null) {
-        locale.value = Locale(savedLocale);
-        Get.updateLocale(locale.value!);
-      } else {
-        locale.value = const Locale('uk');
+      // Check if the language is supported
+      final isSupported = supportedLocales.any((locale) => locale.languageCode == languageCode);
+      if (!isSupported) {
+        return false;
       }
-      debugPrint('LocalizationService initialized with locale: ${locale.value?.languageCode}');
-      return this;
+
+      // Save the selected language
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_languageKey, languageCode);
+
+      // Update the app locale
+      await updateLocale(Locale(languageCode));
+
+      // Refresh translations
+      await Messages.refreshTranslations();
+
+      return true;
     } catch (e) {
-      debugPrint('Error initializing LocalizationService: $e');
-      return this;
+      print('Error changing language: $e');
+      return false;
     }
   }
 
-  Locale getCurrentLocale() => locale.value ?? const Locale('uk');
-
-  // Этот метод мы оставляем, но он будет всегда использовать 'uk'
-  Future<void> changeLocale(String languageCode) async {
-    try {
-      if (languageCode == locale.value?.languageCode) return;
-
-      locale.value = Locale('uk');
-      await _prefs.setString(_localeKey, 'uk');
-      Get.updateLocale(locale.value!);
-      debugPrint('Locale set to: uk');
-    } catch (e) {
-      debugPrint('Error changing locale: $e');
-    }
-  }
-
-  String getLanguageName(String languageCode) {
-    return 'Українська';
+  // Update the locale
+  Future<void> updateLocale(Locale locale) async {
+    Get.updateLocale(locale);
   }
 }

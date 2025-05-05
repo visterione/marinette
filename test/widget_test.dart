@@ -22,7 +22,7 @@ void main() {
     _setupSystemChannelMocks();
 
     // Встановлення тестового режиму
-    BackgroundMusicHandler.isTestMode = true;
+    BackgroundMusicHandler.isTestMode = false;
 
     // Встановлення тестового HTTP-оточення
     HttpOverrides.global = _TestHttpOverrides();

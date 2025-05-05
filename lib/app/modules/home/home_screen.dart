@@ -359,7 +359,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final cameraController = Get.put(CustomCameraController());
@@ -437,13 +436,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildStoriesSection(),
-                      // "Take Photo" button removed
-                      // Only leave the "Choose from Gallery" button
+                      const SizedBox(height: 20), // Increased spacing
+
                       _buildFeatureCard(
                         titleKey: 'choose_from_gallery',
                         subtitleKey: 'choose_from_gallery_subtitle',
@@ -454,7 +453,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           await _processImage(imagePath);
                         },
                       ),
-                      const SizedBox(height: 16),
+
+                      const SizedBox(height: 20), // Increased spacing
+
                       GestureDetector(
                         onTap: () {
                           Get.to(() => const BeautyHubScreen());
@@ -465,11 +466,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           icon: Icons.menu_book,
                         ),
                       ),
-                      const SizedBox(height: 24),
+
+                      const SizedBox(height: 28), // Further increased spacing
+
                       _buildTipOfTheDay(contentService),
-                      const SizedBox(height: 24),
+
+                      const SizedBox(height: 28), // Further increased spacing
+
                       _buildTrendsCarousel(contentService),
-                      const SizedBox(height: 24),
+
+                      // Bottom padding to ensure there's no empty space
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     ],
                   ),
                 ),

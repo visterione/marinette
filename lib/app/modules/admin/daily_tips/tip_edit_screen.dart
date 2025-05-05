@@ -193,38 +193,9 @@ class TipEditScreen extends StatelessWidget {
                 contentPadding: const EdgeInsets.all(12),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Предпросмотр иконки
-            Center(
-              child: Column(
-                children: [
-                  Text('icon_preview'.tr),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.pink.withAlpha(25),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Obx(() {
-                        final iconText = controller.iconController.text.isEmpty
-                            ? '💡'
-                            : controller.iconController.text;
-                        return Text(
-                          iconText,
-                          style: const TextStyle(fontSize: 40),
-                        );
-                      }),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 24),
+
+            // Подсказки для путей
             Text(
               'common_emojis'.tr,
               style: const TextStyle(
