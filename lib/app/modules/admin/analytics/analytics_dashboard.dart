@@ -262,10 +262,6 @@ class AnalyticsDashboard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Time filter selection
-              _buildTimeFilterSection(context),
-              const SizedBox(height: 24),
-
               // Users statistics
               Text(
                 'user_statistics'.tr,
@@ -388,93 +384,6 @@ class AnalyticsDashboard extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-
-  Widget _buildTimeFilterSection(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'time_period'.tr,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Obx(() {
-              // Responsive time filter selector
-              if (MediaQuery.of(context).size.width < 600) {
-                // Use a dropdown for narrow screens
-                return DropdownButtonFormField<TimeFilter>(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  ),
-                  value: controller.selectedTimeFilter.value,
-                  items: [
-                    DropdownMenuItem(
-                      value: TimeFilter.last7Days,
-                      child: Text('last_7_days'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: TimeFilter.last30Days,
-                      child: Text('last_30_days'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: TimeFilter.last90Days,
-                      child: Text('last_90_days'.tr),
-                    ),
-                    DropdownMenuItem(
-                      value: TimeFilter.lastYear,
-                      child: Text('last_year'.tr),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      controller.setTimeFilter(value);
-                    }
-                  },
-                );
-              } else {
-                // Use segmented buttons for wider screens
-                return SegmentedButton<TimeFilter>(
-                  segments: [
-                    ButtonSegment(
-                      value: TimeFilter.last7Days,
-                      label: Text('last_7_days'.tr),
-                    ),
-                    ButtonSegment(
-                      value: TimeFilter.last30Days,
-                      label: Text('last_30_days'.tr),
-                    ),
-                    ButtonSegment(
-                      value: TimeFilter.last90Days,
-                      label: Text('last_90_days'.tr),
-                    ),
-                    ButtonSegment(
-                      value: TimeFilter.lastYear,
-                      label: Text('last_year'.tr),
-                    ),
-                  ],
-                  selected: {controller.selectedTimeFilter.value},
-                  onSelectionChanged: (Set<TimeFilter> selection) {
-                    controller.setTimeFilter(selection.first);
-                  },
-                );
-              }
-            }),
-          ],
-        ),
-      ),
     );
   }
 

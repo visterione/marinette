@@ -38,9 +38,6 @@ class ProfileController extends GetxController {
   final RxBool isDarkMode = false.obs;
   final RxBool isMusicMuted = false.obs;
 
-  // Language-related variables
-  final RxString currentLanguage = ''.obs;
-
   // Saved articles
   final RxList<Article> favoriteArticles = <Article>[].obs;
 
@@ -85,7 +82,6 @@ class ProfileController extends GetxController {
     // Initialize with locally stored values first
     isDarkMode.value = _themeService.isDarkMode;
     isMusicMuted.value = _musicHandler.isMuted;
-    currentLanguage.value = _localizationService.getCurrentLanguage() ?? 'uk';
 
     // Load data
     _loadUserPreferences();
@@ -122,18 +118,6 @@ class ProfileController extends GetxController {
           // Update local theme service
           _themeService.changeThemeMode(savedIsDarkMode ? ThemeMode.dark : ThemeMode.light);
           isDarkMode.value = savedIsDarkMode;
-        }
-      }
-
-      // Load language preference
-      if (prefs.containsKey('language')) {
-        String savedLanguage = prefs['language'] as String? ?? 'uk';
-
-        // Only update if different from current setting
-        if (savedLanguage != currentLanguage.value) {
-          // Update local language service
-          _localizationService.changeLanguage(savedLanguage);
-          currentLanguage.value = savedLanguage;
         }
       }
     }
@@ -418,51 +402,6 @@ class ProfileController extends GetxController {
       _musicHandler.isMuted ? 'music_off'.tr : 'music_on'.tr,
       snackPosition: SnackPosition.BOTTOM,
     );
-  }
-
-  // Toggle language and save to Firebase
-  Future<void> toggleLanguage() async {
-    final newLang = currentLanguage.value == 'uk' ? 'en' : 'uk';
-    final success = await _localizationService.changeLanguage(newLang);
-
-    if (success) {
-      currentLanguage.value = newLang;
-
-      // Save to Firebase
-      try {
-        // Update in database
-        final Map<String, dynamic> preferences =
-            _authService.userModel?.preferences?.cast<String, dynamic>() ?? {};
-
-        preferences['language'] = newLang;
-
-        final saveSuccess = await _authService.updateUserProfile(
-          preferences: preferences,
-        );
-
-        if (saveSuccess) {
-          Get.snackbar(
-            'success'.tr,
-            'language_changed'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
-      } catch (e) {
-        debugPrint('Error saving language preference: $e');
-        // Still show success message for local language change
-        Get.snackbar(
-          'success'.tr,
-          'language_changed'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } else {
-      Get.snackbar(
-        'error'.tr,
-        'language_change_failed'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
   }
 
   // Open article

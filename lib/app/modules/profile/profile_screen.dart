@@ -420,21 +420,9 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.pink,
               value: controller.isDarkMode.value,
               onChanged: (value) {
-                // Theme change logic
                 controller.toggleTheme();
               },
             )),
-            const SizedBox(height: 12),
-            // Language selection button
-            _buildActionButton(
-              icon: Icons.language,
-              label: 'change_language'.tr,
-              color: Colors.pink,
-              onTap: () {
-                // Show language selection dialog
-                _showLanguageSelectionDialog(context);
-              },
-            ),
             const SizedBox(height: 12),
             // Analysis history button (moved from main view)
             _buildActionButton(
@@ -451,7 +439,6 @@ class ProfileScreen extends StatelessWidget {
                 label: 'admin_panel'.tr,
                 color: Colors.pink,
                 onTap: () {
-                  // Open admin panel
                   Get.toNamed(AppRoutes.ADMIN);
                 },
               ),
@@ -748,76 +735,6 @@ class ProfileScreen extends StatelessWidget {
                 }
               }
               Get.back();
-            },
-            child: Text('save'.tr),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLanguageSelectionDialog(BuildContext context) {
-    // Create a local RxString to track the selected value in the dialog
-    // Initialize it with the current language
-    final selectedLanguage = RxString(controller.currentLanguage.value);
-
-    Get.dialog(
-      AlertDialog(
-        title: Text('select_language'.tr),
-        content: Obx(() => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Ukrainian option
-            ListTile(
-              title: const Text('Українська'),
-              leading: Radio<String>(
-                value: 'uk',
-                groupValue: selectedLanguage.value,  // Use the local reactive value
-                onChanged: (value) {
-                  if (value != null) {
-                    selectedLanguage.value = value;  // Update the local value
-                  }
-                },
-              ),
-              onTap: () {
-                selectedLanguage.value = 'uk';  // Update the local value
-              },
-            ),
-            // English option
-            ListTile(
-              title: const Text('English'),
-              leading: Radio<String>(
-                value: 'en',
-                groupValue: selectedLanguage.value,  // Use the local reactive value
-                onChanged: (value) {
-                  if (value != null) {
-                    selectedLanguage.value = value;  // Update the local value
-                  }
-                },
-              ),
-              onTap: () {
-                selectedLanguage.value = 'en';  // Update the local value
-              },
-            ),
-          ],
-        )),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('cancel'.tr),
-          ),
-          TextButton(
-            onPressed: () {
-              // Apply language change only if different from current
-              if (selectedLanguage.value != controller.currentLanguage.value) {
-                // Close dialog first to avoid UI issues during language change
-                Get.back();
-                // Then change the language
-                controller.toggleLanguage();
-              } else {
-                // Just close the dialog if no change
-                Get.back();
-              }
             },
             child: Text('save'.tr),
           ),

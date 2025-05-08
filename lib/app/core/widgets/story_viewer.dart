@@ -35,13 +35,18 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
   bool _isImageLoading = true;
   final RxBool _isInitialLoadComplete = false.obs;
 
+  // Constants for customizing story timing
+  final Duration _storyDuration = const Duration(seconds: 5);
+  final Duration _storyTransitionDuration = const Duration(milliseconds: 300);
+  final Curve _storyTransitionCurve = Curves.easeInOut;
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: _storyDuration,
     );
     _animationController.addStatusListener(_onAnimationStatus);
     _prepareImages();
@@ -87,28 +92,47 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       }
     }
 
-    // Починаємо завантаження наступної історії
+    // Start loading the next story
     _storiesService.preloadNextStoryImages(widget.storyIndex);
   }
 
   void _startAnimation() {
     if (!_isImageLoading && mounted) {
-      _animationController.forward();
+      _animationController.forward(from: 0.0);
     }
+  }
+
+  void _pauseAnimation() {
+    _animationController.stop();
+  }
+
+  void _resumeAnimation() {
+    _animationController.forward();
   }
 
   void _onAnimationStatus(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
       if (currentIndex < widget.story.imageUrls.length - 1) {
-        _pageController.nextPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
+        _goToNextPage();
       } else {
         _storiesService.markStoryAsViewed(widget.story.id);
         widget.onClose();
       }
     }
+  }
+
+  void _goToNextPage() {
+    _pageController.nextPage(
+      duration: _storyTransitionDuration,
+      curve: _storyTransitionCurve,
+    );
+  }
+
+  void _goToPreviousPage() {
+    _pageController.previousPage(
+      duration: _storyTransitionDuration,
+      curve: _storyTransitionCurve,
+    );
   }
 
   void _onPageChanged(int index) {
@@ -134,6 +158,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
   Future<void> _shareCurrentImage() async {
     if (_isSharing) return;
 
+    // Pause animation while sharing
+    _pauseAnimation();
+
     setState(() {
       _isSharing = true;
     });
@@ -142,61 +169,61 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
     File? tempFile;
 
     try {
-      // Локальная копия URL
+      // Local copy of URL
       final String imageUrl = widget.story.imageUrls[currentIndex].tr;
-      debugPrint('Начало загрузки изображения: $imageUrl');
+      debugPrint('Starting image download: $imageUrl');
 
-      // Создаем HTTP-клиент
+      // Create HTTP client
       client = http.Client();
 
-      // Загружаем данные изображения
+      // Download image data
       final response = await client.get(Uri.parse(imageUrl))
           .timeout(const Duration(seconds: 30));
 
       if (response.statusCode != 200) {
-        throw Exception('Ошибка загрузки: ${response.statusCode}');
+        throw Exception('Download error: ${response.statusCode}');
       }
 
-      // Получаем доступную директорию
+      // Get available directory
       final tempDir = await getTemporaryDirectory();
       if (tempDir == null) {
-        throw Exception('Не удалось получить временную директорию');
+        throw Exception('Could not get temporary directory');
       }
 
-      // Проверяем, что директория существует
+      // Check that directory exists
       if (!await tempDir.exists()) {
         await tempDir.create(recursive: true);
       }
 
-      // Создаем уникальное имя файла
+      // Create unique filename
       final tempFileName = 'share_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final tempFilePath = '${tempDir.path}/$tempFileName';
 
-      // Создаем и записываем файл
+      // Create and write file
       tempFile = File(tempFilePath);
       await tempFile.writeAsBytes(response.bodyBytes);
 
-      // Дополнительная проверка существования файла
+      // Additional check for file existence
       if (!await tempFile.exists() || await tempFile.length() == 0) {
-        throw Exception('Не удалось создать временный файл или файл пустой');
+        throw Exception('Could not create temporary file or file is empty');
       }
 
-      // Подготавливаем данные для Share
+      // Prepare data for Share
       String? shareText;
       if (widget.story.captions.isNotEmpty && currentIndex < widget.story.captions.length) {
         shareText = widget.story.captions[currentIndex].tr;
       }
 
-      // Делимся файлом
+      // Share file
       final xFile = XFile(tempFilePath);
       await Share.shareXFiles(
         [xFile],
         text: shareText,
       );
 
-      debugPrint('Успешно выполнен share изображения');
+      debugPrint('Image shared successfully');
     } catch (e) {
-      debugPrint('Ошибка при попытке поделиться: $e');
+      debugPrint('Error while trying to share: $e');
       Get.snackbar(
         'error'.tr,
         'error_sharing'.tr,
@@ -204,24 +231,26 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
         duration: const Duration(seconds: 3),
       );
     } finally {
-      // Освобождаем ресурсы
+      // Free resources
       if (client != null) {
         client.close();
       }
 
-      // Удаляем временный файл, если он был создан
+      // Delete temporary file if it was created
       try {
         if (tempFile != null && await tempFile.exists()) {
           await tempFile.delete();
         }
       } catch (e) {
-        debugPrint('Ошибка удаления временного файла: $e');
+        debugPrint('Error deleting temporary file: $e');
       }
 
       if (mounted) {
         setState(() {
           _isSharing = false;
         });
+        // Resume animation after sharing
+        _resumeAnimation();
       }
     }
   }
@@ -244,24 +273,33 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
     return GestureDetector(
       onTapDown: (details) {
         final screenWidth = MediaQuery.of(context).size.width;
+        // Pause animation on tap
+        _pauseAnimation();
+
         if (details.localPosition.dx < screenWidth / 2) {
           if (currentIndex > 0) {
-            _pageController.previousPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
+            _goToPreviousPage();
           }
         } else {
           if (currentIndex < widget.story.imageUrls.length - 1) {
-            _pageController.nextPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
+            _goToNextPage();
           } else {
             _storiesService.markStoryAsViewed(widget.story.id);
             widget.onClose();
           }
         }
+      },
+      onTapUp: (_) {
+        // Resume animation on tap release
+        _resumeAnimation();
+      },
+      onLongPressStart: (_) {
+        // Pause animation on long press
+        _pauseAnimation();
+      },
+      onLongPressEnd: (_) {
+        // Resume animation when long press ends
+        _resumeAnimation();
       },
       child: Stack(
         children: [
@@ -269,6 +307,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
             controller: _pageController,
             itemCount: widget.story.imageUrls.length,
             onPageChanged: _onPageChanged,
+            physics: const NeverScrollableScrollPhysics(), // Disable manual scrolling
             itemBuilder: (context, index) {
               final imageUrl = widget.story.imageUrls[index].tr;
               return Stack(
@@ -319,21 +358,33 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
             right: 10,
             child: Column(
               children: [
-                Row(
-                  children: List.generate(
-                    widget.story.imageUrls.length,
-                        (index) => Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: LinearProgressIndicator(
-                          value: index == currentIndex
-                              ? _isImageLoading ? 0 : _animationController.value
-                              : index < currentIndex
-                              ? 1.0
-                              : 0.0,
-                          backgroundColor: Colors.white.withOpacity(0.3),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                          minHeight: 2,
+                // Improved progress indicators
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: List.generate(
+                      widget.story.imageUrls.length,
+                          (index) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: AnimatedBuilder(
+                            animation: _animationController,
+                            builder: (context, child) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(2.0),
+                                child: LinearProgressIndicator(
+                                  value: index == currentIndex
+                                      ? _isImageLoading ? 0 : _animationController.value
+                                      : index < currentIndex
+                                      ? 1.0
+                                      : 0.0,
+                                  backgroundColor: Colors.white.withOpacity(0.3),
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                  minHeight: 3, // Slightly thicker for better visibility
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -348,7 +399,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                         Container(
                           width: 32,
                           height: 32,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.black,
                           ),
@@ -383,7 +434,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                         ),
                       ],
                     ),
-                    // Only the close button remains
+                    // Only the close button
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () {
