@@ -6,7 +6,7 @@ class BeautyTrend {
   final String description;
   final String season; // 'winter', 'spring', 'summer', 'autumn'
   final int order;
-  final bool isHidden; // Добавляем флаг видимости
+  final bool isVisible; // Add visibility field
 
   BeautyTrend({
     required this.id,
@@ -14,7 +14,7 @@ class BeautyTrend {
     required this.description,
     required this.season,
     this.order = 0,
-    this.isHidden = false, // По умолчанию тренд видимый
+    this.isVisible = true, // Default to visible
   });
 
   // Конвертация в Map для Firestore
@@ -24,7 +24,7 @@ class BeautyTrend {
       'description': description,
       'season': season,
       'order': order,
-      'isHidden': isHidden, // Добавляем поле в Firestore
+      'isVisible': isVisible, // Include visibility in Firestore data
     };
   }
 
@@ -36,7 +36,7 @@ class BeautyTrend {
       description: data['description'] ?? '',
       season: data['season'] ?? 'spring',
       order: data['order'] ?? 0,
-      isHidden: data['isHidden'] ?? false, // Получаем значение из Firestore
+      isVisible: data['isVisible'] ?? true, // Load visibility from Firestore
     );
   }
 
@@ -46,7 +46,7 @@ class BeautyTrend {
     String? description,
     String? season,
     int? order,
-    bool? isHidden, // Добавляем параметр в copyWith
+    bool? isVisible,
   }) {
     return BeautyTrend(
       id: this.id,
@@ -54,7 +54,7 @@ class BeautyTrend {
       description: description ?? this.description,
       season: season ?? this.season,
       order: order ?? this.order,
-      isHidden: isHidden ?? this.isHidden, // Обновляем поле
+      isVisible: isVisible ?? this.isVisible,
     );
   }
 }

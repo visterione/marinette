@@ -36,9 +36,9 @@ class _BeautyHubScreenState extends State<BeautyHubScreen> with SingleTickerProv
     _isLoading.value = true;
     try {
       final futures = await Future.wait([
-        BeautyHubService.getArticles(),
-        BeautyHubService.getLifehacks(),
-        BeautyHubService.getGuides(),
+        BeautyHubService.getArticles(),  // Эти методы теперь возвращают только видимые статьи
+        BeautyHubService.getLifehacks(), // Эти методы теперь возвращают только видимые статьи
+        BeautyHubService.getGuides(),    // Эти методы теперь возвращают только видимые статьи
       ]);
 
       _articles.value = futures[0];
@@ -169,7 +169,10 @@ class _BeautyHubScreenState extends State<BeautyHubScreen> with SingleTickerProv
   }
 
   Widget _buildArticlesList(List<Article> articles) {
-    if (articles.isEmpty) {
+    // Отфильтровываем на всякий случай (хотя BeautyHubService уже должен вернуть только видимые)
+    final visibleArticles = articles.where((article) => article.isVisible).toList();
+
+    if (visibleArticles.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -196,13 +199,18 @@ class _BeautyHubScreenState extends State<BeautyHubScreen> with SingleTickerProv
       onRefresh: _loadContent,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: articles.length,
-        itemBuilder: (context, index) => _buildArticleCard(articles[index]),
+        itemCount: visibleArticles.length,
+        itemBuilder: (context, index) => _buildArticleCard(visibleArticles[index]),
       ),
     );
   }
 
   Widget _buildArticleCard(Article article) {
+    // Если статья скрыта, не отображаем ее
+    if (!article.isVisible) {
+      return const SizedBox.shrink();
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,

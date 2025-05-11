@@ -1,3 +1,5 @@
+// lib/app/data/models/article.dart
+
 class Article {
   final String id;
   final String titleKey;
@@ -7,7 +9,7 @@ class Article {
   final DateTime publishedAt;
   final String authorNameKey;
   final String authorAvatarUrl;
-  final bool isHidden; // Добавляем флаг видимости
+  final bool isVisible; // Добавлено новое поле
 
   Article({
     required this.id,
@@ -18,10 +20,10 @@ class Article {
     required this.publishedAt,
     required this.authorNameKey,
     required this.authorAvatarUrl,
-    this.isHidden = false, // По умолчанию статья видимая
+    this.isVisible = true, // По умолчанию статья видимая
   });
 
-  // Создание копии с измененными параметрами
+  // Метод для создания копии с обновленными полями
   Article copyWith({
     String? titleKey,
     String? descriptionKey,
@@ -30,7 +32,7 @@ class Article {
     DateTime? publishedAt,
     String? authorNameKey,
     String? authorAvatarUrl,
-    bool? isHidden,
+    bool? isVisible,
   }) {
     return Article(
       id: this.id,
@@ -41,7 +43,21 @@ class Article {
       publishedAt: publishedAt ?? this.publishedAt,
       authorNameKey: authorNameKey ?? this.authorNameKey,
       authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
-      isHidden: isHidden ?? this.isHidden,
+      isVisible: isVisible ?? this.isVisible,
     );
+  }
+
+  // Метод для конвертации в Map для Firebase
+  Map<String, dynamic> toMap() {
+    return {
+      'title': titleKey,
+      'description': descriptionKey,
+      'imageUrl': imageUrl,
+      'content': contentKey,
+      'publishedAt': publishedAt,
+      'authorName': authorNameKey,
+      'authorAvatarUrl': authorAvatarUrl,
+      'isVisible': isVisible,
+    };
   }
 }

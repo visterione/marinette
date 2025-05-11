@@ -9,14 +9,13 @@ import 'package:marinette/app/data/services/beauty_hub_service.dart';
 import 'package:marinette/app/modules/admin/articles/article_edit_screen_direct.dart';
 
 class ArticlesManagementController extends GetxController {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final BeautyHubService _beautyHubService = Get.put(BeautyHubService());
   final RxList<Article> articles = <Article>[].obs;
   final RxList<Article> lifehacks = <Article>[].obs;
   final RxList<Article> guides = <Article>[].obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
   final RxInt selectedTabIndex = 0.obs;
-  final RxBool showHidden = false.obs; // Добавляем флаг для отображения скрытых статей
 
   @override
   void onInit() {
@@ -24,20 +23,14 @@ class ArticlesManagementController extends GetxController {
     loadAllContent();
   }
 
-  // Переключение отображения скрытых статей
-  void toggleShowHidden() {
-    showHidden.value = !showHidden.value;
-    loadAllContent(); // Перезагружаем контент при изменении настройки
-  }
-
   Future<void> loadAllContent() async {
     isLoading.value = true;
     try {
-      // Загрузка всех типов контента с учетом параметра видимости
+      // Используем методы для админ-панели, чтобы получить все статьи, включая скрытые
       final futures = await Future.wait([
-        BeautyHubService.getArticles(includeHidden: showHidden.value),
-        BeautyHubService.getLifehacks(includeHidden: showHidden.value),
-        BeautyHubService.getGuides(includeHidden: showHidden.value),
+        BeautyHubService.getAllArticlesForAdmin(),
+        BeautyHubService.getAllLifehacksForAdmin(),
+        BeautyHubService.getAllGuidesForAdmin(),
       ]);
 
       articles.value = futures[0];
@@ -55,23 +48,88 @@ class ArticlesManagementController extends GetxController {
     }
   }
 
+  Future<bool> toggleArticleVisibility(Article article) async {
+    try {
+      isLoading.value = true;
+
+      // Вызываем метод toggleArticleVisibility в BeautyHubService
+      final newVisibility = !article.isVisible;
+      final success = await _beautyHubService.toggleArticleVisibility(
+          article.id,
+          newVisibility
+      );
+
+      if (success) {
+        // Обновляем статью в соответствующем списке
+        _updateArticleInLists(article.copyWith(isVisible: newVisibility));
+
+        Get.snackbar(
+          'success'.tr,
+          newVisibility ? 'article_visible'.tr : 'article_hidden'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_toggling_visibility'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling article visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_toggling_visibility'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Вспомогательный метод для обновления статьи в списках
+  void _updateArticleInLists(Article updatedArticle) {
+    // Определяем, в каком списке находится статья
+    if (articles.any((a) => a.id == updatedArticle.id)) {
+      final index = articles.indexWhere((a) => a.id == updatedArticle.id);
+      articles[index] = updatedArticle;
+    } else if (lifehacks.any((a) => a.id == updatedArticle.id)) {
+      final index = lifehacks.indexWhere((a) => a.id == updatedArticle.id);
+      lifehacks[index] = updatedArticle;
+    } else if (guides.any((a) => a.id == updatedArticle.id)) {
+      final index = guides.indexWhere((a) => a.id == updatedArticle.id);
+      guides[index] = updatedArticle;
+    }
+  }
+
   Future<bool> deleteArticle(String articleId) async {
     try {
       isLoading.value = true;
-      await _firestore.collection('articles').doc(articleId).delete();
+      final success = await _beautyHubService.deleteArticle(articleId);
 
-      // Удаляем из соответствующего списка
-      articles.removeWhere((article) => article.id == articleId);
-      lifehacks.removeWhere((article) => article.id == articleId);
-      guides.removeWhere((article) => article.id == articleId);
+      if (success) {
+        // Удаляем из соответствующего списка
+        articles.removeWhere((article) => article.id == articleId);
+        lifehacks.removeWhere((article) => article.id == articleId);
+        guides.removeWhere((article) => article.id == articleId);
 
-      Get.snackbar(
-        'success'.tr,
-        'article_deleted'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+        Get.snackbar(
+          'success'.tr,
+          'article_deleted'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_deleting_article'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
 
-      return true;
+      return success;
     } catch (e) {
       debugPrint('Error deleting article: $e');
       Get.snackbar(
@@ -82,67 +140,6 @@ class ArticlesManagementController extends GetxController {
       return false;
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  // Метод для переключения видимости статьи
-  Future<bool> toggleArticleVisibility(Article article) async {
-    try {
-      isLoading.value = true;
-
-      final success = await BeautyHubService.toggleArticleVisibility(
-          article.id, article.isHidden);
-
-      if (success) {
-        // Обновляем локальные списки
-        final updatedArticle = article.copyWith(isHidden: !article.isHidden);
-
-        // Обновляем статью в соответствующем списке
-        _updateArticleInLists(updatedArticle);
-
-        Get.snackbar(
-          'success'.tr,
-          article.isHidden ? 'article_shown'.tr : 'article_hidden'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      } else {
-        Get.snackbar(
-          'error'.tr,
-          'error_changing_visibility'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-
-      return success;
-    } catch (e) {
-      debugPrint('Error toggling article visibility: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_changing_visibility'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // Вспомогательный метод для обновления статьи во всех списках
-  void _updateArticleInLists(Article updatedArticle) {
-    // Ищем и обновляем статью в каждом списке
-    final articleIndex = articles.indexWhere((a) => a.id == updatedArticle.id);
-    if (articleIndex != -1) {
-      articles[articleIndex] = updatedArticle;
-    }
-
-    final lifehackIndex = lifehacks.indexWhere((a) => a.id == updatedArticle.id);
-    if (lifehackIndex != -1) {
-      lifehacks[lifehackIndex] = updatedArticle;
-    }
-
-    final guideIndex = guides.indexWhere((a) => a.id == updatedArticle.id);
-    if (guideIndex != -1) {
-      guides[guideIndex] = updatedArticle;
     }
   }
 
@@ -161,37 +158,31 @@ class ArticlesManagementController extends GetxController {
 
   List<Article> getFilteredArticles() {
     final query = searchQuery.value.toLowerCase();
-    if (query.isEmpty) {
-      // Возвращаем все статьи текущей категории
-      switch (selectedTabIndex.value) {
-        case 0:
-          return articles;
-        case 1:
-          return lifehacks;
-        case 2:
-          return guides;
-        default:
-          return articles;
-      }
-    }
+    List<Article> result;
 
-    // Возвращаем отфильтрованные статьи
+    // Выбираем коллекцию в зависимости от вкладки
     switch (selectedTabIndex.value) {
       case 0:
-        return articles.where((article) =>
-        article.titleKey.tr.toLowerCase().contains(query) ||
-            article.descriptionKey.tr.toLowerCase().contains(query)).toList();
+        result = articles;
+        break;
       case 1:
-        return lifehacks.where((article) =>
-        article.titleKey.tr.toLowerCase().contains(query) ||
-            article.descriptionKey.tr.toLowerCase().contains(query)).toList();
+        result = lifehacks;
+        break;
       case 2:
-        return guides.where((article) =>
-        article.titleKey.tr.toLowerCase().contains(query) ||
-            article.descriptionKey.tr.toLowerCase().contains(query)).toList();
+        result = guides;
+        break;
       default:
-        return articles;
+        result = articles;
     }
+
+    // Фильтруем по поисковому запросу
+    if (query.isNotEmpty) {
+      result = result.where((article) =>
+      article.titleKey.toLowerCase().contains(query) ||
+          article.descriptionKey.toLowerCase().contains(query)).toList();
+    }
+
+    return result;
   }
 }
 
@@ -208,21 +199,6 @@ class ArticlesManagementScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('manage_articles'.tr),
           actions: [
-            // Кнопка для переключения отображения скрытых статей
-            Obx(() => IconButton(
-              icon: Icon(
-                controller.showHidden.value
-                    ? Icons.visibility
-                    : Icons.visibility_off,
-                color: controller.showHidden.value
-                    ? Colors.blue
-                    : Colors.grey,
-              ),
-              tooltip: controller.showHidden.value
-                  ? 'hide_hidden_articles'.tr
-                  : 'show_hidden_articles'.tr,
-              onPressed: controller.toggleShowHidden,
-            )),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: controller.loadAllContent,
@@ -288,9 +264,7 @@ class ArticlesManagementScreen extends StatelessWidget {
                         Text(
                           controller.searchQuery.value.isNotEmpty
                               ? 'no_search_results'.tr
-                              : controller.showHidden.value
-                              ? 'no_articles'.tr
-                              : 'no_visible_articles'.tr,
+                              : 'no_articles'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -320,39 +294,31 @@ class ArticlesManagementScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      // Добавляем серый фон для скрытых статей
-      color: article.isHidden
-          ? Colors.grey.withOpacity(0.1)
-          : Theme.of(context).cardColor,
-      child: InkWell(
-        onTap: () {
-          // Редактирование существующей статьи
-          Get.to(() => ArticleEditDirectScreen(
-            article: article,
-            onSave: () => controller.loadAllContent(),
-          ));
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Изображение
-            if (article.imageUrl.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      CachedNetworkImage(
+      child: Stack(
+        children: [
+          InkWell(
+            onTap: () {
+              // Редактирование существующей статьи
+              Get.to(() => ArticleEditDirectScreen(
+                article: article,
+                onSave: () => controller.loadAllContent(),
+              ));
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Изображение
+                if (article.imageUrl.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: CachedNetworkImage(
                         imageUrl: article.imageUrl,
                         fit: BoxFit.cover,
-                        // Делаем изображение более тусклым, если статья скрыта
-                        color: article.isHidden ? Colors.grey.withOpacity(0.7) : null,
-                        colorBlendMode: article.isHidden ? BlendMode.saturation : null,
                         placeholder: (context, url) => Container(
                           color: Colors.grey[200],
                           child: const Center(
@@ -368,137 +334,123 @@ class ArticlesManagementScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Показываем индикатор скрытой статьи
-                      if (article.isHidden)
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.visibility_off,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'hidden'.tr,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                    ),
+                  ),
+
+                // Информация о статье
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        article.titleKey.tr,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          // Добавляем серый цвет для скрытых статей
+                          color: article.isVisible ? null : Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        article.descriptionKey.tr,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          // Меняем цвет для скрытых статей
+                          color: article.isVisible ? Colors.grey[600] : Colors.grey[400],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text(
+                            'ID: ${article.id}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
                             ),
                           ),
-                        ),
+                          const Spacer(),
+
+                          // Кнопка изменения видимости
+                          IconButton(
+                            icon: Icon(
+                              article.isVisible ? Icons.visibility : Icons.visibility_off,
+                              color: article.isVisible ? Colors.green : Colors.grey,
+                            ),
+                            onPressed: () => controller.toggleArticleVisibility(article),
+                          ),
+
+                          // Кнопки действий
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              Get.to(() => ArticleEditDirectScreen(
+                                article: article,
+                                onSave: () => controller.loadAllContent(),
+                              ));
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              // Диалог подтверждения удаления
+                              Get.dialog(
+                                AlertDialog(
+                                  title: Text('confirm_delete'.tr),
+                                  content: Text('confirm_delete_article'.tr),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Get.back(),
+                                      child: Text('cancel'.tr),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Get.back();
+                                        controller.deleteArticle(article.id);
+                                      },
+                                      child: Text(
+                                        'delete'.tr,
+                                        style: const TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
 
-            // Информация о статье
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    article.titleKey.tr,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      // Изменяем цвет текста для скрытых статей
-                      color: article.isHidden
-                          ? Colors.grey
-                          : Theme.of(context).textTheme.titleLarge?.color,
-                    ),
+          // Метка "Скрыто"
+          if (!article.isVisible)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'hidden'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    article.descriptionKey.tr,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: article.isHidden
-                          ? Colors.grey
-                          : Colors.grey[600],
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        'ID: ${article.id}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const Spacer(),
-
-                      // Кнопки действий
-                      // Кнопка переключения видимости
-                      IconButton(
-                        icon: Icon(
-                          article.isHidden ? Icons.visibility : Icons.visibility_off,
-                          color: article.isHidden ? Colors.blue : Colors.grey,
-                        ),
-                        onPressed: () => controller.toggleArticleVisibility(article),
-                        tooltip: article.isHidden ? 'show_article'.tr : 'hide_article'.tr,
-                      ),
-
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          Get.to(() => ArticleEditDirectScreen(
-                            article: article,
-                            onSave: () => controller.loadAllContent(),
-                          ));
-                        },
-                      ),
-
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          // Диалог подтверждения удаления
-                          Get.dialog(
-                            AlertDialog(
-                              title: Text('confirm_delete'.tr),
-                              content: Text('confirm_delete_article'.tr),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Get.back(),
-                                  child: Text('cancel'.tr),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Get.back();
-                                    controller.deleteArticle(article.id);
-                                  },
-                                  child: Text(
-                                    'delete'.tr,
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

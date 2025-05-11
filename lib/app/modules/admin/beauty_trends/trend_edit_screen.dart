@@ -17,6 +17,7 @@ class TrendEditController extends GetxController {
   // Реактивные переменные
   final RxBool isLoading = false.obs;
   final RxString selectedSeason = 'spring'.obs;
+  final RxBool isVisible = true.obs; // Add visibility reactive variable
 
   TrendEditController({
     this.trend,
@@ -33,7 +34,13 @@ class TrendEditController extends GetxController {
 
     if (trend != null) {
       selectedSeason.value = trend!.season;
+      isVisible.value = trend!.isVisible; // Initialize visibility
     }
+  }
+
+  // Toggle visibility
+  void toggleVisibility() {
+    isVisible.value = !isVisible.value;
   }
 
   @override
@@ -77,6 +84,22 @@ class TrendEditController extends GetxController {
           selectedSeason.value,
         );
 
+        // Set visibility status for new trend
+        if (success) {
+          // Find the newly created trend
+          final lastTrend = _trendsService.trends.lastWhere(
+                (t) => t.title == titleController.text,
+            orElse: () => BeautyTrend(id: '', title: '', description: '', season: ''),
+          );
+
+          if (lastTrend.id.isNotEmpty) {
+            await _trendsService.getFirestore()
+                .collection('beauty_trends')
+                .doc(lastTrend.id)
+                .update({'isVisible': isVisible.value});
+          }
+        }
+
         if (success) {
           Get.snackbar(
             'success'.tr,
@@ -90,6 +113,7 @@ class TrendEditController extends GetxController {
           title: titleController.text,
           description: descriptionController.text,
           season: selectedSeason.value,
+          isVisible: isVisible.value,
         );
 
         success = await _trendsService.updateTrend(updatedTrend);
@@ -183,6 +207,17 @@ class TrendEditScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(trend == null ? 'create_trend'.tr : 'edit_trend'.tr),
         actions: [
+          // Visibility toggle button
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.isVisible.value ? Icons.visibility : Icons.visibility_off,
+              color: controller.isVisible.value ? Colors.green : Colors.grey,
+            ),
+            onPressed: controller.toggleVisibility,
+            tooltip: controller.isVisible.value ? 'hide_trend'.tr : 'show_trend'.tr,
+          )),
+
+          // Loading indicator or save button
           Obx(() => controller.isLoading.value
               ? Container(
             margin: const EdgeInsets.all(16),
@@ -277,19 +312,40 @@ class TrendEditScreen extends StatelessWidget {
                       Obx(() => Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: controller.getSeasonColor(controller.selectedSeason.value).withAlpha(25),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Text(
-                                controller.getSeasonEmoji(controller.selectedSeason.value),
-                                style: const TextStyle(fontSize: 24),
+                          Stack(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: controller.getSeasonColor(controller.selectedSeason.value).withAlpha(25),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    controller.getSeasonEmoji(controller.selectedSeason.value),
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                ),
                               ),
-                            ),
+                              // Add visibility indicator in preview
+                              if (!controller.isVisible.value)
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.visibility_off,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -300,9 +356,11 @@ class TrendEditScreen extends StatelessWidget {
                                   controller.titleController.text.isEmpty
                                       ? 'trend_title_placeholder'.tr
                                       : controller.titleController.text,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
+                                    // Gray out text if not visible
+                                    color: controller.isVisible.value ? null : Colors.grey,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -312,7 +370,10 @@ class TrendEditScreen extends StatelessWidget {
                                       : controller.descriptionController.text,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.grey[600],
+                                    // Gray out text if not visible
+                                    color: controller.isVisible.value
+                                        ? Colors.grey[600]
+                                        : Colors.grey[400],
                                   ),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,

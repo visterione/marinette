@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/beauty_trend.dart';
 import 'package:marinette/app/data/services/beauty_trends_service.dart';
-import 'package:reorderables/reorderables.dart';
 import 'package:marinette/app/modules/admin/beauty_trends/trend_edit_screen.dart';
 
 class BeautyTrendsManagementController extends GetxController {
@@ -14,7 +13,6 @@ class BeautyTrendsManagementController extends GetxController {
   final RxList<BeautyTrend> trends = <BeautyTrend>[].obs;
   final RxBool isLoading = false.obs;
   final RxString selectedSeason = 'spring'.obs;
-  final RxBool showHidden = false.obs; // Показывать ли скрытые тренды
 
   // Form controllers
   final titleController = TextEditingController();
@@ -55,60 +53,10 @@ class BeautyTrendsManagementController extends GetxController {
     }
   }
 
-  // Get filtered trends by season with visibility filter
+  // Get filtered trends by season
   List<BeautyTrend> getFilteredTrends(String season) {
-    // Фильтруем по сезону
-    List<BeautyTrend> filteredTrends = trends.where((trend) => trend.season == season).toList();
-
-    // Если не показываем скрытые, фильтруем их
-    if (!showHidden.value) {
-      filteredTrends = filteredTrends.where((trend) => !trend.isHidden).toList();
-    }
-
-    // Сортируем по порядку
-    filteredTrends.sort((a, b) => a.order.compareTo(b.order));
-
-    return filteredTrends;
-  }
-
-  // Переключение режима отображения скрытых трендов
-  void toggleShowHidden() {
-    showHidden.value = !showHidden.value;
-  }
-
-  // Переключение видимости тренда
-  Future<bool> toggleTrendVisibility(BeautyTrend trend) async {
-    try {
-      isLoading.value = true;
-
-      final success = await _trendsService.toggleTrendVisibility(trend);
-
-      if (success) {
-        Get.snackbar(
-          'success'.tr,
-          trend.isHidden ? 'trend_shown'.tr : 'trend_hidden'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      } else {
-        Get.snackbar(
-          'error'.tr,
-          'error_changing_visibility'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-
-      return success;
-    } catch (e) {
-      debugPrint('Error toggling trend visibility: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_changing_visibility'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
+    return trends.where((trend) => trend.season == season).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
   }
 
   // Add a new trend
@@ -254,57 +202,20 @@ class BeautyTrendsManagementController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Получаем отфильтрованные тренды для выбранного сезона
-      final filteredTrends = getFilteredTrends(season);
+      // Just update local list and call the service
+      final success = await _trendsService.reorderTrends(oldIndex, newIndex);
 
-      // Если старый индекс меньше нового, уменьшаем новый на 1
-      // Это связано с тем, как ReorderableListView обрабатывает индексы
-      if (oldIndex < newIndex) {
-        newIndex -= 1;
-      }
-
-      // Получаем перемещаемый тренд
-      final trendToMove = filteredTrends[oldIndex];
-
-      // Находим глобальные индексы (в полном списке трендов)
-      final globalOldIndex = trends.indexWhere((t) => t.id == trendToMove.id);
-      int globalNewIndex;
-
-      if (newIndex >= filteredTrends.length) {
-        // Защита от выхода за границы
-        newIndex = filteredTrends.length - 1;
-      }
-
-      if (oldIndex < newIndex) {
-        // Перемещение вниз
-        final targetTrend = filteredTrends[newIndex];
-        globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id) + 1;
-        if (globalNewIndex > trends.length) globalNewIndex = trends.length;
-      } else {
-        // Перемещение вверх
-        final targetTrend = filteredTrends[newIndex];
-        globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id);
-      }
-
-      // Перемещаем элемент в локальном списке
-      final item = trends.removeAt(globalOldIndex);
-      trends.insert(globalNewIndex, item);
-
-      // Обновляем порядок всех элементов локально
-      for (int i = 0; i < trends.length; i++) {
-        trends[i] = trends[i].copyWith(order: i);
-      }
-
-      // Обновляем в Firestore
-      final trendIds = trends.map((t) => t.id).toList();
-      for (int i = 0; i < trends.length; i++) {
-        await _trendsService.updateTrend(trends[i]);
-      }
-
-      return true;
+      // Reload trends to ensure proper order
+      await loadTrends();
+      return success;
     } catch (e) {
       debugPrint('Error reordering beauty trends: $e');
-      // В случае ошибки перезагружаем данные
+      Get.snackbar(
+        'error'.tr,
+        'error_reordering_trends'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      // Reload trends on error to restore original order
       await loadTrends();
       return false;
     } finally {
@@ -564,31 +475,16 @@ class BeautyTrendsManagementController extends GetxController {
 }
 
 class BeautyTrendsManagementScreen extends StatelessWidget {
-  final controller = Get.put(BeautyTrendsManagementController());
-
   BeautyTrendsManagementScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(BeautyTrendsManagementController());
+
     return Scaffold(
       appBar: AppBar(
         title: Text('manage_beauty_trends'.tr),
         actions: [
-          // Кнопка для переключения отображения скрытых трендов
-          Obx(() => IconButton(
-            icon: Icon(
-              controller.showHidden.value
-                  ? Icons.visibility
-                  : Icons.visibility_off,
-              color: controller.showHidden.value
-                  ? Colors.blue
-                  : Colors.grey,
-            ),
-            tooltip: controller.showHidden.value
-                ? 'hide_hidden_trends'.tr
-                : 'show_hidden_trends'.tr,
-            onPressed: controller.toggleShowHidden,
-          )),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: controller.loadTrends,
@@ -648,9 +544,7 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              controller.showHidden.value
-                                  ? 'no_trends_for_season'.trParams({'season': season.tr})
-                                  : 'no_visible_trends_for_season'.trParams({'season': season.tr}),
+                              'no_trends_for_season'.trParams({'season': season.tr}),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -691,76 +585,37 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
     return Card(
       key: Key(trend.id),
       margin: const EdgeInsets.only(bottom: 8),
-      // Добавляем цвет фона для скрытых трендов
-      color: trend.isHidden
-          ? Colors.grey.withOpacity(0.1)
-          : Theme.of(context).cardColor,
       child: ListTile(
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                trend.title.tr,
-                style: TextStyle(
-                  // Изменяем стиль для скрытых трендов
-                  color: trend.isHidden
-                      ? Colors.grey
-                      : Theme.of(context).textTheme.titleMedium?.color,
-                ),
-              ),
-            ),
-            if (trend.isHidden)
-              Icon(
-                Icons.visibility_off,
-                size: 16,
-                color: Colors.grey[400],
-              ),
-          ],
+        title: Text(
+          trend.title.tr,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Text(
-          trend.description.tr, // Translation key
+          trend.description.tr,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            // Изменяем стиль для скрытых трендов
-            color: trend.isHidden
-                ? Colors.grey
-                : Colors.grey[600],
-          ),
         ),
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: trend.isHidden
-                ? Colors.grey.withAlpha(30)
-                : Colors.pink.withAlpha(30),
+            color: Colors.pink.withAlpha(30),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Icon(
-              Icons.trending_up,
-              color: trend.isHidden ? Colors.grey : Colors.pink
-          ),
+          child: const Icon(Icons.trending_up, color: Colors.pink),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Кнопка для переключения видимости
-            IconButton(
-              icon: Icon(
-                trend.isHidden ? Icons.visibility : Icons.visibility_off,
-                color: trend.isHidden ? Colors.blue : Colors.grey,
-              ),
-              onPressed: () => controller.toggleTrendVisibility(trend),
-              tooltip: trend.isHidden ? 'show_trend'.tr : 'hide_trend'.tr,
-            ),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => controller.showEditTrendDialog(trend),
+              onPressed: () => Get.find<BeautyTrendsManagementController>().showEditTrendDialog(trend),
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => controller.showDeleteConfirmation(trend),
+              onPressed: () => Get.find<BeautyTrendsManagementController>().showDeleteConfirmation(trend),
             ),
             // Add ReorderableDragStartListener for drag functionality
             ReorderableDragStartListener(
@@ -772,7 +627,7 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
             ),
           ],
         ),
-        onTap: () => controller.showEditTrendDialog(trend),
+        onTap: () => Get.find<BeautyTrendsManagementController>().showEditTrendDialog(trend),
       ),
     );
   }

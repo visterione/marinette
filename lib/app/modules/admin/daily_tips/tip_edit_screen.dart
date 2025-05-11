@@ -16,6 +16,7 @@ class TipEditController extends GetxController {
 
   // Реактивные переменные
   final RxBool isLoading = false.obs;
+  final RxBool isVisible = true.obs; // Add visibility reactive variable
 
   TipEditController({
     this.tip,
@@ -29,6 +30,32 @@ class TipEditController extends GetxController {
     // Инициализация контроллеров
     tipController = TextEditingController(text: tip?.tip ?? '');
     iconController = TextEditingController(text: tip?.icon ?? '💡');
+
+    // Load visibility status if editing an existing tip
+    if (tip != null) {
+      loadTipVisibility();
+    }
+  }
+
+  // Load visibility status from Firestore
+  Future<void> loadTipVisibility() async {
+    if (tip == null) return;
+
+    try {
+      final firestore = _tipsService.getFirestore();
+      final docSnapshot = await firestore.collection('daily_tips').doc(tip!.id).get();
+      final data = docSnapshot.data();
+      if (data != null) {
+        isVisible.value = data['isVisible'] ?? true;
+      }
+    } catch (e) {
+      debugPrint('Error loading tip visibility: $e');
+    }
+  }
+
+  // Toggle visibility
+  void toggleVisibility() {
+    isVisible.value = !isVisible.value;
   }
 
   @override
@@ -62,6 +89,22 @@ class TipEditController extends GetxController {
           iconController.text.isEmpty ? '💡' : iconController.text,
         );
 
+        // Set visibility status in Firestore for new tip
+        if (success) {
+          // The tip was just created, so we need to find its ID
+          final lastTip = _tipsService.tips.lastWhere(
+                (t) => t.tip == tipController.text,
+            orElse: () => DailyTip(id: '', tip: ''),
+          );
+
+          if (lastTip.id.isNotEmpty) {
+            await _tipsService.getFirestore()
+                .collection('daily_tips')
+                .doc(lastTip.id)
+                .update({'isVisible': isVisible.value});
+          }
+        }
+
         if (success) {
           Get.snackbar(
             'success'.tr,
@@ -77,6 +120,14 @@ class TipEditController extends GetxController {
         );
 
         success = await _tipsService.updateTip(updatedTip);
+
+        // Update visibility separately
+        if (success) {
+          await _tipsService.getFirestore()
+              .collection('daily_tips')
+              .doc(tip!.id)
+              .update({'isVisible': isVisible.value});
+        }
 
         if (success) {
           Get.snackbar(
@@ -135,6 +186,17 @@ class TipEditScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(tip == null ? 'create_tip'.tr : 'edit_tip'.tr),
         actions: [
+          // Visibility toggle button
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.isVisible.value ? Icons.visibility : Icons.visibility_off,
+              color: controller.isVisible.value ? Colors.green : Colors.grey,
+            ),
+            onPressed: controller.toggleVisibility,
+            tooltip: controller.isVisible.value ? 'hide_tip'.tr : 'show_tip'.tr,
+          )),
+
+          // Loading indicator or save button
           Obx(() => controller.isLoading.value
               ? Container(
             margin: const EdgeInsets.all(16),

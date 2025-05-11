@@ -12,6 +12,11 @@ class BeautyTrendsService extends GetxService {
 
   static const String collectionName = 'beauty_trends';
 
+  // Add method to expose the Firestore instance
+  FirebaseFirestore getFirestore() {
+    return _firestore;
+  }
+
   Future<BeautyTrendsService> init() async {
     await loadTrends();
     return this;
@@ -27,7 +32,8 @@ class BeautyTrendsService extends GetxService {
           .get();
 
       List<BeautyTrend> loadedTrends = snapshot.docs.map((doc) {
-        return BeautyTrend.fromFirestore(doc.id, doc.data());
+        final data = doc.data();
+        return BeautyTrend.fromFirestore(doc.id, data);
       }).toList();
 
       trends.value = loadedTrends;
@@ -50,6 +56,7 @@ class BeautyTrendsService extends GetxService {
         description: 'glass_skin_description',
         season: 'spring',
         order: 0,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '2',
@@ -57,6 +64,7 @@ class BeautyTrendsService extends GetxService {
         description: 'pastel_eyeshadows_description',
         season: 'spring',
         order: 1,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '3',
@@ -64,6 +72,7 @@ class BeautyTrendsService extends GetxService {
         description: 'natural_blush_description',
         season: 'spring',
         order: 2,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '4',
@@ -71,6 +80,7 @@ class BeautyTrendsService extends GetxService {
         description: 'sunburnt_blush_description',
         season: 'summer',
         order: 3,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '5',
@@ -78,6 +88,7 @@ class BeautyTrendsService extends GetxService {
         description: 'glazed_skin_description',
         season: 'summer',
         order: 4,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '6',
@@ -85,6 +96,7 @@ class BeautyTrendsService extends GetxService {
         description: 'waterproof_makeup_description',
         season: 'summer',
         order: 5,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '7',
@@ -92,6 +104,7 @@ class BeautyTrendsService extends GetxService {
         description: 'soft_matte_skin_description',
         season: 'autumn',
         order: 6,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '8',
@@ -99,6 +112,7 @@ class BeautyTrendsService extends GetxService {
         description: 'berry_lips_description',
         season: 'autumn',
         order: 7,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '9',
@@ -106,6 +120,7 @@ class BeautyTrendsService extends GetxService {
         description: 'copper_eyes_description',
         season: 'autumn',
         order: 8,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '10',
@@ -113,6 +128,7 @@ class BeautyTrendsService extends GetxService {
         description: 'glossy_lips_description',
         season: 'winter',
         order: 9,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '11',
@@ -120,6 +136,7 @@ class BeautyTrendsService extends GetxService {
         description: 'frosted_looks_description',
         season: 'winter',
         order: 10,
+        isVisible: true,
       ),
       BeautyTrend(
         id: '12',
@@ -127,6 +144,7 @@ class BeautyTrendsService extends GetxService {
         description: 'rich_hydration_description',
         season: 'winter',
         order: 11,
+        isVisible: true,
       ),
     ];
   }
@@ -138,7 +156,14 @@ class BeautyTrendsService extends GetxService {
 
       int nextOrder = 0;
       if (trends.isNotEmpty) {
-        nextOrder = trends.map((t) => t.order).reduce((a, b) => a > b ? a : b) + 1;
+        // Find max order for the specific season to place it at the end of its season group
+        final seasonTrends = trends.where((t) => t.season == season).toList();
+        if (seasonTrends.isNotEmpty) {
+          nextOrder = seasonTrends.map((t) => t.order).reduce((a, b) => a > b ? a : b) + 1;
+        } else {
+          // If no trends in this season, use base order for this season
+          nextOrder = _getBaseOrderForSeason(season);
+        }
       }
 
       final newTrend = BeautyTrend(
@@ -147,7 +172,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
-        isHidden: false, // По умолчанию новый тренд видимый
+        isVisible: true, // Default to visible
       );
 
       final docRef = await _firestore
@@ -161,7 +186,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
-        isHidden: false,
+        isVisible: true,
       ));
 
       // Сортируем по порядку
@@ -226,7 +251,7 @@ class BeautyTrendsService extends GetxService {
     }
   }
 
-  // Изменение порядка трендов
+  // Изменение порядка трендов - реализация через отдельное обновление каждого тренда
   Future<bool> reorderTrends(int oldIndex, int newIndex) async {
     try {
       isLoading.value = true;
@@ -235,24 +260,19 @@ class BeautyTrendsService extends GetxService {
         newIndex -= 1;
       }
 
-      // Перемещаем элемент в локальном списке
       final item = trends.removeAt(oldIndex);
       trends.insert(newIndex, item);
 
       // Обновляем порядок всех элементов
-      final batch = _firestore.batch();
-
       for (int i = 0; i < trends.length; i++) {
         final trend = trends[i].copyWith(order: i);
         trends[i] = trend;
 
-        // Используем batch для обновления данных в Firestore
-        final docRef = _firestore.collection(collectionName).doc(trend.id);
-        batch.update(docRef, {'order': i});
+        await _firestore
+            .collection(collectionName)
+            .doc(trend.id)
+            .update({'order': i});
       }
-
-      // Применяем все изменения за один раз
-      await batch.commit();
 
       return true;
     } catch (e) {
@@ -265,36 +285,18 @@ class BeautyTrendsService extends GetxService {
     }
   }
 
-  // Переключение видимости тренда
-  Future<bool> toggleTrendVisibility(BeautyTrend trend) async {
-    try {
-      isLoading.value = true;
-
-      // Создаем обновленный тренд с инвертированной видимостью
-      final updatedTrend = trend.copyWith(isHidden: !trend.isHidden);
-
-      // Обновляем в Firestore
-      await _firestore
-          .collection(collectionName)
-          .doc(trend.id)
-          .update({'isHidden': updatedTrend.isHidden});
-
-      // Обновляем в локальном списке
-      final index = trends.indexWhere((t) => t.id == trend.id);
-      if (index != -1) {
-        trends[index] = updatedTrend;
-      }
-
-      return true;
-    } catch (e) {
-      debugPrint('Error toggling trend visibility: $e');
-      return false;
-    } finally {
-      isLoading.value = false;
+  // Helper method to get base order for a season
+  int _getBaseOrderForSeason(String season) {
+    // Use a base order offset for each season to ensure they don't interfere with each other
+    switch (season) {
+      case 'spring': return 0;
+      case 'summer': return 100;
+      case 'autumn': return 200;
+      case 'winter': return 300;
+      default: return 0;
     }
   }
 
-  // Получение трендов текущего сезона (только видимые)
   List<BeautyTrend> getCurrentSeasonTrends() {
     final currentMonth = DateTime.now().month;
     String season;
@@ -309,10 +311,9 @@ class BeautyTrendsService extends GetxService {
       season = 'winter';
     }
 
-    // Возвращаем только видимые тренды текущего сезона
-    return trends
-        .where((trend) => trend.season == season && !trend.isHidden)
-        .toList();
+    // Only return visible trends for current season
+    return trends.where((trend) =>
+    trend.season == season && trend.isVisible).toList();
   }
 
   // Синхронизация локальных данных с Firestore
@@ -340,7 +341,7 @@ class BeautyTrendsService extends GetxService {
             description: trend.description,
             season: trend.season,
             order: i,
-            isHidden: trend.isHidden
+            isVisible: trend.isVisible
         );
       }
 
