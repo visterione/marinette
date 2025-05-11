@@ -172,7 +172,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
-        isVisible: true, // Default to visible
+        isVisible: true, // По умолчанию тренды видимые
       );
 
       final docRef = await _firestore
@@ -186,7 +186,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
-        isVisible: true,
+        isVisible: true, // По умолчанию тренды видимые
       ));
 
       // Сортируем по порядку
@@ -297,6 +297,7 @@ class BeautyTrendsService extends GetxService {
     }
   }
 
+  // Получение актуальных трендов текущего сезона (только видимые)
   List<BeautyTrend> getCurrentSeasonTrends() {
     final currentMonth = DateTime.now().month;
     String season;
@@ -311,7 +312,7 @@ class BeautyTrendsService extends GetxService {
       season = 'winter';
     }
 
-    // Only return visible trends for current season
+    // Только видимые тренды текущего сезона
     return trends.where((trend) =>
     trend.season == season && trend.isVisible).toList();
   }
@@ -341,7 +342,7 @@ class BeautyTrendsService extends GetxService {
             description: trend.description,
             season: trend.season,
             order: i,
-            isVisible: trend.isVisible
+            isVisible: trend.isVisible // Сохраняем статус видимости
         );
       }
 

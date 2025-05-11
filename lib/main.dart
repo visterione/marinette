@@ -19,6 +19,9 @@ import 'package:marinette/config/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/stories_service.dart';
 import 'firebase_options.dart';
+// Добавляем импорты для новых сервисов
+import 'package:marinette/app/data/services/beauty_trends_service.dart';
+import 'package:marinette/app/data/services/daily_tips_service.dart';
 
 // Add this function to check if it's the first launch
 Future<bool> isFirstLaunch() async {
@@ -102,12 +105,22 @@ Future<void> _initializeServices() async {
   await Get.putAsync(() => FirestoreAnalysisService().init());
   debugPrint('FirestoreAnalysisService initialized');
 
+  // Инициализируем новые сервисы перед ContentService
+  await Get.putAsync(() => BeautyTrendsService().init(), permanent: true);
+  debugPrint('BeautyTrendsService initialized');
+
+  await Get.putAsync(() => DailyTipsService().init(), permanent: true);
+  debugPrint('DailyTipsService initialized');
+
+  // Content Service должен быть инициализирован после своих зависимостей
   await Get.putAsync(() => ContentService().init());
   debugPrint('Content service initialized');
 
   Get.put(StoriesService(), permanent: true);
   debugPrint('Stories service initialized');
 
+  // ResultSaverService должен быть инициализирован последним,
+  // так как он зависит от UserPreferencesService и ThemeService
   await Get.putAsync(() => ResultSaverService().init());
   debugPrint('ResultSaver service initialized');
 

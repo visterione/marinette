@@ -1,0 +1,22 @@
+{
+  "title": "Заголовок",
+  "description": "Описание",
+  "content": "Содержание",
+  "author_name": "Имя автора",
+  "article_title_hint": "Введите заголовок статьи",
+  "article_description_hint": "Введите краткое описание статьи",
+  "article_content_hint": "Введите полный текст статьи здесь",
+  "author_name_hint": "Введите имя автора",
+  "loading_translations": "Загрузка переводов...",
+  "translations_loaded": "Переводы успешно загружены",
+  "error_loading_translations": "Ошибка загрузки переводов",
+  "add_translation": "Добавить перевод",
+  "ukrainian_translation": "Украинский перевод",
+  "english_translation": "Английский перевод",
+  "primary_language": "Основной язык",
+  "secondary_language": "Дополнительный язык",
+  "article_type": "Тип",
+  "article": "Статья",
+  "guide": "Гайд",
+  "lifehack": "Лайфхак"
+}

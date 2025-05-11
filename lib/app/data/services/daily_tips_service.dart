@@ -77,6 +77,7 @@ class DailyTipsService extends GetxService {
         tip: tip,
         icon: icon,
         order: nextOrder,
+        isVisible: true, // По умолчанию советы видимые
       );
 
       final docRef = await _firestore
@@ -89,6 +90,7 @@ class DailyTipsService extends GetxService {
         tip: tip,
         icon: icon,
         order: nextOrder,
+        isVisible: true, // По умолчанию советы видимые
       ));
 
       // Сортируем по порядку
@@ -210,7 +212,8 @@ class DailyTipsService extends GetxService {
             id: docRef.id,
             tip: tip.tip,
             icon: tip.icon,
-            order: i
+            order: i,
+            isVisible: tip.isVisible // Сохраняем состояние видимости
         );
       }
 
@@ -223,15 +226,23 @@ class DailyTipsService extends GetxService {
     }
   }
 
-  // Получить совет дня
+  // Получить совет дня (только видимые)
   DailyTip getCurrentDailyTip() {
     if (tips.isEmpty) {
       return DailyTip(id: 'default', tip: 'stay_hydrated', icon: '💧');
     }
 
+    // Фильтруем по видимым советам
+    final visibleTips = tips.where((tip) => tip.isVisible).toList();
+
+    // Если нет видимых советов, возвращаем дефолтный
+    if (visibleTips.isEmpty) {
+      return DailyTip(id: 'default', tip: 'stay_hydrated', icon: '💧');
+    }
+
     final dayOfYear =
         DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
-    final tipIndex = dayOfYear % tips.length;
-    return tips[tipIndex];
+    final tipIndex = dayOfYear % visibleTips.length;
+    return visibleTips[tipIndex];
   }
 }

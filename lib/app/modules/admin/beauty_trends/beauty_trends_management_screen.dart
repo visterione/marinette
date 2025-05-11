@@ -163,6 +163,51 @@ class BeautyTrendsManagementController extends GetxController {
     }
   }
 
+  // Метод для переключения видимости тренда
+  Future<bool> toggleTrendVisibility(BeautyTrend trend) async {
+    try {
+      isLoading.value = true;
+
+      // Создаем обновленный тренд с противоположным статусом видимости
+      final updatedTrend = trend.copyWith(isVisible: !trend.isVisible);
+
+      // Обновляем в Firestore
+      final success = await _trendsService.updateTrend(updatedTrend);
+
+      if (success) {
+        // Обновляем тренд в локальном списке
+        final index = trends.indexWhere((t) => t.id == trend.id);
+        if (index != -1) {
+          trends[index] = updatedTrend;
+        }
+
+        Get.snackbar(
+          'success'.tr,
+          updatedTrend.isVisible ? 'trend_visible'.tr : 'trend_hidden'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_toggling_visibility'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling trend visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_toggling_visibility'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   // Delete a trend
   Future<bool> deleteTrend(String trendId) async {
     isLoading.value = true;
@@ -202,12 +247,37 @@ class BeautyTrendsManagementController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Just update local list and call the service
-      final success = await _trendsService.reorderTrends(oldIndex, newIndex);
+      // Создаем временную копию списка для манипуляций
+      final List<BeautyTrend> seasonTrends = getFilteredTrends(season);
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
 
-      // Reload trends to ensure proper order
-      await loadTrends();
-      return success;
+      // Перемещаем элемент внутри временного списка
+      final item = seasonTrends.removeAt(oldIndex);
+      seasonTrends.insert(newIndex, item);
+
+      // Обновляем order значения в локальном списке трендов для данного сезона
+      for (int i = 0; i < seasonTrends.length; i++) {
+        final trendId = seasonTrends[i].id;
+        final mainIndex = trends.indexWhere((t) => t.id == trendId);
+
+        if (mainIndex != -1) {
+          final newOrder = _getBaseOrderForSeason(season) + i;
+          trends[mainIndex] = trends[mainIndex].copyWith(order: newOrder);
+
+          // Обновляем в Firestore
+          await _trendsService.getFirestore()
+              .collection('beauty_trends')
+              .doc(trendId)
+              .update({'order': newOrder});
+        }
+      }
+
+      // Сортируем общий список по order
+      trends.sort((a, b) => a.order.compareTo(b.order));
+
+      return true;
     } catch (e) {
       debugPrint('Error reordering beauty trends: $e');
       Get.snackbar(
@@ -220,6 +290,17 @@ class BeautyTrendsManagementController extends GetxController {
       return false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Вспомогательный метод для определения базового порядка для сезона
+  int _getBaseOrderForSeason(String season) {
+    switch (season) {
+      case 'spring': return 0;
+      case 'summer': return 100;
+      case 'autumn': return 200;
+      case 'winter': return 300;
+      default: return 0;
     }
   }
 
@@ -567,7 +648,7 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
                         },
                         itemBuilder: (context, index) {
                           final trend = filteredTrends[index];
-                          return _buildTrendItem(context, trend, index);
+                          return _buildTrendItem(context, trend, index, controller);
                         },
                       );
                     }).toList(),
@@ -581,53 +662,95 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTrendItem(BuildContext context, BeautyTrend trend, int index) {
+  Widget _buildTrendItem(BuildContext context, BeautyTrend trend, int index, BeautyTrendsManagementController controller) {
     return Card(
       key: Key(trend.id),
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          trend.title.tr,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          trend.description.tr,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.pink.withAlpha(30),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(Icons.trending_up, color: Colors.pink),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => Get.find<BeautyTrendsManagementController>().showEditTrendDialog(trend),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => Get.find<BeautyTrendsManagementController>().showDeleteConfirmation(trend),
-            ),
-            // Add ReorderableDragStartListener for drag functionality
-            ReorderableDragStartListener(
-              index: index,
-              child: Icon(
-                Icons.drag_handle,
-                color: Colors.grey[400],
+      // Добавляем прозрачность для скрытых трендов
+      color: trend.isVisible ? null : Colors.grey.withOpacity(0.2),
+      child: Stack(
+        children: [
+          ListTile(
+            title: Text(
+              trend.title.tr,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                // Меняем цвет текста для скрытых трендов
+                color: trend.isVisible ? null : Colors.grey,
               ),
             ),
-          ],
-        ),
-        onTap: () => Get.find<BeautyTrendsManagementController>().showEditTrendDialog(trend),
+            subtitle: Text(
+              trend.description.tr,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: trend.isVisible ? Colors.grey[600] : Colors.grey[400],
+              ),
+            ),
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.pink.withAlpha(30),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.trending_up, color: Colors.pink),
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Кнопка переключения видимости
+                IconButton(
+                  icon: Icon(
+                    trend.isVisible ? Icons.visibility : Icons.visibility_off,
+                    color: trend.isVisible ? Colors.green : Colors.grey,
+                  ),
+                  onPressed: () => controller.toggleTrendVisibility(trend),
+                  tooltip: trend.isVisible ? 'hide_trend'.tr : 'show_trend'.tr,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => controller.showEditTrendDialog(trend),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => controller.showDeleteConfirmation(trend),
+                ),
+                // Add ReorderableDragStartListener for drag functionality
+                ReorderableDragStartListener(
+                  index: index,
+                  child: Icon(
+                    Icons.drag_handle,
+                    color: Colors.grey[400],
+                  ),
+                ),
+              ],
+            ),
+            onTap: () => controller.showEditTrendDialog(trend),
+          ),
+
+          // Метка для скрытых трендов
+          if (!trend.isVisible)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'hidden'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
