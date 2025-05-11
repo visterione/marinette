@@ -16,6 +16,7 @@ class StoriesManagementController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
   final RxString selectedCategory = 'all'.obs;
+  final RxBool showHidden = false.obs; // Новый флаг для отображения скрытых историй
 
   @override
   void onInit() {
@@ -73,6 +74,48 @@ class StoriesManagementController extends GetxController {
     }
   }
 
+  // Добавляем метод для переключения видимости истории
+  Future<bool> toggleStoryVisibility(String storyId) async {
+    try {
+      isLoading.value = true;
+      final success = await _storiesService.toggleStoryVisibility(storyId);
+
+      if (success) {
+        // Находим индекс обновленной истории
+        final index = stories.indexWhere((story) => story.id == storyId);
+        if (index >= 0) {
+          final isVisible = stories[index].isVisible;
+
+          Get.snackbar(
+            'success'.tr,
+            isVisible
+                ? 'story_visible'.tr
+                : 'story_hidden'.tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_updating_story'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling story visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_updating_story'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> reorderStories(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) {
       newIndex -= 1;
@@ -112,9 +155,17 @@ class StoriesManagementController extends GetxController {
     }
   }
 
+  // Обновляем метод для учета фильтрации по видимости
   List<Story> getFilteredStories() {
     final query = searchQuery.value.toLowerCase();
     var filteredStories = stories.toList();
+
+    // Фильтрация по видимости, если не установлен флаг showHidden
+    if (!showHidden.value) {
+      filteredStories = filteredStories
+          .where((story) => story.isVisible)
+          .toList();
+    }
 
     // Фильтрация по категории
     if (selectedCategory.value != 'all') {
@@ -194,6 +245,23 @@ class StoriesManagementScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
+                // Добавляем переключатель для отображения скрытых историй
+                Row(
+                  children: [
+                    Obx(() => Checkbox(
+                      value: controller.showHidden.value,
+                      onChanged: (value) {
+                        if (value != null) {
+                          controller.showHidden.value = value;
+                        }
+                      },
+                    )),
+                    Text('show_hidden_stories'.tr),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
                 // Выпадающий список категорий
                 Obx(() {
                   final categories = controller.getCategories();
@@ -252,7 +320,9 @@ class StoriesManagementScreen extends StatelessWidget {
                       Text(
                         controller.searchQuery.value.isNotEmpty || controller.selectedCategory.value != 'all'
                             ? 'no_search_results'.tr
-                            : 'no_stories'.tr,
+                            : controller.showHidden.value
+                            ? 'no_stories'.tr
+                            : 'no_visible_stories'.tr,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -278,12 +348,21 @@ class StoriesManagementScreen extends StatelessWidget {
   }
 
   Widget _buildStoryItem(BuildContext context, Story story, int index) {
+    // Добавляем визуальное отличие для скрытых историй
+    final isHidden = !story.isVisible;
+
     return Card(
       key: Key(story.id),
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
+      // Используем разный цвет фона для видимых и скрытых историй
+      color: isHidden
+          ? Theme.of(context).brightness == Brightness.light
+          ? Colors.grey[200]
+          : Colors.grey[850]
+          : Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
           // Редактирование существующей истории
@@ -300,42 +379,66 @@ class StoriesManagementScreen extends StatelessWidget {
             Row(
               children: [
                 // Превью изображение
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
-                  ),
-                  child: SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: story.previewImageUrl.isNotEmpty
-                        ? CachedNetworkImage(
-                      imageUrl: story.previewImageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.error_outline,
-                          size: 32,
-                          color: Colors.grey,
+                      child: SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: story.previewImageUrl.isNotEmpty
+                            ? CachedNetworkImage(
+                          imageUrl: story.previewImageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(
+                              Icons.error_outline,
+                              size: 32,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                            : Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.image,
+                            size: 32,
+                            color: Colors.grey,
+                          ),
                         ),
-                      ),
-                    )
-                        : Container(
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.image,
-                        size: 32,
-                        color: Colors.grey,
                       ),
                     ),
-                  ),
+                    // Показываем индикатор для скрытых историй
+                    if (isHidden)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.visibility_off,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
 
                 // Информация о истории
@@ -345,11 +448,39 @@ class StoriesManagementScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          story.title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                story.title,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  // Меняем стиль для скрытых историй
+                                  color: isHidden
+                                      ? Theme.of(context).brightness == Brightness.light
+                                      ? Colors.grey[600]
+                                      : Colors.grey[400]
+                                      : null,
+                                ),
+                              ),
+                            ),
+                            // Добавляем индикатор скрытой истории
+                            if (isHidden)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  'hidden'.tr,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -378,12 +509,15 @@ class StoriesManagementScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Иконка для перетаскивания
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.drag_handle,
-                    color: Colors.grey[400],
+                // Иконка для перетаскивания с ReorderableDragStartListener
+                ReorderableDragStartListener(
+                  index: index,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: Colors.grey[400],
+                    ),
                   ),
                 ),
               ],
@@ -468,6 +602,16 @@ class StoriesManagementScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // Кнопка переключения видимости
+                  IconButton(
+                    icon: Icon(
+                      story.isVisible ? Icons.visibility : Icons.visibility_off,
+                      color: story.isVisible ? Colors.blue : Colors.grey,
+                    ),
+                    tooltip: story.isVisible ? 'hide'.tr : 'show'.tr,
+                    onPressed: () => controller.toggleStoryVisibility(story.id),
+                  ),
+
                   // Кнопка редактирования
                   IconButton(
                     icon: const Icon(Icons.edit),

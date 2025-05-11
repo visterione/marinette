@@ -245,7 +245,6 @@
   "logout_confirmation": "Ви впевнені, що хочете вийти?",
   "unknown": "Невідомо",
   "success": "Успіх",
-  "error": "Помилка",
   "photo_updated": "Фото профілю успішно оновлено",
   "photo_update_failed": "Не вдалося оновити фото профілю",
   "photo_upload_error": "Помилка завантаження фото",
@@ -307,7 +306,6 @@
   "close": "Закрити",
 
   "select_language": "Оберіть мову",
-  "view_history": "Переглянути історію",
 
   "sync_to_cloud": "Синхронізувати з хмарою",
   "synced_to_cloud": "Синхронізовано з хмарою",
@@ -323,6 +321,13 @@
   "sync_now": "Синхронізувати зараз",
   "results_synced_successfully": "Результати успішно синхронізовано",
 
-  "recommendations": "рекомендацій",
-  "result_deleted_successfully": "Результат успішно видалено"
+  "result_deleted_successfully": "Результат успішно видалено",
+
+  "show_hidden_stories": "Показати приховані історії",
+  "story_visible": "Історія відображається",
+  "story_hidden": "Історія прихована",
+  "hidden": "Приховано",
+  "show": "Показати",
+  "hide": "Приховати",
+  "no_visible_stories": "Немає видимих історій"
 }

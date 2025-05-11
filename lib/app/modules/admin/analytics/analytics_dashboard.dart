@@ -282,32 +282,6 @@ class AnalyticsDashboard extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // User preferences statistics
-              Text(
-                'user_preferences'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Age distribution
-              _buildHistogramCard(
-                title: 'age_distribution'.tr,
-                data: controller.ageDistribution,
-                colors: const [Colors.blue, Colors.lightBlue, Colors.blueAccent],
-              ),
-              const SizedBox(height: 16),
-
-              // Skin type distribution
-              _buildHistogramCard(
-                title: 'skin_type_distribution'.tr,
-                data: controller.skinTypeDistribution,
-                colors: const [Colors.purple, Colors.purpleAccent, Colors.deepPurple],
-              ),
-              const SizedBox(height: 24),
-
               // Content statistics
               Text(
                 'content_statistics'.tr,
@@ -348,6 +322,22 @@ class AnalyticsDashboard extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 16),
+
+              // Age distribution (moved from User Preferences)
+              _buildHistogramCard(
+                title: 'age_distribution'.tr,
+                data: controller.ageDistribution,
+                colors: const [Colors.blue, Colors.lightBlue, Colors.blueAccent],
+              ),
+              const SizedBox(height: 16),
+
+              // Skin type distribution (moved from User Preferences)
+              _buildHistogramCard(
+                title: 'skin_type_distribution'.tr,
+                data: controller.skinTypeDistribution,
+                colors: const [Colors.purple, Colors.purpleAccent, Colors.deepPurple],
               ),
               const SizedBox(height: 16),
 

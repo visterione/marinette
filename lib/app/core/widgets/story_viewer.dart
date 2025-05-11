@@ -92,7 +92,6 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       }
     }
 
-    // Start loading the next story
     _storiesService.preloadNextStoryImages(widget.storyIndex);
   }
 

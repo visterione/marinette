@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _handleStoryTap(Story story) {
     final storiesService = Get.find<StoriesService>();
-    final storyIndex = storiesService.stories.indexOf(story);
+    final storyIndex = storiesService.visibleStories.indexOf(story);
 
     Get.to(
           () => StoryViewer(
@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final storiesService = Get.find<StoriesService>();
 
     return Obx(() {
-      final stories = storiesService.stories;
+      final stories = storiesService.visibleStories;
       if (stories.isEmpty) return const SizedBox.shrink();
 
       return StoriesSection(
@@ -281,9 +281,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildTrendsCarousel(ContentService contentService) {
     return Obx(() {
       final trends = contentService.currentTrends;
+
+      if (trends.isEmpty) {
+        return const SizedBox.shrink(); // Если нет трендов, не показываем блок
+      }
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Заголовок секции
           Row(
             children: [
               const Icon(
@@ -302,19 +308,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ],
           ),
           const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: trends
-                  .map((trend) => Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: _buildTrendCard(
-                  title: trend.title,
-                  description: trend.description,
-                ),
-              ))
-                  .toList(),
+
+          // Карусель трендов
+          SizedBox(
+            height: 120.0, // Фиксированная высота для самой карусели
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: trends.length,
+              itemBuilder: (context, index) {
+                final trend = trends[index];
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: 16,
+                    // Добавляем отступ слева только для первого элемента,
+                    // если мы хотим, чтобы первый элемент был отступлен
+                    // left: index == 0 ? 4 : 0,
+                  ),
+                  child: _buildTrendCard(
+                    title: trend.title,
+                    description: trend.description,
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -323,8 +339,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Widget _buildTrendCard({required String title, required String description}) {
+    // Фиксированная высота контейнера для всех карточек
     return Container(
       width: 250,
+      // Высота контролируется родительским SizedBox
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -340,25 +358,36 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Заголовок
           Text(
-            title.tr,  // Используем .tr здесь для перевода
+            title.tr,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
+            maxLines: 1, // Ограничиваем заголовок одной строкой
+            overflow: TextOverflow.ellipsis, // Добавляем многоточие при переполнении
           ),
           const SizedBox(height: 8),
-          Text(
-            description.tr,  // Используем .tr здесь для перевода
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
+          // Описание в контейнере Expanded, чтобы оно занимало все доступное пространство
+          Expanded(
+            child: Text(
+              description.tr,
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.grey[600]
+                    : Colors.grey[300],
+                fontSize: 14,
+              ),
+              maxLines: 4, // Ограничиваем количество строк
+              overflow: TextOverflow.ellipsis, // Добавляем многоточие при переполнении
             ),
           ),
         ],
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final cameraController = Get.put(CustomCameraController());

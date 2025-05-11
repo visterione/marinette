@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marinette/app/data/models/face_analysis_result.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AnalysisResultScreen extends StatelessWidget {
   final String imagePath;
@@ -19,6 +20,9 @@ class AnalysisResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final tag = heroTag ?? imagePath;
     final screenWidth = MediaQuery.of(context).size.width;
+    final isRemoteImage = imagePath.contains('http://') ||
+        imagePath.contains('https://') ||
+        imagePath.contains('firebasestorage.googleapis.com');
 
     return Scaffold(
       body: Container(
@@ -45,14 +49,45 @@ class AnalysisResultScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                centerTitle: true,
                 background: Stack(
                   fit: StackFit.expand,
                   children: [
                     Hero(
                       tag: tag,
-                      child: Image.file(
+                      child: isRemoteImage
+                          ? CachedNetworkImage(
+                        imageUrl: imagePath,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) {
+                          debugPrint('Error loading image: $error');
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )
+                          : Image.file(
                         File(imagePath),
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          debugPrint('Error loading image: $error');
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const DecoratedBox(

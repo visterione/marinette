@@ -57,14 +57,33 @@ class DailyTipsManagementController extends GetxController {
   }
 
   Future<void> reorderTips(int oldIndex, int newIndex) async {
-    final success = await _tipsService.reorderTips(oldIndex, newIndex);
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
 
-    if (!success) {
+    try {
+      final success = await _tipsService.reorderTips(oldIndex, newIndex);
+
+      if (!success) {
+        Get.snackbar(
+          'error'.tr,
+          'error_reordering_tips'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+        // В случае неудачи перезагружаем советы
+        await loadTips();
+      }
+    } catch (e) {
+      debugPrint('Error reordering tips: $e');
       Get.snackbar(
         'error'.tr,
         'error_reordering_tips'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
+
+      // В случае ошибки перезагружаем советы
+      await loadTips();
     }
   }
 
@@ -325,10 +344,13 @@ class DailyTipsManagementScreen extends StatelessWidget {
                 ],
               ),
 
-              // Иконка для перетаскивания
-              Icon(
-                Icons.drag_handle,
-                color: Colors.grey[400],
+              // Иконка для перетаскивания с ReorderableDragStartListener
+              ReorderableDragStartListener(
+                index: index,
+                child: Icon(
+                  Icons.drag_handle,
+                  color: Colors.grey[400],
+                ),
               ),
             ],
           ),

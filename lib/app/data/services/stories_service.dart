@@ -1,5 +1,5 @@
 // lib/app/data/services/stories_service.dart
-// Updated version with Firebase Storage support
+// Updated version with Firebase Storage support and story visibility features
 
 import 'dart:async';
 import 'package:get/get.dart';
@@ -24,6 +24,9 @@ class StoriesService extends GetxService {
   // Firebase
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late StorageService _storageService;
+
+  // Геттер, который возвращает только видимые истории
+  List<Story> get visibleStories => stories.where((story) => story.isVisible).toList();
 
   @visibleForTesting
   set prefs(SharedPreferences value) {
@@ -111,6 +114,8 @@ class StoriesService extends GetxService {
             category: data['category'] ?? '',
             previewImageUrl: previewImageUrl,
             isViewed: viewedStories.contains(doc.id),
+            // Добавляем поле видимости, по умолчанию true
+            isVisible: data['isVisible'] ?? true,
           ));
         } catch (e) {
           debugPrint('Error creating Story object for ${doc.id}: $e');
@@ -226,9 +231,11 @@ class StoriesService extends GetxService {
   }
 
   Future<void> preloadNextStoryImages(int currentStoryIndex) async {
-    if (currentStoryIndex >= stories.length - 1) return;
+    final visibleStoriesList = visibleStories;
 
-    final nextStory = stories[currentStoryIndex + 1];
+    if (currentStoryIndex >= visibleStoriesList.length - 1) return;
+
+    final nextStory = visibleStoriesList[currentStoryIndex + 1];
     await preloadSingleImage(nextStory.previewImageUrl, priority: true);
     for (var imageUrl in nextStory.imageUrls) {
       await preloadSingleImage(imageUrl, priority: true);
@@ -273,6 +280,7 @@ class StoriesService extends GetxService {
     required List<String> captions,
     required String category,
     required String previewImageUrl,
+    bool isVisible = true, // Добавляем параметр видимости
   }) async {
     try {
       // Create entry in Firestore
@@ -282,6 +290,7 @@ class StoriesService extends GetxService {
         'captions': captions,
         'category': category,
         'previewImageUrl': previewImageUrl,
+        'isVisible': isVisible, // Сохраняем статус видимости
         'createdAt': FieldValue.serverTimestamp(),
         'order': stories.length, // for sorting
       });
@@ -295,6 +304,7 @@ class StoriesService extends GetxService {
         category: category,
         previewImageUrl: previewImageUrl,
         isViewed: false,
+        isVisible: isVisible, // Устанавливаем статус видимости в модели
       ));
 
       return true;
@@ -313,6 +323,7 @@ class StoriesService extends GetxService {
         'captions': updatedStory.captions,
         'category': updatedStory.category,
         'previewImageUrl': updatedStory.previewImageUrl,
+        'isVisible': updatedStory.isVisible, // Обновляем статус видимости
       });
 
       // Update local list
@@ -339,6 +350,34 @@ class StoriesService extends GetxService {
       return true;
     } catch (e) {
       debugPrint('Error deleting story: $e');
+      return false;
+    }
+  }
+
+  // Метод для переключения видимости истории
+  Future<bool> toggleStoryVisibility(String storyId) async {
+    try {
+      // Находим историю по ID
+      final index = stories.indexWhere((story) => story.id == storyId);
+      if (index == -1) return false;
+
+      // Получаем текущий статус видимости и инвертируем его
+      final story = stories[index];
+      final newVisibility = !story.isVisible;
+
+      // Обновляем статус видимости в Firestore
+      await _firestore.collection('stories').doc(storyId).update({
+        'isVisible': newVisibility,
+      });
+
+      // Обновляем локальную модель
+      final updatedStory = story.copyWith(isVisible: newVisibility);
+      stories[index] = updatedStory;
+
+      debugPrint('Story visibility updated: $storyId, isVisible: $newVisibility');
+      return true;
+    } catch (e) {
+      debugPrint('Error toggling story visibility: $e');
       return false;
     }
   }

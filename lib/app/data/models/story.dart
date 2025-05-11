@@ -1,3 +1,5 @@
+// lib/app/data/models/story.dart
+
 class Story {
   final String id;
   final String title;
@@ -6,6 +8,8 @@ class Story {
   final String category;
   final String previewImageUrl;
   bool isViewed;
+  // Добавляем поле для видимости истории (по умолчанию - видимая)
+  bool isVisible;
 
   Story({
     required this.id,
@@ -15,6 +19,7 @@ class Story {
     required this.category,
     required this.previewImageUrl,
     this.isViewed = false,
+    this.isVisible = true, // По умолчанию история видима
   });
 
   Story copyWith({
@@ -25,6 +30,7 @@ class Story {
     String? category,
     String? previewImageUrl,
     bool? isViewed,
+    bool? isVisible, // Добавляем в copyWith
   }) {
     return Story(
       id: id ?? this.id,
@@ -34,6 +40,7 @@ class Story {
       category: category ?? this.category,
       previewImageUrl: previewImageUrl ?? this.previewImageUrl,
       isViewed: isViewed ?? this.isViewed,
+      isVisible: isVisible ?? this.isVisible, // Используем в copyWith
     );
   }
 }

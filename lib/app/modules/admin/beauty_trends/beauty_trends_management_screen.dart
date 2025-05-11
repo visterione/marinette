@@ -633,6 +633,14 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () => controller.showDeleteConfirmation(trend),
             ),
+            // Add ReorderableDragStartListener for drag functionality
+            ReorderableDragStartListener(
+              index: index,
+              child: Icon(
+                Icons.drag_handle,
+                color: Colors.grey[400],
+              ),
+            ),
           ],
         ),
         onTap: () => controller.showEditTrendDialog(trend),
