@@ -16,6 +16,7 @@ class ArticlesManagementController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
   final RxInt selectedTabIndex = 0.obs;
+  final RxBool showHidden = false.obs; // Добавляем флаг для отображения скрытых статей
 
   @override
   void onInit() {
@@ -23,14 +24,20 @@ class ArticlesManagementController extends GetxController {
     loadAllContent();
   }
 
+  // Переключение отображения скрытых статей
+  void toggleShowHidden() {
+    showHidden.value = !showHidden.value;
+    loadAllContent(); // Перезагружаем контент при изменении настройки
+  }
+
   Future<void> loadAllContent() async {
     isLoading.value = true;
     try {
-      // Загрузка всех типов контента
+      // Загрузка всех типов контента с учетом параметра видимости
       final futures = await Future.wait([
-        BeautyHubService.getArticles(),
-        BeautyHubService.getLifehacks(),
-        BeautyHubService.getGuides(),
+        BeautyHubService.getArticles(includeHidden: showHidden.value),
+        BeautyHubService.getLifehacks(includeHidden: showHidden.value),
+        BeautyHubService.getGuides(includeHidden: showHidden.value),
       ]);
 
       articles.value = futures[0];
@@ -75,6 +82,67 @@ class ArticlesManagementController extends GetxController {
       return false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Метод для переключения видимости статьи
+  Future<bool> toggleArticleVisibility(Article article) async {
+    try {
+      isLoading.value = true;
+
+      final success = await BeautyHubService.toggleArticleVisibility(
+          article.id, article.isHidden);
+
+      if (success) {
+        // Обновляем локальные списки
+        final updatedArticle = article.copyWith(isHidden: !article.isHidden);
+
+        // Обновляем статью в соответствующем списке
+        _updateArticleInLists(updatedArticle);
+
+        Get.snackbar(
+          'success'.tr,
+          article.isHidden ? 'article_shown'.tr : 'article_hidden'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_changing_visibility'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling article visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_changing_visibility'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Вспомогательный метод для обновления статьи во всех списках
+  void _updateArticleInLists(Article updatedArticle) {
+    // Ищем и обновляем статью в каждом списке
+    final articleIndex = articles.indexWhere((a) => a.id == updatedArticle.id);
+    if (articleIndex != -1) {
+      articles[articleIndex] = updatedArticle;
+    }
+
+    final lifehackIndex = lifehacks.indexWhere((a) => a.id == updatedArticle.id);
+    if (lifehackIndex != -1) {
+      lifehacks[lifehackIndex] = updatedArticle;
+    }
+
+    final guideIndex = guides.indexWhere((a) => a.id == updatedArticle.id);
+    if (guideIndex != -1) {
+      guides[guideIndex] = updatedArticle;
     }
   }
 
@@ -140,6 +208,21 @@ class ArticlesManagementScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('manage_articles'.tr),
           actions: [
+            // Кнопка для переключения отображения скрытых статей
+            Obx(() => IconButton(
+              icon: Icon(
+                controller.showHidden.value
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+                color: controller.showHidden.value
+                    ? Colors.blue
+                    : Colors.grey,
+              ),
+              tooltip: controller.showHidden.value
+                  ? 'hide_hidden_articles'.tr
+                  : 'show_hidden_articles'.tr,
+              onPressed: controller.toggleShowHidden,
+            )),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: controller.loadAllContent,
@@ -205,7 +288,9 @@ class ArticlesManagementScreen extends StatelessWidget {
                         Text(
                           controller.searchQuery.value.isNotEmpty
                               ? 'no_search_results'.tr
-                              : 'no_articles'.tr,
+                              : controller.showHidden.value
+                              ? 'no_articles'.tr
+                              : 'no_visible_articles'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -235,6 +320,10 @@ class ArticlesManagementScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
+      // Добавляем серый фон для скрытых статей
+      color: article.isHidden
+          ? Colors.grey.withOpacity(0.1)
+          : Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
           // Редактирование существующей статьи
@@ -255,23 +344,62 @@ class ArticlesManagementScreen extends StatelessWidget {
                 ),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: article.imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: article.imageUrl,
+                        fit: BoxFit.cover,
+                        // Делаем изображение более тусклым, если статья скрыта
+                        color: article.isHidden ? Colors.grey.withOpacity(0.7) : null,
+                        colorBlendMode: article.isHidden ? BlendMode.saturation : null,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, error, stackTrace) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
-                    ),
-                    errorWidget: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
-                    ),
+                      // Показываем индикатор скрытой статьи
+                      if (article.isHidden)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.visibility_off,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'hidden'.tr,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -286,13 +414,19 @@ class ArticlesManagementScreen extends StatelessWidget {
                     article.titleKey.tr,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
+                      // Изменяем цвет текста для скрытых статей
+                      color: article.isHidden
+                          ? Colors.grey
+                          : Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     article.descriptionKey.tr,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
+                      color: article.isHidden
+                          ? Colors.grey
+                          : Colors.grey[600],
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -310,6 +444,16 @@ class ArticlesManagementScreen extends StatelessWidget {
                       const Spacer(),
 
                       // Кнопки действий
+                      // Кнопка переключения видимости
+                      IconButton(
+                        icon: Icon(
+                          article.isHidden ? Icons.visibility : Icons.visibility_off,
+                          color: article.isHidden ? Colors.blue : Colors.grey,
+                        ),
+                        onPressed: () => controller.toggleArticleVisibility(article),
+                        tooltip: article.isHidden ? 'show_article'.tr : 'hide_article'.tr,
+                      ),
+
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
@@ -319,6 +463,7 @@ class ArticlesManagementScreen extends StatelessWidget {
                           ));
                         },
                       ),
+
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {

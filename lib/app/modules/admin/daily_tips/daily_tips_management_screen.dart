@@ -12,6 +12,7 @@ class DailyTipsManagementController extends GetxController {
   final RxList<DailyTip> tips = <DailyTip>[].obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
+  final RxBool showHidden = false.obs; // Показывать ли скрытые советы
 
   @override
   void onInit() {
@@ -57,11 +58,24 @@ class DailyTipsManagementController extends GetxController {
   }
 
   Future<void> reorderTips(int oldIndex, int newIndex) async {
+    // Если старый индекс меньше нового, уменьшаем новый на 1
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
 
     try {
+      isLoading.value = true;
+
+      // 1. Сначала меняем порядок в локальном списке
+      final item = tips.removeAt(oldIndex);
+      tips.insert(newIndex, item);
+
+      // 2. Обновляем порядок (order) всех элементов в локальном списке
+      for (int i = 0; i < tips.length; i++) {
+        tips[i] = tips[i].copyWith(order: i);
+      }
+
+      // 3. После этого обновляем порядок в Firestore
       final success = await _tipsService.reorderTips(oldIndex, newIndex);
 
       if (!success) {
@@ -74,6 +88,7 @@ class DailyTipsManagementController extends GetxController {
         // В случае неудачи перезагружаем советы
         await loadTips();
       }
+
     } catch (e) {
       debugPrint('Error reordering tips: $e');
       Get.snackbar(
@@ -84,19 +99,77 @@ class DailyTipsManagementController extends GetxController {
 
       // В случае ошибки перезагружаем советы
       await loadTips();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Изменение видимости совета
+  Future<bool> toggleTipVisibility(DailyTip tip) async {
+    try {
+      isLoading.value = true;
+
+      // Создаем обновленный совет с измененной видимостью
+      final updatedTip = tip.copyWith(
+        isHidden: !tip.isHidden, // Инвертируем текущее значение
+      );
+
+      // Обновляем совет в сервисе
+      final success = await _tipsService.updateTip(updatedTip);
+
+      if (success) {
+        // Показываем уведомление об успехе
+        Get.snackbar(
+          'success'.tr,
+          tip.isHidden ? 'tip_shown'.tr : 'tip_hidden'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        // Показываем уведомление об ошибке
+        Get.snackbar(
+          'error'.tr,
+          'error_changing_visibility'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling tip visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_changing_visibility'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
   List<DailyTip> getFilteredTips() {
+    // Фильтруем советы по строке поиска
     final query = searchQuery.value.toLowerCase();
-    if (query.isEmpty) {
-      return tips;
+    List<DailyTip> filteredTips = tips;
+
+    if (query.isNotEmpty) {
+      filteredTips = filteredTips.where((tip) =>
+      tip.tip.toLowerCase().contains(query) ||
+          tip.icon.toLowerCase().contains(query)
+      ).toList();
     }
 
-    return tips.where((tip) =>
-    tip.tip.toLowerCase().contains(query) ||
-        tip.icon.toLowerCase().contains(query)
-    ).toList();
+    // Фильтруем по видимости, если не показываем скрытые
+    if (!showHidden.value) {
+      filteredTips = filteredTips.where((tip) => !tip.isHidden).toList();
+    }
+
+    return filteredTips;
+  }
+
+  // Переключение режима отображения скрытых советов
+  void toggleShowHidden() {
+    showHidden.value = !showHidden.value;
   }
 
   // Синхронизация локальных данных с Firestore
@@ -143,6 +216,21 @@ class DailyTipsManagementScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('manage_daily_tips'.tr),
         actions: [
+          // Кнопка для переключения отображения скрытых советов
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.showHidden.value
+                  ? Icons.visibility
+                  : Icons.visibility_off,
+              color: controller.showHidden.value
+                  ? Colors.blue
+                  : Colors.grey,
+            ),
+            tooltip: controller.showHidden.value
+                ? 'hide_hidden_tips'.tr
+                : 'show_hidden_tips'.tr,
+            onPressed: controller.toggleShowHidden,
+          )),
           IconButton(
             icon: const Icon(Icons.sync),
             tooltip: 'synchronize_with_firestore'.tr,
@@ -204,7 +292,9 @@ class DailyTipsManagementScreen extends StatelessWidget {
                       Text(
                         controller.searchQuery.value.isNotEmpty
                             ? 'no_search_results'.tr
-                            : 'no_tips'.tr,
+                            : controller.showHidden.value
+                            ? 'no_tips'.tr
+                            : 'no_visible_tips'.tr,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -236,6 +326,10 @@ class DailyTipsManagementScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
+      // Добавляем цвет фона для скрытых советов
+      color: tip.isHidden
+          ? Colors.grey.withOpacity(0.1)
+          : Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
           // Редактирование совета
@@ -255,7 +349,9 @@ class DailyTipsManagementScreen extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.pink.withAlpha(25),
+                  color: tip.isHidden
+                      ? Colors.grey.withAlpha(25)
+                      : Colors.pink.withAlpha(25),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
@@ -272,11 +368,27 @@ class DailyTipsManagementScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      tip.tip.tr,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            tip.tip.tr,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              // Уменьшаем яркость текста для скрытых элементов
+                              color: tip.isHidden
+                                  ? Colors.grey
+                                  : Theme.of(context).textTheme.titleMedium?.color,
+                            ),
+                          ),
+                        ),
+                        if (tip.isHidden)
+                          Icon(
+                            Icons.visibility_off,
+                            size: 16,
+                            color: Colors.grey[400],
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -301,6 +413,16 @@ class DailyTipsManagementScreen extends StatelessWidget {
               // Кнопки действий
               Column(
                 children: [
+                  // Кнопка переключения видимости
+                  IconButton(
+                    icon: Icon(
+                      tip.isHidden ? Icons.visibility : Icons.visibility_off,
+                      color: tip.isHidden ? Colors.blue : Colors.grey,
+                    ),
+                    onPressed: () => controller.toggleTipVisibility(tip),
+                    tooltip: tip.isHidden ? 'show_tip'.tr : 'hide_tip'.tr,
+                  ),
+
                   // Кнопка редактирования
                   IconButton(
                     icon: const Icon(Icons.edit),

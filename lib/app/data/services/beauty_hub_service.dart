@@ -10,14 +10,21 @@ class BeautyHubService extends GetxService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final StorageService _storageService = Get.find<StorageService>();
 
-  // Получение всех статей
-  static Future<List<Article>> getArticles() async {
+  // Получение всех видимых статей
+  static Future<List<Article>> getArticles({bool includeHidden = false}) async {
     try {
-      // Обновленный запрос для получения только статей типа 'article'
-      final articlesSnapshot = await FirebaseFirestore.instance
-          .collection('articles')
-          .where('type', isEqualTo: 'article')
-          .get();
+      // Создаем базовый запрос для коллекции articles
+      var articlesRef = FirebaseFirestore.instance.collection('articles');
+
+      // Создаем запрос для получения статей типа 'article'
+      Query<Map<String, dynamic>> query = articlesRef.where('type', isEqualTo: 'article');
+
+      // Если не нужно включать скрытые статьи, добавляем фильтр
+      if (!includeHidden) {
+        query = query.where('isHidden', isEqualTo: false);
+      }
+
+      final articlesSnapshot = await query.get();
 
       // Сортировка выполняется на стороне клиента
       final articles = _processArticles(articlesSnapshot);
@@ -31,13 +38,20 @@ class BeautyHubService extends GetxService {
   }
 
   // Получение лайфхаков
-  static Future<List<Article>> getLifehacks() async {
+  static Future<List<Article>> getLifehacks({bool includeHidden = false}) async {
     try {
-      // Обновленный запрос для получения только статей типа 'lifehack'
-      final articlesSnapshot = await FirebaseFirestore.instance
-          .collection('articles')
-          .where('type', isEqualTo: 'lifehack')
-          .get();
+      // Создаем базовый запрос для коллекции articles
+      var articlesRef = FirebaseFirestore.instance.collection('articles');
+
+      // Создаем запрос для получения статей типа 'lifehack'
+      Query<Map<String, dynamic>> query = articlesRef.where('type', isEqualTo: 'lifehack');
+
+      // Если не нужно включать скрытые статьи, добавляем фильтр
+      if (!includeHidden) {
+        query = query.where('isHidden', isEqualTo: false);
+      }
+
+      final articlesSnapshot = await query.get();
 
       // Сортировка выполняется на стороне клиента
       final lifehacks = _processArticles(articlesSnapshot);
@@ -51,13 +65,20 @@ class BeautyHubService extends GetxService {
   }
 
   // Получение гайдов
-  static Future<List<Article>> getGuides() async {
+  static Future<List<Article>> getGuides({bool includeHidden = false}) async {
     try {
-      // Обновленный запрос для получения только статей типа 'guide'
-      final articlesSnapshot = await FirebaseFirestore.instance
-          .collection('articles')
-          .where('type', isEqualTo: 'guide')
-          .get();
+      // Создаем базовый запрос для коллекции articles
+      var articlesRef = FirebaseFirestore.instance.collection('articles');
+
+      // Создаем запрос для получения статей типа 'guide'
+      Query<Map<String, dynamic>> query = articlesRef.where('type', isEqualTo: 'guide');
+
+      // Если не нужно включать скрытые статьи, добавляем фильтр
+      if (!includeHidden) {
+        query = query.where('isHidden', isEqualTo: false);
+      }
+
+      final articlesSnapshot = await query.get();
 
       // Сортировка выполняется на стороне клиента
       final guides = _processArticles(articlesSnapshot);
@@ -92,6 +113,7 @@ class BeautyHubService extends GetxService {
               : DateTime.now(),
           authorNameKey: data['authorName'] ?? data['authorNameKey'] ?? '',
           authorAvatarUrl: data['authorAvatarUrl'] ?? '',
+          isHidden: data['isHidden'] ?? false, // Добавляем поле видимости
         ));
       } catch (e) {
         debugPrint('Error processing article document: $e');
@@ -110,6 +132,7 @@ class BeautyHubService extends GetxService {
     required String authorName,
     required String authorAvatarUrl,
     required String type,
+    bool isHidden = false, // Добавляем параметр видимости
   }) async {
     try {
       await _firestore.collection('articles').add({
@@ -122,6 +145,7 @@ class BeautyHubService extends GetxService {
         'authorAvatarUrl': authorAvatarUrl,
         'type': type, // Обязательно указываем тип статьи
         'createdAt': FieldValue.serverTimestamp(),
+        'isHidden': isHidden, // Добавляем поле видимости
       });
 
       return true;
@@ -158,6 +182,7 @@ class BeautyHubService extends GetxService {
             : DateTime.now(),
         authorNameKey: data['authorName'] ?? data['authorNameKey'] ?? '',
         authorAvatarUrl: data['authorAvatarUrl'] ?? '',
+        isHidden: data['isHidden'] ?? false, // Добавляем поле видимости
       );
     } catch (e) {
       debugPrint('Error getting article by ID: $e');
@@ -187,12 +212,37 @@ class BeautyHubService extends GetxService {
     }
   }
 
-  // Поиск статей
-  static Future<List<Article>> searchArticles(String query) async {
+  // Переключение видимости статьи
+  static Future<bool> toggleArticleVisibility(String articleId, bool currentVisibility) async {
     try {
-      final articlesSnapshot = await FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('articles')
-          .get();
+          .doc(articleId)
+          .update({'isHidden': !currentVisibility});
+      return true;
+    } catch (e) {
+      debugPrint('Error toggling article visibility: $e');
+      return false;
+    }
+  }
+
+  // Поиск статей
+  static Future<List<Article>> searchArticles(String query, {bool includeHidden = false}) async {
+    try {
+      // Получаем ссылку на коллекцию
+      CollectionReference<Map<String, dynamic>> articlesRef =
+      FirebaseFirestore.instance.collection('articles');
+
+      // Выполняем запрос к Firestore
+      QuerySnapshot<Map<String, dynamic>> articlesSnapshot;
+
+      if (includeHidden) {
+        // Если нужно включать скрытые - запрашиваем все документы
+        articlesSnapshot = await articlesRef.get();
+      } else {
+        // Иначе только те, которые не скрыты
+        articlesSnapshot = await articlesRef.where('isHidden', isEqualTo: false).get();
+      }
 
       List<Article> allArticles = _processArticles(articlesSnapshot);
 

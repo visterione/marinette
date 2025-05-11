@@ -5,12 +5,14 @@ class DailyTip {
   final String tip;
   final String icon;
   final int order;
+  final bool isHidden;  // Добавляем флаг видимости
 
   DailyTip({
     required this.id,
     required this.tip,
     this.icon = '💡',
     this.order = 0,
+    this.isHidden = false,  // По умолчанию элемент видимый
   });
 
   // Конвертация в Map для Firestore
@@ -19,6 +21,7 @@ class DailyTip {
       'tip': tip,
       'icon': icon,
       'order': order,
+      'isHidden': isHidden,  // Добавляем поле в Firestore
     };
   }
 
@@ -29,6 +32,7 @@ class DailyTip {
       tip: data['tip'] ?? '',
       icon: data['icon'] ?? '💡',
       order: data['order'] ?? 0,
+      isHidden: data['isHidden'] ?? false,  // Получаем значение из Firestore
     );
   }
 
@@ -37,12 +41,14 @@ class DailyTip {
     String? tip,
     String? icon,
     int? order,
+    bool? isHidden,  // Добавляем параметр в copyWith
   }) {
     return DailyTip(
       id: this.id,
       tip: tip ?? this.tip,
       icon: icon ?? this.icon,
       order: order ?? this.order,
+      isHidden: isHidden ?? this.isHidden,  // Обновляем поле
     );
   }
 }

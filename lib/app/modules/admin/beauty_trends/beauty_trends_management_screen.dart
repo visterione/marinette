@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:marinette/app/data/models/beauty_trend.dart';
 import 'package:marinette/app/data/services/beauty_trends_service.dart';
 import 'package:reorderables/reorderables.dart';
+import 'package:marinette/app/modules/admin/beauty_trends/trend_edit_screen.dart';
 
 class BeautyTrendsManagementController extends GetxController {
   final BeautyTrendsService _trendsService = Get.find<BeautyTrendsService>();
@@ -13,6 +14,7 @@ class BeautyTrendsManagementController extends GetxController {
   final RxList<BeautyTrend> trends = <BeautyTrend>[].obs;
   final RxBool isLoading = false.obs;
   final RxString selectedSeason = 'spring'.obs;
+  final RxBool showHidden = false.obs; // Показывать ли скрытые тренды
 
   // Form controllers
   final titleController = TextEditingController();
@@ -53,10 +55,60 @@ class BeautyTrendsManagementController extends GetxController {
     }
   }
 
-  // Get filtered trends by season
+  // Get filtered trends by season with visibility filter
   List<BeautyTrend> getFilteredTrends(String season) {
-    return trends.where((trend) => trend.season == season).toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    // Фильтруем по сезону
+    List<BeautyTrend> filteredTrends = trends.where((trend) => trend.season == season).toList();
+
+    // Если не показываем скрытые, фильтруем их
+    if (!showHidden.value) {
+      filteredTrends = filteredTrends.where((trend) => !trend.isHidden).toList();
+    }
+
+    // Сортируем по порядку
+    filteredTrends.sort((a, b) => a.order.compareTo(b.order));
+
+    return filteredTrends;
+  }
+
+  // Переключение режима отображения скрытых трендов
+  void toggleShowHidden() {
+    showHidden.value = !showHidden.value;
+  }
+
+  // Переключение видимости тренда
+  Future<bool> toggleTrendVisibility(BeautyTrend trend) async {
+    try {
+      isLoading.value = true;
+
+      final success = await _trendsService.toggleTrendVisibility(trend);
+
+      if (success) {
+        Get.snackbar(
+          'success'.tr,
+          trend.isHidden ? 'trend_shown'.tr : 'trend_hidden'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          'error_changing_visibility'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('Error toggling trend visibility: $e');
+      Get.snackbar(
+        'error'.tr,
+        'error_changing_visibility'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // Add a new trend
@@ -199,45 +251,61 @@ class BeautyTrendsManagementController extends GetxController {
 
   // Reorder trends within a season
   Future<bool> reorderTrends(int oldIndex, int newIndex, String season) async {
-    // Get filtered trends by season
-    final filteredTrends = getFilteredTrends(season);
-
-    // Map to global indices
-    final trendToMove = filteredTrends[oldIndex];
-    final globalOldIndex = trends.indexWhere((t) => t.id == trendToMove.id);
-
-    // Calculate global new index
-    int globalNewIndex;
-    if (oldIndex < newIndex) {
-      // Moving down
-      final targetTrend = filteredTrends[newIndex - 1];
-      globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id) + 1;
-    } else {
-      // Moving up
-      final targetTrend = filteredTrends[newIndex];
-      globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id);
-    }
-
-    isLoading.value = true;
     try {
-      final success = await _trendsService.reorderTrends(globalOldIndex, globalNewIndex);
+      isLoading.value = true;
 
-      if (!success) {
-        Get.snackbar(
-          'error'.tr,
-          'error_reordering_trends'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+      // Получаем отфильтрованные тренды для выбранного сезона
+      final filteredTrends = getFilteredTrends(season);
+
+      // Если старый индекс меньше нового, уменьшаем новый на 1
+      // Это связано с тем, как ReorderableListView обрабатывает индексы
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
       }
 
-      return success;
+      // Получаем перемещаемый тренд
+      final trendToMove = filteredTrends[oldIndex];
+
+      // Находим глобальные индексы (в полном списке трендов)
+      final globalOldIndex = trends.indexWhere((t) => t.id == trendToMove.id);
+      int globalNewIndex;
+
+      if (newIndex >= filteredTrends.length) {
+        // Защита от выхода за границы
+        newIndex = filteredTrends.length - 1;
+      }
+
+      if (oldIndex < newIndex) {
+        // Перемещение вниз
+        final targetTrend = filteredTrends[newIndex];
+        globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id) + 1;
+        if (globalNewIndex > trends.length) globalNewIndex = trends.length;
+      } else {
+        // Перемещение вверх
+        final targetTrend = filteredTrends[newIndex];
+        globalNewIndex = trends.indexWhere((t) => t.id == targetTrend.id);
+      }
+
+      // Перемещаем элемент в локальном списке
+      final item = trends.removeAt(globalOldIndex);
+      trends.insert(globalNewIndex, item);
+
+      // Обновляем порядок всех элементов локально
+      for (int i = 0; i < trends.length; i++) {
+        trends[i] = trends[i].copyWith(order: i);
+      }
+
+      // Обновляем в Firestore
+      final trendIds = trends.map((t) => t.id).toList();
+      for (int i = 0; i < trends.length; i++) {
+        await _trendsService.updateTrend(trends[i]);
+      }
+
+      return true;
     } catch (e) {
       debugPrint('Error reordering beauty trends: $e');
-      Get.snackbar(
-        'error'.tr,
-        'error_reordering_trends'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // В случае ошибки перезагружаем данные
+      await loadTrends();
       return false;
     } finally {
       isLoading.value = false;
@@ -506,6 +574,21 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('manage_beauty_trends'.tr),
         actions: [
+          // Кнопка для переключения отображения скрытых трендов
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.showHidden.value
+                  ? Icons.visibility
+                  : Icons.visibility_off,
+              color: controller.showHidden.value
+                  ? Colors.blue
+                  : Colors.grey,
+            ),
+            tooltip: controller.showHidden.value
+                ? 'hide_hidden_trends'.tr
+                : 'show_hidden_trends'.tr,
+            onPressed: controller.toggleShowHidden,
+          )),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: controller.loadTrends,
@@ -565,7 +648,9 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'no_trends_for_season'.trParams({'season': season.tr}),
+                              controller.showHidden.value
+                                  ? 'no_trends_for_season'.trParams({'season': season.tr})
+                                  : 'no_visible_trends_for_season'.trParams({'season': season.tr}),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -606,25 +691,69 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
     return Card(
       key: Key(trend.id),
       margin: const EdgeInsets.only(bottom: 8),
+      // Добавляем цвет фона для скрытых трендов
+      color: trend.isHidden
+          ? Colors.grey.withOpacity(0.1)
+          : Theme.of(context).cardColor,
       child: ListTile(
-        title: Text(trend.title.tr), // Translation key
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                trend.title.tr,
+                style: TextStyle(
+                  // Изменяем стиль для скрытых трендов
+                  color: trend.isHidden
+                      ? Colors.grey
+                      : Theme.of(context).textTheme.titleMedium?.color,
+                ),
+              ),
+            ),
+            if (trend.isHidden)
+              Icon(
+                Icons.visibility_off,
+                size: 16,
+                color: Colors.grey[400],
+              ),
+          ],
+        ),
         subtitle: Text(
           trend.description.tr, // Translation key
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            // Изменяем стиль для скрытых трендов
+            color: trend.isHidden
+                ? Colors.grey
+                : Colors.grey[600],
+          ),
         ),
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.pink.withAlpha(30),
+            color: trend.isHidden
+                ? Colors.grey.withAlpha(30)
+                : Colors.pink.withAlpha(30),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Icon(Icons.trending_up, color: Colors.pink),
+          child: Icon(
+              Icons.trending_up,
+              color: trend.isHidden ? Colors.grey : Colors.pink
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Кнопка для переключения видимости
+            IconButton(
+              icon: Icon(
+                trend.isHidden ? Icons.visibility : Icons.visibility_off,
+                color: trend.isHidden ? Colors.blue : Colors.grey,
+              ),
+              onPressed: () => controller.toggleTrendVisibility(trend),
+              tooltip: trend.isHidden ? 'show_trend'.tr : 'hide_trend'.tr,
+            ),
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => controller.showEditTrendDialog(trend),

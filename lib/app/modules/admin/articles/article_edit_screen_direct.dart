@@ -22,6 +22,7 @@ class ArticleModel {
   final String authorName;
   final String authorAvatarUrl;
   final String type;
+  final bool isHidden; // Добавляем флаг видимости
 
   ArticleModel({
     required this.id,
@@ -33,6 +34,7 @@ class ArticleModel {
     required this.authorName,
     required this.authorAvatarUrl,
     required this.type,
+    this.isHidden = false, // По умолчанию статья видимая
   });
 
   // Создаем ключи на основе ID или UUID
@@ -52,6 +54,7 @@ class ArticleModel {
       'authorAvatarUrl': authorAvatarUrl,
       'type': type, // 'article', 'lifehack', или 'guide'
       'publishedAt': publishedAt,
+      'isHidden': isHidden, // Добавляем поле видимости
     };
   }
 
@@ -67,6 +70,33 @@ class ArticleModel {
       authorName: article.authorNameKey,
       authorAvatarUrl: article.authorAvatarUrl,
       type: type,
+      isHidden: article.isHidden, // Копируем значение флага
+    );
+  }
+
+  // Создание копии с измененными параметрами
+  ArticleModel copyWith({
+    String? title,
+    String? description,
+    String? content,
+    String? imageUrl,
+    DateTime? publishedAt,
+    String? authorName,
+    String? authorAvatarUrl,
+    String? type,
+    bool? isHidden,
+  }) {
+    return ArticleModel(
+      id: this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      content: content ?? this.content,
+      imageUrl: imageUrl ?? this.imageUrl,
+      publishedAt: publishedAt ?? this.publishedAt,
+      authorName: authorName ?? this.authorName,
+      authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
+      type: type ?? this.type,
+      isHidden: isHidden ?? this.isHidden,
     );
   }
 }
@@ -92,6 +122,7 @@ class ArticleEditDirectController extends GetxController {
   final RxString imageUrl = ''.obs;
   final Rxn<File> imageFile = Rxn<File>();
   final RxString selectedType = 'article'.obs;
+  final RxBool isHidden = false.obs; // Добавляем флаг видимости как реактивную переменную
 
   // Определение списка доступных типов статей
   final List<Map<String, String>> articleTypes = [
@@ -119,6 +150,11 @@ class ArticleEditDirectController extends GetxController {
     contentController = TextEditingController(text: article != null ? article!.contentKey : '');
     authorNameController = TextEditingController(text: article != null ? article!.authorNameKey : 'Admin');
 
+    // Инициализация флага видимости
+    if (article != null) {
+      isHidden.value = article!.isHidden;
+    }
+
     // Инициализация типа статьи
     if (article != null) {
       // Определяем тип из существующей статьи
@@ -145,6 +181,11 @@ class ArticleEditDirectController extends GetxController {
     contentController.dispose();
     authorNameController.dispose();
     super.onClose();
+  }
+
+  // Переключение флага видимости
+  void toggleVisibility() {
+    isHidden.value = !isHidden.value;
   }
 
   // Выбор изображения
@@ -231,6 +272,7 @@ class ArticleEditDirectController extends GetxController {
         authorName: authorNameController.text,
         authorAvatarUrl: defaultAuthorAvatarUrl, // Используем фиксированный URL
         type: selectedType.value,
+        isHidden: isHidden.value, // Используем значение флага видимости
       );
 
       // Конвертируем в Map для Firestore
@@ -299,6 +341,15 @@ class ArticleEditDirectScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(article == null ? 'create_article'.tr : 'edit_article'.tr),
         actions: [
+          // Кнопка переключения видимости
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.isHidden.value ? Icons.visibility : Icons.visibility_off,
+              color: controller.isHidden.value ? Colors.blue : Colors.grey,
+            ),
+            tooltip: controller.isHidden.value ? 'show_article'.tr : 'hide_article'.tr,
+            onPressed: controller.toggleVisibility,
+          )),
           Obx(() => controller.isLoading.value
               ? Container(
             margin: const EdgeInsets.all(16),
@@ -331,6 +382,52 @@ class ArticleEditDirectScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _buildArticleTypeSelector(controller),
+            const SizedBox(height: 24),
+
+            // Статус видимости
+            Obx(() => Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: controller.isHidden.value
+                    ? Colors.grey.withOpacity(0.1)
+                    : Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    controller.isHidden.value
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: controller.isHidden.value
+                        ? Colors.grey
+                        : Colors.green,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    controller.isHidden.value
+                        ? 'article_hidden'.tr
+                        : 'article_visible'.tr,
+                    style: TextStyle(
+                      color: controller.isHidden.value
+                          ? Colors.grey
+                          : Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: controller.toggleVisibility,
+                    child: Text(
+                      controller.isHidden.value
+                          ? 'make_visible'.tr
+                          : 'make_hidden'.tr,
+                    ),
+                  ),
+                ],
+              ),
+            )),
             const SizedBox(height: 24),
 
             // Основные поля
@@ -458,24 +555,63 @@ class ArticleEditDirectScreen extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: CachedNetworkImage(
-                      imageUrl: controller.imageUrl.value,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: controller.imageUrl.value,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          // Делаем изображение более тусклым, если статья скрыта
+                          color: controller.isHidden.value ? Colors.grey.withOpacity(0.7) : null,
+                          colorBlendMode: controller.isHidden.value ? BlendMode.saturation : null,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: Colors.grey,
-                        ),
-                      ),
+                        // Показываем индикатор скрытой статьи если нужно
+                        if (controller.isHidden.value)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.visibility_off,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'hidden'.tr,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   Padding(

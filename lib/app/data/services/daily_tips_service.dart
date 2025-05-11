@@ -157,19 +157,25 @@ class DailyTipsService extends GetxService {
         newIndex -= 1;
       }
 
+      // Перемещаем элемент в локальном списке
       final item = tips.removeAt(oldIndex);
       tips.insert(newIndex, item);
+
+      // Создаем batch для групповых операций
+      final batch = _firestore.batch();
 
       // Обновляем порядок всех элементов
       for (int i = 0; i < tips.length; i++) {
         final tip = tips[i].copyWith(order: i);
         tips[i] = tip;
 
-        await _firestore
-            .collection(collectionName)
-            .doc(tip.id)
-            .update({'order': i});
+        // Добавляем обновление в batch
+        final docRef = _firestore.collection(collectionName).doc(tip.id);
+        batch.update(docRef, {'order': i});
       }
+
+      // Выполняем все обновления за одну операцию
+      await batch.commit();
 
       return true;
     } catch (e) {
@@ -205,7 +211,8 @@ class DailyTipsService extends GetxService {
             id: docRef.id,
             tip: tip.tip,
             icon: tip.icon,
-            order: i
+            order: i,
+            isHidden: tip.isHidden
         );
       }
 
@@ -224,9 +231,16 @@ class DailyTipsService extends GetxService {
       return DailyTip(id: 'default', tip: 'stay_hydrated', icon: '💧');
     }
 
+    // Получаем только видимые советы
+    final visibleTips = tips.where((tip) => !tip.isHidden).toList();
+
+    if (visibleTips.isEmpty) {
+      return DailyTip(id: 'default', tip: 'stay_hydrated', icon: '💧');
+    }
+
     final dayOfYear =
         DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
-    final tipIndex = dayOfYear % tips.length;
-    return tips[tipIndex];
+    final tipIndex = dayOfYear % visibleTips.length;
+    return visibleTips[tipIndex];
   }
 }

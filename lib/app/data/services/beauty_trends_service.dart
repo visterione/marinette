@@ -147,6 +147,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
+        isHidden: false, // По умолчанию новый тренд видимый
       );
 
       final docRef = await _firestore
@@ -160,6 +161,7 @@ class BeautyTrendsService extends GetxService {
         description: description,
         season: season,
         order: nextOrder,
+        isHidden: false,
       ));
 
       // Сортируем по порядку
@@ -233,19 +235,24 @@ class BeautyTrendsService extends GetxService {
         newIndex -= 1;
       }
 
+      // Перемещаем элемент в локальном списке
       final item = trends.removeAt(oldIndex);
       trends.insert(newIndex, item);
 
       // Обновляем порядок всех элементов
+      final batch = _firestore.batch();
+
       for (int i = 0; i < trends.length; i++) {
         final trend = trends[i].copyWith(order: i);
         trends[i] = trend;
 
-        await _firestore
-            .collection(collectionName)
-            .doc(trend.id)
-            .update({'order': i});
+        // Используем batch для обновления данных в Firestore
+        final docRef = _firestore.collection(collectionName).doc(trend.id);
+        batch.update(docRef, {'order': i});
       }
+
+      // Применяем все изменения за один раз
+      await batch.commit();
 
       return true;
     } catch (e) {
@@ -258,6 +265,36 @@ class BeautyTrendsService extends GetxService {
     }
   }
 
+  // Переключение видимости тренда
+  Future<bool> toggleTrendVisibility(BeautyTrend trend) async {
+    try {
+      isLoading.value = true;
+
+      // Создаем обновленный тренд с инвертированной видимостью
+      final updatedTrend = trend.copyWith(isHidden: !trend.isHidden);
+
+      // Обновляем в Firestore
+      await _firestore
+          .collection(collectionName)
+          .doc(trend.id)
+          .update({'isHidden': updatedTrend.isHidden});
+
+      // Обновляем в локальном списке
+      final index = trends.indexWhere((t) => t.id == trend.id);
+      if (index != -1) {
+        trends[index] = updatedTrend;
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Error toggling trend visibility: $e');
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Получение трендов текущего сезона (только видимые)
   List<BeautyTrend> getCurrentSeasonTrends() {
     final currentMonth = DateTime.now().month;
     String season;
@@ -272,7 +309,10 @@ class BeautyTrendsService extends GetxService {
       season = 'winter';
     }
 
-    return trends.where((trend) => trend.season == season).toList();
+    // Возвращаем только видимые тренды текущего сезона
+    return trends
+        .where((trend) => trend.season == season && !trend.isHidden)
+        .toList();
   }
 
   // Синхронизация локальных данных с Firestore
@@ -299,7 +339,8 @@ class BeautyTrendsService extends GetxService {
             title: trend.title,
             description: trend.description,
             season: trend.season,
-            order: i
+            order: i,
+            isHidden: trend.isHidden
         );
       }
 
