@@ -289,167 +289,153 @@ class DailyTipsManagementScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: InkWell(
-        onTap: () {
-          // Редактирование совета
-          Get.to(() => TipEditScreen(
-            tip: tip,
-            onSave: () => controller.loadTips(),
-          ));
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Иконка совета
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.pink.withAlpha(25),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        tip.icon,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Иконка совета
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.pink.withAlpha(25),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      tip.icon,
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                ),
+                const SizedBox(width: 16),
 
-                  // Содержимое совета
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          tip.tip.tr,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            // Меняем цвет текста для скрытых советов
-                            color: tip.isVisible ? null : Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${'position'.tr}: ${index + 1}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: tip.isVisible ? Colors.grey[600] : Colors.grey[400],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${'id'.tr}: ${tip.id}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: tip.isVisible ? Colors.grey[600] : Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Action buttons
-                  Column(
+                // Содержимое совета
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Кнопка переключения видимости
-                      IconButton(
-                        icon: Icon(
-                          tip.isVisible ? Icons.visibility : Icons.visibility_off,
-                          color: tip.isVisible ? Colors.green : Colors.grey,
+                      Text(
+                        tip.tip.tr,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          // Меняем цвет текста для скрытых советов
+                          color: tip.isVisible ? null : Colors.grey,
                         ),
-                        onPressed: () => controller.toggleTipVisibility(tip),
-                        tooltip: tip.isVisible ? 'hide_tip'.tr : 'show_tip'.tr,
                       ),
-
-                      // Edit button
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          Get.to(() => TipEditScreen(
-                            tip: tip,
-                            onSave: () => controller.loadTips(),
-                          ));
-                        },
+                      const SizedBox(height: 4),
+                      Text(
+                        '${'position'.tr}: ${index + 1}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: tip.isVisible ? Colors.grey[600] : Colors.grey[400],
+                        ),
                       ),
-
-                      // Delete button
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          // Диалог подтверждения удаления
-                          Get.dialog(
-                            AlertDialog(
-                              title: Text('confirm_delete'.tr),
-                              content: Text('confirm_delete_tip'.tr),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Get.back(),
-                                  child: Text('cancel'.tr),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Get.back();
-                                    controller.deleteTip(tip.id);
-                                  },
-                                  child: Text(
-                                    'delete'.tr,
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                      const SizedBox(height: 4),
+                      Text(
+                        '${'id'.tr}: ${tip.id}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: tip.isVisible ? Colors.grey[600] : Colors.grey[400],
+                        ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-            // Метка для скрытых советов
-            if (!tip.isVisible)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'hidden'.tr,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                // Action buttons
+                Column(
+                  children: [
+                    // Кнопка переключения видимости
+                    IconButton(
+                      icon: Icon(
+                        tip.isVisible ? Icons.visibility : Icons.visibility_off,
+                        color: tip.isVisible ? Colors.green : Colors.grey,
+                      ),
+                      onPressed: () => controller.toggleTipVisibility(tip),
+                      tooltip: tip.isVisible ? 'hide_tip'.tr : 'show_tip'.tr,
                     ),
+
+                    // Edit button
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        Get.to(() => TipEditScreen(
+                          tip: tip,
+                          onSave: () => controller.loadTips(),
+                        ));
+                      },
+                    ),
+
+                    // Delete button
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        // Диалог подтверждения удаления
+                        Get.dialog(
+                          AlertDialog(
+                            title: Text('confirm_delete'.tr),
+                            content: Text('confirm_delete_tip'.tr),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Get.back(),
+                                child: Text('cancel'.tr),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                  controller.deleteTip(tip.id);
+                                },
+                                child: Text(
+                                  'delete'.tr,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    // Drag handle icon - now aligned with other action buttons
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: Icon(
+                        Icons.drag_handle,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Метка для скрытых советов
+          if (!tip.isVisible)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'hidden'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-
-            // Иконка для перетаскивания с ReorderableDragStartListener
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: ReorderableDragStartListener(
-                index: index,
-                child: Icon(
-                  Icons.drag_handle,
-                  color: Colors.grey[400],
-                ),
-              ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

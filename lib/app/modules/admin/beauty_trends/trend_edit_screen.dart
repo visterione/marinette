@@ -207,16 +207,6 @@ class TrendEditScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(trend == null ? 'create_trend'.tr : 'edit_trend'.tr),
         actions: [
-          // Visibility toggle button
-          Obx(() => IconButton(
-            icon: Icon(
-              controller.isVisible.value ? Icons.visibility : Icons.visibility_off,
-              color: controller.isVisible.value ? Colors.green : Colors.grey,
-            ),
-            onPressed: controller.toggleVisibility,
-            tooltip: controller.isVisible.value ? 'hide_trend'.tr : 'show_trend'.tr,
-          )),
-
           // Loading indicator or save button
           Obx(() => controller.isLoading.value
               ? Container(
@@ -246,6 +236,33 @@ class TrendEditScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Obx(() => _buildSeasonSelector(controller)),
+            const SizedBox(height: 24),
+
+            // Visibility toggle
+            Row(
+              children: [
+                Text(
+                  'visibility'.tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Obx(() => Switch(
+                  value: controller.isVisible.value,
+                  onChanged: (value) {
+                    controller.isVisible.value = value;
+                  },
+                  activeColor: Colors.green,
+                )),
+                Text(
+                  controller.isVisible.value ? 'visible'.tr : 'hidden'.tr,
+                  style: TextStyle(
+                    color: controller.isVisible.value ? Colors.green : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // Поле заголовка

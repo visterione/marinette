@@ -687,15 +687,7 @@ class BeautyTrendsManagementScreen extends StatelessWidget {
                 color: trend.isVisible ? Colors.grey[600] : Colors.grey[400],
               ),
             ),
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.pink.withAlpha(30),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.trending_up, color: Colors.pink),
-            ),
+            // Removed pink icon container
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
